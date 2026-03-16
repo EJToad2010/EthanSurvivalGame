@@ -1,0 +1,9 @@
+INFORMATION ABOUT THIS PROJECT:
+Open the Ethan's Survival Game folder inside VSCodium or it will not work
+Run the project from Main.java or it will not work
+
+I got a bit carried away making this game and I worked on it during classes after finishing work and whenenver I had time
+I had to look up specific features such as the protected access modifier and Thread.sleep() but I did not use AI to generate code
+
+This was mostly coded on codiva.io until I realized that the online compiler repeatedly stopped the project automatically.
+I copy pasted everything into VSCodium
