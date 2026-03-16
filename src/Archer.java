@@ -1,5 +1,3 @@
-#asdfasdfasdf
-
 package src;
 class Archer extends PlayerCharacter {
   public Archer(String name){
