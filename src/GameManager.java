@@ -120,12 +120,7 @@ class GameManager {
   
   // Set up the characters in Player and Enemy before gameplay starts
   private void initialize() throws InterruptedException{
-    if(skipTutorial && dayNum == 1){
-      playerTeam.addCharacter(new Knight("Ethan"));
-      playerTeam.addCharacter(new Archer("Jung"));
-    } else{
-      initializePlayer();
-    }
+    initializePlayer();
     initializeEnemy();
   }
   
@@ -147,9 +142,10 @@ class GameManager {
       String message = "Choose a class for your character:\n";
       message += "1: Knight\n";
       message += "2: Archer\n";
-      message += "3: HELP";
-      int classInput = GameManager.obtainInput(message, 1, 3, false);
-      if(classInput == 3){
+      message += "3: Wizard\n";
+      message += "4: HELP";
+      int classInput = GameManager.obtainInput(message, 1, 4, false);
+      if(classInput == 4){
         System.out.println("\nKNIGHT:");
         printCharacterInfo(new Knight("Knight"), false);
         Thread.sleep(1000);
@@ -159,6 +155,7 @@ class GameManager {
         Thread.sleep(1000);
         anythingToContinue();
         System.out.println("\nWIZARD:");
+        printCharacterInfo(new Wizard("Wizard"), false);
         Thread.sleep(1000);
         anythingToContinue();
         System.out.println("\nHEALER:");
@@ -171,6 +168,8 @@ class GameManager {
         System.out.println("Selected class: Knight");
       } else if(classInput == 2){
         System.out.println("Selected class: Archer");
+      } else if(classInput == 3){
+        System.out.println("Selected class: Wizard");
       }
       System.out.print("Provide a name for your character: >>> ");
       String name = s.nextLine();
@@ -179,6 +178,8 @@ class GameManager {
         playerTeam.addCharacter(new Knight(name));
       } else if(classInput == 2){
         playerTeam.addCharacter(new Archer(name));
+      } else if(classInput == 3){
+        playerTeam.addCharacter(new Wizard(name));
       }
       System.out.println(playerTeam);
       Thread.sleep(1000);

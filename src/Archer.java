@@ -10,14 +10,14 @@ class Archer extends PlayerCharacter {
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 2});
-    addToArrayList(getSpecialAbilityNames(), new String[]{"Volley", "Explosive Arrow"});
-    addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Fires an arrow at every enemy, dealing moderate damage. Each enemy has a 10% chance of being burned for 2 turns.",
-                                                               "Deals high single target damage to one unit, as well as reduced splash damage on other enemies."});
+    addToArrayList(getSpecialAbilityNames(), new String[]{"Volley", "Crippling Arrow"});
+    addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Fires an arrow at every enemy, dealing moderate damage. Each enemy has a 10% chance of being burned for 1 turn.",
+                                                               "Deals moderate damage to a single target. The target has a 50% chance of being slowed for 2 turns."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
-    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 4});
-    addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 4});
+    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 2});
+    addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 2});
   }
   
   // Overrided getType method
@@ -35,8 +35,8 @@ class Archer extends PlayerCharacter {
       }
       System.out.println(target.getSimpleOutput());
     } else if(basicAbilityIndex == 1){
-      System.out.println(getName() + " cautiously swung his sword at " + target.getName() + " for " + (getAttackStrength() - 10) + " HP!");
-      handleEnemyDefense(target, getAttackStrength() - 10);
+      System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + (getAttackStrength() - 5) + " HP!");
+      handleEnemyDefense(target, getAttackStrength() - 5);
       System.out.println(target.getSimpleOutput());
     }
   }
@@ -47,19 +47,19 @@ class Archer extends PlayerCharacter {
       System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
       boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength());
       if((int)(Math.random() * 100) < 10 && wasEnemyHit){
-        StatusEffect.addStatusEffect(target, "Burn", 2);
+        StatusEffect.addStatusEffect(target, "Burn", 1);
       }
     } else if(specialAbilityIndex == 1){
-      System.out.println(getName() + " furiously attacked " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!");
-      handleEnemyDefense(target, (getAttackStrength() * 2));
-      System.out.println(getName() + "'s rage made him lose " + (getAttackStrength() * 0.5) + " HP!");
-      changeCurrentHP(-(getAttackStrength() * 0.5));
-      System.out.println(getSimpleOutput());
+      System.out.println(getName() + " fired a crippling arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!");
+      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength());
+      if((int)(Math.random() * 100) < 50 && wasEnemyHit){
+        StatusEffect.addStatusEffect(target, "Slow", 2);
+      }
     }
     System.out.println(target.getSimpleOutput());
   }
   
-  // Defense function which is called when an enemy targets the Knight
+  // Defense function which is called when an enemy targets the Archer
   public void defend(BasicCharacter target, double actualDamage){
     if(actualDamage == 0){
       System.out.println(getName() + " evaded " + target.getName() + "'s attack!");

@@ -3,9 +3,9 @@ import java.util.ArrayList;
 // Handles all status effects that both players and enemies experience
 class StatusEffect {
   // All types of status effects in the game
-  private static String[] effectTypes = new String[]{"Soft", "Bleed", "Poison", "Slow", "Stun", "Nimble", "Taunt"};
+  private static String[] effectTypes = new String[]{"Soft", "Bleed", "Poison", "Slow", "Stun", "Nimble", "Taunt", "Burn"};
   // How each status effect affects a target
-  private static String[] applyTypes = new String[]{"One-time", "Passive", "Passive", "One-time", "One-time", "Other", "Other"};
+  private static String[] applyTypes = new String[]{"One-time", "Passive", "Passive", "One-time", "One-time", "Other", "Other", "Passive"};
   
   private static ArrayList<BasicCharacter> affectedCharacters = new ArrayList<BasicCharacter>();
   private static ArrayList<String> affectedTypes = new ArrayList<String>();
@@ -65,7 +65,7 @@ class StatusEffect {
   
   private static void applyOneTimeEffect(BasicCharacter c, String type){
     if(type.equals("Slow")){
-      c.changeSpeed(-10);
+      c.changeSpeed(-15);
     } else if(type.equals("Soft")){
       c.changeAttackStrength(-10);
     }
@@ -73,7 +73,7 @@ class StatusEffect {
   
   private static void reverseOneTimeEffect(BasicCharacter c, String type){
     if(type.equals("Slow")){
-      c.changeSpeed(10);
+      c.changeSpeed(15);
     } else if(type.equals("Soft")){
       c.changeAttackStrength(10);
     }
@@ -85,6 +85,9 @@ class StatusEffect {
       c.changeCurrentHP(-5);
     } else if (type.equals("Bleed")){
       System.out.println(c.getName() + " lost 5 HP from bleeding!");
+      c.changeCurrentHP(-5);
+    } else if(type.equals("Burn")){
+      System.out.println(c.getName() + " lost 5 HP from burning!");
       c.changeCurrentHP(-5);
     }
     Thread.sleep(1000);

@@ -7,7 +7,7 @@ class Knight extends PlayerCharacter {
     setDescription("An offensive tank who can withstand the front lines of battle, at the cost of speed.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Sword Swing", "Cautious Attack"});
     addToArrayList(getBasicAbilityDescriptions(), new String[]{"A melee attack. The enemy counterattacks for a small amount of damage.",
-                                                             "Deals -10 damage from Sword Swing, but the enemy cannot counterattack."});
+                                                             "Deals less damage than Sword Swing, but the enemy cannot counterattack."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 1});
@@ -42,8 +42,8 @@ class Knight extends PlayerCharacter {
         System.out.println(getSimpleOutput());
       }
     } else if(basicAbilityIndex == 1){
-      System.out.println(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 10) + " HP!");
-      handleEnemyDefense(target, getAttackStrength() - 10);
+      System.out.println(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 5) + " HP!");
+      handleEnemyDefense(target, getAttackStrength() - 5);
       System.out.println(target.getSimpleOutput());
     }
   }
