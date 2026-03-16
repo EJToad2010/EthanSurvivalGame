@@ -74,9 +74,9 @@ class DartGoblin extends EnemyCharacter{
   public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
       System.out.println(getName() + " shot a poison dart at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      target.changeCurrentHP(-getAttackStrength());
+      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength());
       System.out.println(target.getSimpleOutput());
-      if((int)(Math.random() * 100) < 50){
+      if((int)(Math.random() * 100) < 50 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Poison", 2);
       }
     } else if(basicAbilityIndex == 1){

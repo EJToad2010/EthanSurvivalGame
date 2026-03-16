@@ -31,8 +31,8 @@ class Wizard extends PlayerCharacter {
   // Overrided battle methods
   public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
-      System.out.println(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()-10) + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, (getAttackStrength()-10));
+      System.out.println(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()-5) + " HP!");
+      boolean wasEnemyHit = handleEnemyDefense(target, (getAttackStrength()-5));
       if((int)(Math.random() * 100) < 10 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Stun", 1);
       }
@@ -69,13 +69,11 @@ class Wizard extends PlayerCharacter {
         Thread.sleep(1000);
         System.out.println(getName() + " casted the ancient spell at " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!");
         handleEnemyDefense(target, (getAttackStrength() * 2));
-        System.out.println(target.getSimpleOutput());
       } else{
         System.out.println("The spirits have rejected your call.");
         Thread.sleep(1000);
         System.out.println(getName() + " casted a weak spell at " + target.getName() + " for " + (getAttackStrength() / 2) + " HP.");
         handleEnemyDefense(target, (getAttackStrength() / 2));
-        System.out.println(target.getSimpleOutput());
       }
     }
     System.out.println(target.getSimpleOutput());
