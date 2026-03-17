@@ -30,7 +30,7 @@ class Archer extends PlayerCharacter {
     if(basicAbilityIndex == 0){
       // Softening Arrow
       System.out.println(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength());
+      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       if((int)(Math.random() * 100) < 25 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Soft", 2);
       }
@@ -38,7 +38,7 @@ class Archer extends PlayerCharacter {
     } else if(basicAbilityIndex == 1){
       // Double Shot
       System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + (getAttackStrength() - 5) + " HP!");
-      handleEnemyDefense(target, getAttackStrength() - 5);
+      handleEnemyDefense(target, getAttackStrength() - 5, playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
     }
   }
@@ -48,14 +48,14 @@ class Archer extends PlayerCharacter {
     if(specialAbilityIndex == 0){
       // Volley
       System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength());
+      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       if((int)(Math.random() * 100) < 10 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Burn", 1);
       }
     } else if(specialAbilityIndex == 1){
       // Crippling Arrow
       System.out.println(getName() + " fired a crippling arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength());
+      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       if((int)(Math.random() * 100) < 50 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Slow", 2);
       }

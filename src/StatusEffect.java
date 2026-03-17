@@ -41,7 +41,7 @@ class StatusEffect {
     System.out.println(c.getName() + " has gained [" + type.toUpperCase() + "] for " + totalTurns + " turns!");
     Thread.sleep(1000);
     if(indexOfType(type) == -1){
-      System.out.println("DEBUG: " + type + " was not found in effectTypes.");
+      // System.out.println("DEBUG: " + type + " was not found in effectTypes.");
       return;
     }
     // One-time effect apply immediately after a StatusEffect is added

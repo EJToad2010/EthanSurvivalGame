@@ -33,7 +33,7 @@ class Wizard extends PlayerCharacter {
     if(basicAbilityIndex == 0){
       // Magic Zap
       System.out.println(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()-5) + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, (getAttackStrength()-5));
+      boolean wasEnemyHit = handleEnemyDefense(target, (getAttackStrength()-5), playerTeam, enemyTeam);
       if((int)(Math.random() * 100) < 10 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Stun", 1);
       }
@@ -41,7 +41,7 @@ class Wizard extends PlayerCharacter {
     } else if(basicAbilityIndex == 1){
       // Electro Spirit
       System.out.println(getName() + "'s Electro Spirit zapped " + target.getName() + " for " + (getAttackStrength() - 15) + " HP!");
-      handleEnemyDefense(target, getAttackStrength() - 15);
+      handleEnemyDefense(target, getAttackStrength() - 15, playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
     }
   }
@@ -51,7 +51,7 @@ class Wizard extends PlayerCharacter {
     if(specialAbilityIndex == 0){
       // Fireball
       System.out.println(getName() + " launched a fireball at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength());
+      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       if((int)(Math.random() * 100) < 25 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Burn", 2);
       }
@@ -62,12 +62,12 @@ class Wizard extends PlayerCharacter {
         System.out.println("The spirits have answered your call!");
         Thread.sleep(1000);
         System.out.println(getName() + " casted the ancient spell at " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!");
-        handleEnemyDefense(target, (getAttackStrength() * 2));
+        handleEnemyDefense(target, (getAttackStrength() * 2), playerTeam, enemyTeam);
       } else{
         System.out.println("The spirits have rejected your call.");
         Thread.sleep(1000);
-        System.out.println(getName() + " casted a weak spell at " + target.getName() + " for " + (getAttackStrength() / 2) + " HP.");
-        handleEnemyDefense(target, (getAttackStrength() / 2));
+        System.out.println(getName() + " casted a weak spell at " + target.getName() + " for " + (getAttackStrength() * 0.75) + " HP.");
+        handleEnemyDefense(target, (getAttackStrength() * 0.75), playerTeam, enemyTeam);
       }
     }
     System.out.println(target.getSimpleOutput());

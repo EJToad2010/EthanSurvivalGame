@@ -1,9 +1,7 @@
 package src;
-import java.io.IOException;
-import java.io.FileNotFoundException;
 public class Main {
   // Game architecture
-  // Superclass: Character
+  // Superclass: BasicCharacter
   // Subclasses: PlayerCharacter, EnemyCharacter
   // PlayerCharacter subclasses: Knight, Archer, Wizard
   // EnemyCharacter subclasses: Goblin, Dart Goblin
@@ -19,7 +17,7 @@ public class Main {
   // Class: PlayerTeam
   // Class: EnemyTeam
   // Class: GameManager
-  public static void main(String[] args) throws InterruptedException, FileNotFoundException, IOException{
+  public static void main(String[] args) throws InterruptedException{
     GameManager gm = new GameManager();
     GameManager.clearScreen();
     System.out.println("Welcome to Ethan's AP CSA Survival Game!");

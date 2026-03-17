@@ -8,6 +8,9 @@ class PlayerTeam {
   // One main variable, which stores all characters that the player currently controls
   private ArrayList<PlayerCharacter> playerTeam;
   private Inventory playerInventory;
+  // Handle characters who defend each other from enemy attacks
+  private ArrayList<PlayerCharacter> protectedCharacters = new ArrayList<PlayerCharacter>();
+  private ArrayList<Double> protectedCharacterAmounts = new ArrayList<Double>();
   
   // How many coins the player's team currently has
   private int coinBalance = 0;
@@ -41,6 +44,39 @@ class PlayerTeam {
   // Return the inventory
   public Inventory getPlayerInventory(){
     return playerInventory;
+  }
+
+  // Return the ArrayList of Characters who are being protected by another Character that turn
+  public ArrayList<PlayerCharacter> getProtectedCharacters(){
+    return protectedCharacters;
+  }
+
+  // Return the ArrayList of the defensive strength each protected Character is receiving that turn
+  public ArrayList<Double> getProtectedCharacterAmounts(){
+    return protectedCharacterAmounts;
+  }
+
+  // Return the index of a Character in protectedCharacters
+  // Return -1 if not found
+  public int getIndexOfProtectedCharacter(BasicCharacter c){
+    if(!(c instanceof PlayerCharacter)){
+      return -1;
+    }
+    else{
+      for(int i = 0; i < protectedCharacters.size(); i++){
+        if(protectedCharacters.get(i).equals(c)){
+          return i;
+        }
+      }
+      return -1;
+    }
+  }
+
+  // Remove all protected Characters
+  // Used at the start of the next turn
+  public void resetProtectedCharacters(){
+    protectedCharacters.clear();
+    protectedCharacterAmounts.clear();
   }
   
   // Balance of player team's combined money

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 class Goblin extends EnemyCharacter{
   // Items that the Goblin steals from the player. They are not used by the Goblin and will be returned on death.
   public Goblin(String name, String behaviorType){
-    super(name, 80.0, 16.0, 4.0, 30.0, 50, 20, behaviorType);
+    super(name, 70.0, 16.0, 4.0, 30.0, 50, 20, behaviorType);
     setDescription("A weak enemy focused on annoying the player and causing chaos.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Rusty Dagger", "Nimble Dodge"});
     addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto a single target. 10% chance to inflict bleed.",
@@ -27,7 +27,7 @@ class Goblin extends EnemyCharacter{
   }
 
   public void basicAbilityAI(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
-    System.out.println("DEBUG: Goblin Basic Ability AI");
+    // System.out.println("DEBUG: Goblin Basic Ability AI");
     int basicAbilityLimit = getBasicAbilityLimit();
     if(basicAbilityLimit >= 1){
       // Guaranteed to use Nimble Dodge if under 25% HP
@@ -50,7 +50,7 @@ class Goblin extends EnemyCharacter{
   }
 
   public void basicAbilityAI(BasicCharacter preferredCharacter, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
-    System.out.println("DEBUG: Goblin aggressive AI");
+    // System.out.println("DEBUG: Goblin aggressive AI");
     // Likely has aggressive AI behavior, so automatically use Rusty Dagger
     basicAbility(0, preferredCharacter, playerTeam, enemyTeam);
   }
@@ -95,7 +95,7 @@ class Goblin extends EnemyCharacter{
   public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
       System.out.println(getName() + " stabbed " + target.getName() + " with their dagger for " + getAttackStrength() + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength());
+      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
       if((int)(Math.random() * 100) < 10 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Bleed", 2);
@@ -116,7 +116,7 @@ class Goblin extends EnemyCharacter{
       StatusEffect.addStatusEffect(target, "Taunt", 1);
     } else if(specialAbilityIndex == 1){
       System.out.println(getName() + " swiped at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      handleEnemyDefense(target, getAttackStrength());
+      handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
       if(playerTeam.getCoinBalance() > 0 && (int)(Math.random() * 100) < 25){
         

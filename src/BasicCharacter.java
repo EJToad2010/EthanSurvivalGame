@@ -319,24 +319,24 @@ public class BasicCharacter {
   // Take appropriate amount of damage as the enemy and print relevant information
   // This function is almost completely overriden by the basicAbility and specialAbility functions,
   // but it is still usable in case specific situations happen
-  public void attack(BasicCharacter target) throws InterruptedException{
+  public void attack(BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     System.out.println(name + " attacked " + target.getName() + " for " + attackStrength + " HP!");
-    handleEnemyDefense(target, attackStrength);
+    handleEnemyDefense(target, attackStrength, playerTeam, enemyTeam);
     System.out.println(target.getSimpleOutput());
   }
   
   // Calls the enemy target's defend function against the attacker
   // Reduce enemy HP by the appropriate amount
   // Boolean returns true if the enemy received any damage, false if not
-  protected boolean handleEnemyDefense(BasicCharacter target, double attack) throws InterruptedException{
+  protected boolean handleEnemyDefense(BasicCharacter target, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     Thread.sleep(1000);
     double actualDamage;
     if(StatusEffect.hasStatusEffect(target, "Nimble")){
       System.out.println("Attack was reduced by 25% from " + target.getName() + " being NIMBLE!");
       Thread.sleep(1000);
-      actualDamage = calculateActualDamage(target, attack*0.75);
+      actualDamage = calculateActualDamage(target, attack*0.75, playerTeam, enemyTeam);
     } else{
-      actualDamage = calculateActualDamage(target, attack);
+      actualDamage = calculateActualDamage(target, attack, playerTeam, enemyTeam);
     } 
     target.defend(this, actualDamage);
     Thread.sleep(1000);
@@ -349,12 +349,16 @@ public class BasicCharacter {
   
   // If a character did not actively defend, their normal defenseStrength is applied
   // When a character actively defends, their defenseStrength is doubled
-  private double calculateActualDamage(BasicCharacter target, double attack){
+  private double calculateActualDamage(BasicCharacter target, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     double actualDamage;
     if(target.isDefending){
       actualDamage = attack - (target.defenseStrength * 2);
     } else{
       actualDamage = attack - target.defenseStrength;
+    }
+    if(playerTeam.getIndexOfProtectedCharacter(target) != -1){
+      int index = playerTeam.getIndexOfProtectedCharacter(target);
+      System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
     }
     return Math.max(actualDamage, 0);
   }

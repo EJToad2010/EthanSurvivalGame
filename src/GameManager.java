@@ -324,24 +324,24 @@ class GameManager {
       turnNum++;
       System.out.println("\nTurn " + turnNum + ":");
       if(turnPriority.equals("Player")){
-        StatusEffect.handleStatusTurn();
         beforePlayerTurn();
+        StatusEffect.handleStatusTurn();
         handlePlayerTurn();
         if(hasPlayerWon() || hasEnemyWon()){
           break;
         }
-        StatusEffect.handleStatusTurn();
         beforeEnemyTurn();
+        StatusEffect.handleStatusTurn();
         handleEnemyTurn();
       } else if(turnPriority.equals("Enemy")){
-        StatusEffect.handleStatusTurn();
         beforeEnemyTurn();
+        StatusEffect.handleStatusTurn();
         handleEnemyTurn();
         if(hasPlayerWon() || hasEnemyWon()){
           break;
         }
-        StatusEffect.handleStatusTurn();
         beforePlayerTurn();
+        StatusEffect.handleStatusTurn();
         handlePlayerTurn();
       }
     }
@@ -353,6 +353,7 @@ class GameManager {
     if(turnNum > 1){
       playerTeam.decreasePlayerCooldowns();
     }
+    playerTeam.resetProtectedCharacters();
     // Reset each player's defensive state to passive
     playerTeam.resetPlayerDefense();
     currentPlayer = "Player";
@@ -517,10 +518,31 @@ class GameManager {
             }
 
           } else if(selectedAction == 4){
-
             // Defend
-            // TODO: Allow a character to protect one of their allies
-            selectedCharacter.setIsDefending(true);
+            // The user selects another character to defend.
+            // If they select the same character, its own defensive strength will increase for one turn.
+            // If they select another character, the original character's defensive strength will be added to the target for 1 turn.
+            int selectedProtectCharacterIndex;
+            PlayerCharacter selectedProtectCharacter;
+            message = "\nSelect a character to defend: \n" + playerTeam.getPlayerTeamNumFormat();
+            // Ensure the character is not dead
+            while(true){
+              selectedProtectCharacterIndex = GameManager.obtainInput(message, 1, playerBattleCapacity, true);
+              selectedProtectCharacter = playerTeam.getCharacterAt(selectedProtectCharacterIndex);
+              if(selectedProtectCharacter.getIsDead()){
+                System.out.println("Invalid input. This character is dead!");
+              } else{
+                break;
+              }
+            }
+            // Check if they selected themselves
+            if(selectedCharacter.equals(selectedProtectCharacter)){
+              selectedCharacter.setIsDefending(true);
+            } else{
+              System.out.println(selectedProtectCharacter.getName() + " will receive " + selectedCharacter.getDefenseStrength() + " defense strength from " + selectedCharacter.getName() + "!");
+              playerTeam.getProtectedCharacters().add(selectedProtectCharacter);
+              playerTeam.getProtectedCharacterAmounts().add(selectedCharacter.getDefenseStrength());
+            }
             anythingToContinue();
 
           } else if(selectedAction == 5){

@@ -81,7 +81,7 @@ class EnemyCharacter extends BasicCharacter{
     ArrayList<Integer> availableSpecialAbilityIndices = getAvailableSpecialAbilityIndices();
     if(availableSpecialAbilityIndices.size() > 0 && (Math.random() * 100) < 50){
       specialAbilityAI(availableSpecialAbilityIndices, playerTeam, enemyTeam);
-      System.out.println("DEBUG: Special Ability Used");
+      // System.out.println("DEBUG: Special Ability Used");
       hasTakenTurn = true;
       resetSpecialAbilityCooldowns();
     }
@@ -110,14 +110,14 @@ class EnemyCharacter extends BasicCharacter{
         if(getCurrentHP() / getMaxHP() < 0.5 && (int)(Math.random()) * 100 < 50){
           enemyTeam.useItem(i, this, playerTeam);
           hasTakenTurn = true;
-          System.out.println("DEBUG: Health Potion Used");
+          // System.out.println("DEBUG: Health Potion Used");
           break;
         }
       } else if(enemyInventory.get(i).getItem() instanceof HealthPool){
         if(enemyTeam.getTotalHPPercentage() < 0.5 && (int)(Math.random()) * 100 < 50){
           enemyTeam.useItem(i, this, playerTeam);
           hasTakenTurn = true;
-          System.out.println("DEBUG: Health Pool Used");
+          // System.out.println("DEBUG: Health Pool Used");
           break;
         }
       }

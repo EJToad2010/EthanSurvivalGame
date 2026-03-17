@@ -31,7 +31,7 @@ class Knight extends PlayerCharacter {
     if(basicAbilityIndex == 0){
       // Sword Swing
       System.out.println(getName() + " swung their sword at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      handleEnemyDefense(target, getAttackStrength());
+      handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
       
       if(!target.getIsDead()){
@@ -45,7 +45,7 @@ class Knight extends PlayerCharacter {
     } else if(basicAbilityIndex == 1){
       // Cautious Attack
       System.out.println(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 5) + " HP!");
-      handleEnemyDefense(target, getAttackStrength() - 5);
+      handleEnemyDefense(target, getAttackStrength() - 5, playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
     }
   }
@@ -56,16 +56,16 @@ class Knight extends PlayerCharacter {
       // Last Push
       if(target.getCurrentHP() / target.getMaxHP() < 0.5){
         System.out.println(getName() + " had a last push against " + target.getName() + " for " + (getAttackStrength() + 10) * 1.5 + " HP!");
-        handleEnemyDefense(target, (getAttackStrength() + 10) * 1.5);
+        handleEnemyDefense(target, (getAttackStrength() + 10) * 1.5, playerTeam, enemyTeam);
       } else{
         System.out.println(getName() + " pushed against " + target.getName() + " for " + (getAttackStrength() + 10) + " HP!");
-        handleEnemyDefense(target, getAttackStrength() + 10);
+        handleEnemyDefense(target, getAttackStrength() + 10, playerTeam, enemyTeam);
       }
       
     } else if(specialAbilityIndex == 1){
       // Rage Strike
       System.out.println(getName() + " furiously attacked " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!");
-      handleEnemyDefense(target, (getAttackStrength() * 2));
+      handleEnemyDefense(target, (getAttackStrength() * 2), playerTeam, enemyTeam);
       System.out.println(getName() + "'s rage made them lose " + (getAttackStrength() * 0.5) + " HP!");
       changeCurrentHP(-(getAttackStrength() * 0.5));
       System.out.println(getSimpleOutput());

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 class DartGoblin extends EnemyCharacter{
   public DartGoblin(String name, String behaviorType){
     // Set the names, descriptions, and cooldowns of the Dart Goblin.
-    super(name, 70.0, 8.0, 5.0, 35.0, 50, 20, behaviorType);
+    super(name, 60.0, 8.0, 5.0, 35.0, 50, 20, behaviorType);
     setDescription("A fast, ranged, weak enemy who focuses on dealing poison damage to the player's team.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Poison Dart", "Nimble Dodge"});
     addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto one target, ignoring their defense. 50% to poison the character for two turns.",
@@ -28,7 +28,7 @@ class DartGoblin extends EnemyCharacter{
 
   // AI for deciding what basic ability to use
   public void basicAbilityAI(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
-    System.out.println("DEBUG: Dart Goblin basic ability AI");
+    // System.out.println("DEBUG: Dart Goblin basic ability AI");
     int basicAbilityLimit = getBasicAbilityLimit();
     if(basicAbilityLimit >= 1){
       // Guaranteed to use Nimble Dodge if under 25% HP
@@ -52,7 +52,7 @@ class DartGoblin extends EnemyCharacter{
 
   // This method is used instead of the original if the EnemyCharacter AI finds a specific Character that is prioritized most
   public void basicAbilityAI(BasicCharacter preferredCharacter, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
-    System.out.println("DEBUG: Dart Goblin aggressive AI");
+    // System.out.println("DEBUG: Dart Goblin aggressive AI");
     // Likely has aggressive AI behavior, so automatically use Poison Dart
     basicAbility(0, preferredCharacter, playerTeam, enemyTeam);
   }
@@ -79,7 +79,7 @@ class DartGoblin extends EnemyCharacter{
     if(basicAbilityIndex == 0){
       // Poison Dart
       System.out.println(getName() + " shot a poison dart at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength());
+      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
       if((int)(Math.random() * 100) < 50 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Poison", 2);
@@ -105,7 +105,7 @@ class DartGoblin extends EnemyCharacter{
     } else if(specialAbilityIndex == 1){
       // TODO: CREATE UNIQUE SECOND SPECIAL ABILITY FOR DART GOBLIN
       System.out.println(getName() + " swiped at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      handleEnemyDefense(target, getAttackStrength());
+      handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
       if(enemyTeam.getEnemyInventory().getInventory().size() > 0 && (int)(Math.random() * 100) < 25){
         
