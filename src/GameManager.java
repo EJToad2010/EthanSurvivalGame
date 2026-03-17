@@ -1,15 +1,17 @@
 package src;
 import java.util.*;
-// Controls the gameplay loop including win/lose conditions
+// Controls the gameplay loop, which includes the battle loop, shop loop, etc.
 class GameManager {
+  // Scanner used in static methods. It is declared here so that it doesn't have to use close()
+  // and cause an error (I forgot what it was called)
   static Scanner inputScanner = new Scanner(System.in);
-  // Manually set this to ture during repeated playtesting
+  // Manually set this to true during repeated playtesting
   private boolean skipTutorial = true;
-  
+  // Local Scanner used outside of specialized methods
   private Scanner s = new Scanner(System.in);
   // Arrays used to track enemy difficulty progression through their class types.
   // Influences the probability that each class will be chosen
-  private String[] earlyGameEnemies = new String[]{"Goblin", "Goblin", "DartGoblin"};
+  private String[] earlyGameEnemies = new String[]{"Goblin", "Goblin", "Dart Goblin"};
   // Enemy behaviors change as the game progresses, adding more complex roles.
   // This simulates the AI getting smarter.
   private String[] earlyGameEnemyBehaviors = new String[]{"RANDOM", "RANDOM", "RANDOM", "AGGRESSIVE", "DEFENSIVE"};
@@ -21,7 +23,6 @@ class GameManager {
   // Attributes used to keep track of game progression
   private int dayNum = 1;
   private int turnNum;
-  private String currentPlayer;
   
   // Attributes used within battles, which are the core part of the gameplay loop
   private int playerActionPoints = playerBattleCapacity;
@@ -30,21 +31,24 @@ class GameManager {
   private int enemyActionPoints = enemyBattleCapacity;
   private PlayerTeam playerTeam;
   private EnemyTeam enemyTeam;
+  private String currentPlayer;
   
   private ArrayList<String> adjectives = new ArrayList<String>();
   
-  // Constructors
+  // Constructor used when existing teams are provided
   public GameManager(PlayerTeam playerTeam, EnemyTeam enemyTeam){
     this.playerTeam = playerTeam;
     this.enemyTeam = enemyTeam;
     fillAdjectives();
   }
   
+  // Constructor used to create empty teams
   public GameManager(){
     this(new PlayerTeam(), new EnemyTeam());
   }
   
   // Initialize file ArrayLists in constructor
+  // Explanation for why this exists is in Data.java
   private void fillAdjectives(){
     String[] adjectivesStr = Data.getAdjectives();
     for(String s : adjectivesStr){
@@ -61,21 +65,11 @@ class GameManager {
     return enemyTeam;
   }
   
-  /* Gameplay loop
-  // Increase turnNum by 1
-  // currentPlayer = player
-  // Prompt player for actions between their characters
-  // Handle character actions
-  // Check end conditions
-  // currentPlayer = enemy
-  // Enemy AI decides best action
-  // Handle enemy actions
-  // Check end conditions */
-  
   // Broad method that contains the entire gameplay
   public void run() throws InterruptedException {
     clearScreen();
     playerTeam.clearPlayerTeam();
+    // Brief description of the game given at the very start
     if(!skipTutorial){
       System.out.println("You have been hired to defeat the enemies attacking your kingdom.");
       Thread.sleep(1000);
@@ -86,6 +80,7 @@ class GameManager {
     
     clearScreen();
     while(true){
+      // Announce a new day
       StatusEffect.resetStatusEffects();
       System.out.println("\nDay " + dayNum);
       Thread.sleep(1000);
@@ -98,6 +93,7 @@ class GameManager {
       Thread.sleep(1000);
       runBattleLoop();
       StatusEffect.resetStatusEffects();
+      // Handle win/lose conditions
       if(hasPlayerWon()){
         System.out.println("\nCongratulations! You have defeated the enemy team.\n");
       } else{
@@ -107,8 +103,11 @@ class GameManager {
       anythingToContinue();
       handleEnemyRewards();
       clearScreen();
+
+      // Shop is guaranteed to appear after battle
       handleShop();
       
+      // I have plans to expand on the evening phase, but it is not implemented yet,
       System.out.println("It is now the evening.");
       Thread.sleep(1000);
       System.out.println("Your characters have constructed a small campsite to stay for the night.");
@@ -124,7 +123,9 @@ class GameManager {
     initializeEnemy();
   }
   
+  // Prompt a user to create new Character(s) and their classes until they reach their battle capacity.
   private void initializePlayer() throws InterruptedException{
+    // Calculate how many more Characters the user can add
     int allowedCharacters = playerBattleCapacity - playerTeam.getPlayerTeam().size();
     if(allowedCharacters > 0){
       if(allowedCharacters == 1){
@@ -134,11 +135,15 @@ class GameManager {
       }
       anythingToContinue();
     }
+
+    // isFirstLoop is used for visual changes. It clarifies that another Character can be made
+    // if allowedCharacters > 1
     boolean isFirstLoop = true;
     while(playerTeam.getPlayerTeam().size() < playerBattleCapacity){
       if(!isFirstLoop){
         System.out.println("You may create another character.");
       }
+      // Prompt the user to select a character class or learn more
       String message = "Choose a class for your character:\n";
       message += "1: Knight\n";
       message += "2: Archer\n";
@@ -146,6 +151,7 @@ class GameManager {
       message += "4: HELP";
       int classInput = GameManager.obtainInput(message, 1, 4, false);
       if(classInput == 4){
+        // Print the descriptions, stats, and level 1 abilities of each Character class
         System.out.println("\nKNIGHT:");
         printCharacterInfo(new Knight("Knight"), false);
         Thread.sleep(1000);
@@ -164,6 +170,7 @@ class GameManager {
         continue;
       }
       
+      // Prompt the user for a Character name
       if(classInput == 1){
         System.out.println("Selected class: Knight");
       } else if(classInput == 2){
@@ -174,6 +181,7 @@ class GameManager {
       System.out.print("Provide a name for your character: >>> ");
       String name = s.nextLine();
       
+      // Create the new object
       if(classInput == 1){
         playerTeam.addCharacter(new Knight(name));
       } else if(classInput == 2){
@@ -184,6 +192,7 @@ class GameManager {
       System.out.println(playerTeam);
       Thread.sleep(1000);
       if(dayNum == 1 && playerTeam.getPlayerTeam().size() == 2){
+        // Part of the in-game tutorial if it is the user's first time making Characters
         System.out.println("Congratulations! You have trained your first fighters.");
         Thread.sleep(1000);
         anythingToContinue();
@@ -192,6 +201,7 @@ class GameManager {
     }
   }
   
+  // Create a new set of EnemyCharacters equal to enemyBattleCapacity
   private void initializeEnemy(){
     enemyTeam.clearEnemyTeam();
     // enemyBattleCapacity can be between playerBattleCapacity - 1 and playerBattleCapacity + 1
@@ -199,22 +209,24 @@ class GameManager {
     enemyBattleCapacity += (int)(Math.random() * 3) - 1;
     // There will be one additional enemy added approximately every three days
     // dayNum is an int so it will automatically round down
-	enemyBattleCapacity += dayNum/3;
+	  enemyBattleCapacity += dayNum/3;
     // On the first day, it is guaranteed that there will only be one enemy to act as a tutorial
     if(dayNum == 1){
       enemyBattleCapacity = 1;
     }
     for(int i = 0; i < enemyBattleCapacity; i++){
+      // Currently limited to the earlyGameEnemy set until more difficult enemy types are added into the game.
       String chosenEnemyType = earlyGameEnemies[(int)(Math.random() * earlyGameEnemies.length)];
       String chosenEnemyBehavior = earlyGameEnemyBehaviors[(int)(Math.random() * earlyGameEnemyBehaviors.length)];
       if(chosenEnemyType.equals("Goblin")){
         enemyTeam.addEnemy(new Goblin(nameEnemy("Goblin"), chosenEnemyBehavior), playerTeam.getHighestLevel());
-      } else if(chosenEnemyType.equals("DartGoblin")){
+      } else if(chosenEnemyType.equals("Dart Goblin")){
         enemyTeam.addEnemy(new DartGoblin(nameEnemy("Dart Goblin"), chosenEnemyBehavior), playerTeam.getHighestLevel());
       }
     }
   }
   
+  // Enemy name is a random adjective + the type of the enemy
   private String nameEnemy(String type){
     return adjectives.get((int)(Math.random() * adjectives.size())) + " " + type;
   }
@@ -236,6 +248,8 @@ class GameManager {
     }
   }
   
+  // Prompt the user if they are interested in entering a shop.
+  // The shop logic itself is handled in Shop.java
   private void handleShop() throws InterruptedException{
     String message = "You have encountered a shop! Would you like to visit?\n";
     message += "1: YES\n";
@@ -252,10 +266,20 @@ class GameManager {
       Thread.sleep(1000);
     }
   }
-  
+  /* Battle loop
+  // Increase turnNum by 1
+  // currentPlayer = player
+  // Prompt player for actions between their characters
+  // Handle character actions
+  // Check end conditions
+  // currentPlayer = enemy
+  // Enemy AI decides best action
+  // Handle enemy actions
+  // Check end conditions */
   private void runBattleLoop() throws InterruptedException{
     playerActionPoints = playerBattleCapacity;
     enemyActionPoints = enemyBattleCapacity;
+    // Quick print message which shows the beginning states of both teams
     System.out.println(playerTeam);
     Thread.sleep(1500);
     System.out.println("VS\n");
@@ -266,6 +290,7 @@ class GameManager {
 
     turnNum = 0;
     String turnPriority;
+    // Detect who gets to start first which depends on speed
     if(playerTeam.getTotalSpeed() >= enemyTeam.getTotalSpeed()){
       System.out.println("The player's team has the higher combined speed and will go first!");
       turnPriority = "Player";
@@ -275,6 +300,7 @@ class GameManager {
     }
     Thread.sleep(1000);
     if(dayNum == 1 && !skipTutorial){
+      // Teaches a user how a battle works for the first time
       System.out.println("\nBattle tutorial:");
       Thread.sleep(1000);
       System.out.println("You and the enemy will take alternating turns.");
@@ -293,6 +319,7 @@ class GameManager {
       anythingToContinue();
     }
     
+    // Handle the initialization and logic of each party's turn until the battle ends
     while(!hasPlayerWon() && !hasEnemyWon()){
       turnNum++;
       System.out.println("\nTurn " + turnNum + ":");
@@ -317,19 +344,22 @@ class GameManager {
         beforePlayerTurn();
         handlePlayerTurn();
       }
-      
     }
   }
   
+  // Messages that are shared before the user handles any input
   private void beforePlayerTurn() throws InterruptedException {
+    // Decrease special ability cooldowns of each player
     if(turnNum > 1){
       playerTeam.decreasePlayerCooldowns();
     }
+    // Reset each player's defensive state to passive
     playerTeam.resetPlayerDefense();
     currentPlayer = "Player";
     Thread.sleep(1000);
     System.out.println("\nIt is your turn!\n");
     Thread.sleep(1000);
+    // Receive action points equal to the number of PlayerCharacters that are alive
     playerActionPoints = playerTeam.getNumAlive();
     if(playerActionPoints == 1){
       System.out.println("You may perform 1 action during your turn.\n");
@@ -338,6 +368,7 @@ class GameManager {
     }
   }
   
+  // Messages printed before the enemy AI performs any logic
   private void beforeEnemyTurn() throws InterruptedException {
     if(turnNum > 1){
       enemyTeam.decreaseEnemyCooldowns();
@@ -347,6 +378,7 @@ class GameManager {
     Thread.sleep(1000);
   }
   
+  // Each alive EnemyCharacter performs one action
   private void handleEnemyTurn() throws InterruptedException {
     for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
       if(!e.getIsDead()){
@@ -357,9 +389,11 @@ class GameManager {
     }
   }
   
+  // This function runs until the player consumes all of their action points
   private void handlePlayerTurn() throws InterruptedException {
       actionPointsLeft = playerActionPoints;
       while(actionPointsLeft > 0){
+        // Print how many action points the player has left
         Thread.sleep(1000);
         if(actionPointsLeft < playerActionPoints){
           if(actionPointsLeft == 1){
@@ -369,10 +403,12 @@ class GameManager {
           }
         }
         Thread.sleep(1000);
+
         // Obtain a character for the user to select
         String message = "\nSelect a character to perform an action with: \n" + playerTeam.getPlayerTeamNumFormat();
         int selectedCharacterIndex;
         PlayerCharacter selectedCharacter;
+        // Ensure the character is not dead
         while(true){
           selectedCharacterIndex = GameManager.obtainInput(message, 1, playerBattleCapacity, true);
           selectedCharacter = playerTeam.getCharacterAt(selectedCharacterIndex);
@@ -385,6 +421,8 @@ class GameManager {
         
         // currentActionPoints is initialized to avoid confusion when characters take multiple actions (speed advantage)
         currentActionPoints = actionPointsLeft;
+        // PlayerCharacters should not have the chance to receive another action if they selected "Cancel"
+        // Deleting this variable leads to a glitch where the player can have infinite actions
         boolean canGainAnotherAction;
         while(currentActionPoints >= actionPointsLeft){
           canGainAnotherAction = true;
@@ -392,6 +430,7 @@ class GameManager {
           // Obtain an action from the chosen character
           message = "What would you like to do?\n";
           if(StatusEffect.hasStatusEffect(selectedCharacter, "Taunt")){
+            // When taunted, a character cannot use any abilities
             message += "1: Basic ability [UNAVAILABLE]\n";
             message += "2: Special ability [UNAVAILABLE]\n";
           } else{
@@ -417,11 +456,14 @@ class GameManager {
 
             // Basic ability
             int limit = findBasicAbilityLimit(selectedCharacter, false);
+            // Allow the user to choose from all basic abilities that they have unlocked
             int basicAbilityIndex = GameManager.obtainInputWithCancel("Select a basic ability:\n" + playerTeam.getBasicAbilityNamesNumFormat(selectedCharacter, false), 1, limit, true);
             if(basicAbilityIndex != -1){
+              // Redirect to a helper function that prompts the user to select their targets and perform the ability itself
               conductOffensiveAttack(selectedCharacter, basicAbilityIndex, "basic");
               anythingToContinue();
             } else{
+              // The user chose to cancel their action
               currentActionPoints++;
               canGainAnotherAction = false;
             }
@@ -429,28 +471,31 @@ class GameManager {
           } else if(selectedAction == 2){
             // Special ability
 			      int limit = findSpecialAbilityLimit(selectedCharacter, false);
-            if(limit != -1){
-              int specialAbilityIndex = GameManager.obtainInputWithCancel("Select a special ability:\n" + playerTeam.getSpecialAbilityNamesNumFormat(selectedCharacter, false), 1, limit, true);
-              if(specialAbilityIndex != -1){
-                if(selectedCharacter.getCurrentSpecialAbilityCooldowns().get(specialAbilityIndex) > 0){
-                  System.out.println("Invalid ability. Cooldown must be 0!");
-                  currentActionPoints++;
-                  canGainAnotherAction = false;
-                  anythingToContinue();
-                } else{
-                  conductOffensiveAttack(selectedCharacter, specialAbilityIndex, "special");
-                  anythingToContinue();
-                }
-              } else{
+            // Allow the user to choose from all special abilities that they have unlocked
+            int specialAbilityIndex = GameManager.obtainInputWithCancel("Select a special ability:\n" + playerTeam.getSpecialAbilityNamesNumFormat(selectedCharacter, false), 1, limit, true);
+            if(specialAbilityIndex != -1){
+              // Make sure the chosen special ability is not on a cooldown
+              if(selectedCharacter.getCurrentSpecialAbilityCooldowns().get(specialAbilityIndex) > 0){
+                System.out.println("Invalid ability. Cooldown must be 0!");
                 currentActionPoints++;
                 canGainAnotherAction = false;
+                anythingToContinue();
+              } else{
+                // Redirect to a helper function that prompts the user to select their targets and perform the ability itself
+                conductOffensiveAttack(selectedCharacter, specialAbilityIndex, "special");
+                anythingToContinue();
               }
+            } else{
+              // The user chose to cancel their action
+              currentActionPoints++;
+              canGainAnotherAction = false;
             }
 
           } else if(selectedAction == 3){
 
             // Use item
             
+            // Check if the player has any usable items at the moment
             if(playerTeam.getPlayerInventory().isEmpty()){
               System.out.println("Your inventory is empty.");
               Thread.sleep(1000);
@@ -459,11 +504,13 @@ class GameManager {
               canGainAnotherAction = false;
             } else{
               int limit = playerTeam.getPlayerInventory().getInventory().size();
+              // Prompt the user to choose one item from a printed list of their inventory
               int itemIndex = GameManager.obtainInputWithCancel("Select an item to use: \n" + playerTeam.getPlayerInventory().getInventoryNumFormat(), 1, limit, true);
               if(itemIndex != -1){
                 playerTeam.useItem(itemIndex, selectedCharacter, enemyTeam);
               	anythingToContinue();
               } else{
+                // The player chose to cancel
                 currentActionPoints++;
                 canGainAnotherAction = false;
               }
@@ -472,13 +519,16 @@ class GameManager {
           } else if(selectedAction == 4){
 
             // Defend
+            // TODO: Allow a character to protect one of their allies
             selectedCharacter.setIsDefending(true);
             anythingToContinue();
 
           } else if(selectedAction == 5){
             // HELP
+            // Print the stats, descriptions, and abilities unlocked at their current level
             printCharacterInfo(selectedCharacter, false);
             anythingToContinue();
+            // Refund an action to the user
             currentActionPoints++;
             canGainAnotherAction = false;
           }
@@ -537,6 +587,8 @@ class GameManager {
  }
   
   // Obtain the enemy/enemies the user chooses to target and immediately apply their ability to them
+  // I am aware that a lot of this code is repeated for overlapping basic and special ability behaviors.
+  // I could not think of an elegant solution for this because the variables being used are fundamentally different
   private void conductOffensiveAttack(BasicCharacter selectedCharacter, int index, String abilityType) throws InterruptedException{
     if(abilityType.equals("basic")){
       // Detect if the user entered a real basic ability or "Cancel"
@@ -763,6 +815,8 @@ class GameManager {
     }
   }
   
+  // Used to obtain an input for general messages, including an option to cancel
+  // Cancelling returns -1
   public static int obtainInputWithCancel(String message, int min, int max, boolean applyIndexOffset){
     String input = "";
     //message += "\n";
@@ -789,17 +843,20 @@ class GameManager {
     return -1;
   }
   
+  // Disregard the user's input and wait for them to submit any input
   public static void anythingToContinue(){
     System.out.print("Press ENTER to continue. >>> ");
     inputScanner.nextLine();
   }
 
+  // Print blank lines repeatedly to simulate clearing the screen
   public static void clearScreen(){
     for(int i = 0; i < 100; i++){
       System.out.println();
     }
   }
   
+  // Print each team
   public String toString(){
     return playerTeam + "\n" + enemyTeam;
   }

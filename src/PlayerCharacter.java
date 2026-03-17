@@ -10,20 +10,25 @@ class PlayerCharacter extends BasicCharacter {
   // Legth must equal all other special ability ArrayLists in Character.java
   private ArrayList<Integer> specialAbilityUnlockLevels = new ArrayList<Integer>();
   
+  // XP-related attributes
   private int xp = 0;
   private int level = 1;
   private int xpToNextLevel;
   
+  // Constructor that requires all attributes
   public PlayerCharacter(String name, double maxHP, double attackStrength, double defenseStrength, double speed){
     super(name, maxHP, attackStrength, defenseStrength, speed);
     setDescription("A basic player character.");
   }
   
+  // Constructor that only requires a name
   public PlayerCharacter(String name){
     super(name);
     setDescription("A basic player character.");
   }
   
+  // Getter methods
+
   public int getXP(){
     return xp;
   }
@@ -40,6 +45,7 @@ class PlayerCharacter extends BasicCharacter {
     return specialAbilityUnlockLevels;
   }
   
+  // Obtain the index of basicAbilityUnlockLevels less than or equal to level
   public int getHighestIndexBasic(){
     int index = 0;
     for(int i = 0; i < basicAbilityUnlockLevels.size(); i++){
@@ -50,6 +56,7 @@ class PlayerCharacter extends BasicCharacter {
     return index;
   }
   
+  // Obtain the index of specialAbilityUnlockLevels less than or equal to level
   public int getHighestIndexSpecial(){
     int index = -1;
     for(int i = 0; i < specialAbilityUnlockLevels.size(); i++){
@@ -66,6 +73,8 @@ class PlayerCharacter extends BasicCharacter {
     xpToNextLevel =  25 * level * level + 25 * level;
   }
   
+  // Increase the Character's total xp by the specified amount
+  // Handle detection for levelling up and its logic
   public void increaseXP(int amount) throws InterruptedException {
     System.out.println(getName() + " gained " + amount + " XP!");
     updateXPToNextLevel();
@@ -82,9 +91,10 @@ class PlayerCharacter extends BasicCharacter {
       Thread.sleep(1000);
       checkUnlockedAbilities(prevBasic, prevSpecial);
     }
-	System.out.println(getName() + "'s XP to next level: " + (xpToNextLevel - xp) + "\n");
+	  System.out.println(getName() + "'s XP to next level: " + (xpToNextLevel - xp) + "\n");
   }
   
+  //Attributes that upgrade every time a PlayerCharacter levels up
   private void updatePlayerStats(){
     System.out.println("+5 MAX HP");
     changeMaxHP(5);
@@ -96,6 +106,7 @@ class PlayerCharacter extends BasicCharacter {
     changeSpeed(2);
   }
   
+  // Check if a new basic or special ability was unlocked after levelling up
   private void checkUnlockedAbilities(int prevBasic, int prevSpecial) throws InterruptedException{
     for(int i = prevBasic + 1; i < basicAbilityUnlockLevels.size(); i++){
       if(basicAbilityUnlockLevels.get(i) <= level){

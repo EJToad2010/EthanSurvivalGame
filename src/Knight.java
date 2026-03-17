@@ -29,6 +29,7 @@ class Knight extends PlayerCharacter {
   // Overrided battle methods
   public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
+      // Sword Swing
       System.out.println(getName() + " swung their sword at " + target.getName() + " for " + getAttackStrength() + " HP!");
       handleEnemyDefense(target, getAttackStrength());
       System.out.println(target.getSimpleOutput());
@@ -42,6 +43,7 @@ class Knight extends PlayerCharacter {
         System.out.println(getSimpleOutput());
       }
     } else if(basicAbilityIndex == 1){
+      // Cautious Attack
       System.out.println(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 5) + " HP!");
       handleEnemyDefense(target, getAttackStrength() - 5);
       System.out.println(target.getSimpleOutput());
@@ -51,6 +53,7 @@ class Knight extends PlayerCharacter {
   // Knight has two special attacks to choose from
   public void specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(specialAbilityIndex == 0){
+      // Last Push
       if(target.getCurrentHP() / target.getMaxHP() < 0.5){
         System.out.println(getName() + " had a last push against " + target.getName() + " for " + (getAttackStrength() + 10) * 1.5 + " HP!");
         handleEnemyDefense(target, (getAttackStrength() + 10) * 1.5);
@@ -60,6 +63,7 @@ class Knight extends PlayerCharacter {
       }
       
     } else if(specialAbilityIndex == 1){
+      // Rage Strike
       System.out.println(getName() + " furiously attacked " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!");
       handleEnemyDefense(target, (getAttackStrength() * 2));
       System.out.println(getName() + "'s rage made them lose " + (getAttackStrength() * 0.5) + " HP!");

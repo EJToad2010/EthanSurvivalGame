@@ -51,6 +51,7 @@ class HealthPotion extends Item {
     return output;
   }
   
+  // Print message used when a shop displays its stock
   public String shopDisplay(ItemStack i){
     String output = "";
     output += getName() + ": (+" + healStrength + " HP) " + getDescription();

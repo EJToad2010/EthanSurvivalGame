@@ -2,10 +2,12 @@ package src;
 import java.util.ArrayList;
 
 // Represents the main opponent, who controls multiple enemies and performs their actions
-// It only has one instance variable, but it is its own class due to the specialized methods needed to modify
-// all relevant EnemyCharacters
+// This class and PlayerTeam share a lot of similar logic, but they are kept in separate classes
+// because they deal with separate object types.
 class EnemyTeam {
+  // This ArrayList contains the raw enemy characters that are a part of the team.
   private ArrayList<EnemyCharacter> enemyTeam;
+  // The EnemyTeam has one shared inventory.
   private Inventory enemyInventory;
   
   // Constructor that takes in an exisiting ArrayList and modifies its components into an enemy
@@ -77,6 +79,8 @@ class EnemyTeam {
     return output;
   }
   
+  // Used in battle messages
+  // Has a blacklist of enemies in case they are already selected or they cannot be targeteds
   public String getEnemyTeamNumFormat(ArrayList<Integer> unacceptableInputs){
     String output = "";
     for(int i = 1; i <= enemyTeam.size(); i++){
@@ -94,6 +98,8 @@ class EnemyTeam {
     return enemyTeam.get(index);
   }
 
+  // Use THIS method for using an item as it handles quantity decreasing and
+  // automatic removal when the ItemStack becomes empty.
   public void useItem(int itemIndex, BasicCharacter c, PlayerTeam playerTeam){
     ItemStack stack = enemyInventory.get(itemIndex);
     Item item = stack.getItem();

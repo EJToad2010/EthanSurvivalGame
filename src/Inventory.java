@@ -63,19 +63,21 @@ class Inventory {
     }
   }
   
+  // Return all items in the inventory separated by number
   public String getInventoryNumFormat(){
     String output = "";
     for(int i = 1; i <= inventory.size(); i++){
-      output += i + ": " + inventory.get(i-1).getItem();
+      output += i + ": " + inventory.get(i-1).getItem() + " x" + inventory.get(i-1).getQuantity();
       output += "\n";
     }
     return output;
   }
   
+  // Print each item without the numbers in NumFormat
   public String toString(){
     String output = "INVENTORY:\n";
     if(inventory.size() == 0){
-      output += "Empty";
+      output += "Empty\n";
     }
     for(ItemStack i : inventory){
       output += i.getItem();

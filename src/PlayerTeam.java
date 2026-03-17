@@ -2,8 +2,8 @@ package src;
 import java.util.ArrayList;
 
 // Represents the user, who controls multiple characters and performs their actions
-// It only has one instance variable, but it is its own class due to the specialized methods needed to modify
-// all relevant PlayerCharacters
+// This class and EnemyTeam share a lot of similar logic, but they are kept in separate classes
+// because they deal with separate object types.
 class PlayerTeam {
   // One main variable, which stores all characters that the player currently controls
   private ArrayList<PlayerCharacter> playerTeam;
@@ -128,6 +128,8 @@ class PlayerTeam {
     return playerTeam.get(index);
   }
 
+  // Use THIS method for using an item as it handles quantity decreasing and
+  // automatic removal when the ItemStack becomes empty.
   public void useItem(int itemIndex, BasicCharacter c, EnemyTeam enemyTeam){
     ItemStack stack = playerInventory.get(itemIndex);
     Item item = stack.getItem();

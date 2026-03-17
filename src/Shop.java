@@ -6,6 +6,7 @@ class Shop {
   // All the items that are available in the shop
   private Inventory shopInventory;
   // Types: Adventure, Offense, Defense, Rare
+  // Currently, only Adventure is implemented
   private String shopType;
   // Constructors
   public Shop(Inventory shopInventory, String shopType){
@@ -17,6 +18,7 @@ class Shop {
     this(new Inventory(), "Adventure");
   }
   
+  // Defines what items are placed into each type of shop
   public void resetStock(){
     shopInventory.clear();
     if(shopType.equals("Adventure")){
@@ -28,8 +30,10 @@ class Shop {
     }
   }
   
+  // Handle all user's decision making while they are in the shop
   public void handleShopLoop(PlayerTeam playerTeam) throws InterruptedException {
     resetStock();
+    // Welcome message
     System.out.print("A sign is on the wall. it says: WELCOME TO ");
     if(shopType.equals("Adventure")){
       System.out.println("RASCAL'S HIDEOUT");
@@ -56,6 +60,7 @@ class Shop {
     Thread.sleep(1000);
     
     while(true){
+      // Prompt the user for one action
       String message = "What would you like to do?\n";
       message += "1: Check stock\n";
       message += "2: Buy item\n";
@@ -65,20 +70,25 @@ class Shop {
       int input = GameManager.obtainInput(message, 1, 5, false);
       
       if(input == 1){
+        // Check stock
         System.out.println(this);
         GameManager.anythingToContinue();
       } else if(input == 2){
+        // Buy item
         message = "What would you like to buy?\n";
         int itemNum = GameManager.obtainInputWithCancel(message + shopInventory.getInventoryNumFormat(), 1, shopInventory.getInventory().size(), true);
       	if(itemNum != -1){
           ItemStack i = shopInventory.get(itemNum);
+          // Check if the player has enough coins to buy the item
           if(i.getItem().getPrice() > playerTeam.getCoinBalance()){
             System.out.println("You cannot afford this item.");
           } else{
+            // Avoid duplicating an object reference when an item is added
             Item item = i.getItem();
             System.out.println("You have bought " + item.getName() + " for " + item.getPrice() + "g.");
             playerTeam.increaseCoinBalance(-item.getPrice());
             playerTeam.getPlayerInventory().add(item, 1);
+            // Update the shop's stock for that item
             i.remove(1);
             if(i.getQuantity() <= 0){
               shopInventory.remove(i);
@@ -87,14 +97,18 @@ class Shop {
           GameManager.anythingToContinue();
         }
       } else if(input == 3){
+        // Get balance
         System.out.println("You have " + playerTeam.getCoinBalance() + "g");
         GameManager.anythingToContinue();
       } else if(input == 4){
+        // Check inventory
         System.out.println(playerTeam.getPlayerInventory());
       } else{
+        // Leave shop
         break;
       }
     }
+    // Randomly generated exit message
     if(merchantReaction == 0){
       System.out.println("The merchant sighs in relief as you head towards the exit.");
     } else if(merchantReaction == 1){
@@ -110,6 +124,7 @@ class Shop {
     GameManager.anythingToContinue();
   }
   
+  // Prints all ItemStacks the shop contains
   public String toString(){
     String output = "";
     output += "SHOP STOCK:\n";

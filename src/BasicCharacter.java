@@ -86,6 +86,7 @@ public class BasicCharacter {
   }
   
   // Used to briefly display a character's stats within dialogue and prompts
+  // EX: Unnamed (PLAYER Character) 100.0/100.0
   public String getSimpleOutput(){
     String output = "";
     String characterOwner = "";
@@ -119,6 +120,8 @@ public class BasicCharacter {
     return output;
   }
   
+  // Misc getter methods
+
   public double getMaxHP(){
     return maxHP;
   }
@@ -273,6 +276,7 @@ public class BasicCharacter {
     }
   }
   
+  // Reset each special attack's cooldown timer to their originally instantiated cooldowns
   public void resetSpecialAbilityCooldowns(){
     for(int i = 0; i < currentSpecialAbilityCooldowns.size(); i++){
       currentSpecialAbilityCooldowns.set(i, specialAbilityCooldowns.get(i));

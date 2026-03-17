@@ -90,6 +90,8 @@ class Goblin extends EnemyCharacter{
   }
 
   // Overrided battle methods
+  // basicAbilityAI handles the decision making, while basicAbility handles the outcome of an ability itself.
+  // Same for specialAbility()
   public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
       System.out.println(getName() + " stabbed " + target.getName() + " with their dagger for " + getAttackStrength() + " HP!");
@@ -99,6 +101,7 @@ class Goblin extends EnemyCharacter{
         StatusEffect.addStatusEffect(target, "Bleed", 2);
       }
     } else if(basicAbilityIndex == 1){
+      // Nimble Dodge (shared with Goblin class since they are both speedy Goblin types)
       System.out.println(getName() + " prepared Nimble Dodge for the player's next turn!");
       StatusEffect.addStatusEffect(this, "Nimble", 1);
     }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 class DartGoblin extends EnemyCharacter{
   public DartGoblin(String name, String behaviorType){
+    // Set the names, descriptions, and cooldowns of the Dart Goblin.
     super(name, 70.0, 8.0, 5.0, 35.0, 50, 20, behaviorType);
     setDescription("A fast, ranged, weak enemy who focuses on dealing poison damage to the player's team.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Poison Dart", "Nimble Dodge"});
@@ -22,7 +23,7 @@ class DartGoblin extends EnemyCharacter{
   
   // Overrided getType method
   public String getType(){
-    return "Goblin";
+    return "Dart Goblin";
   }
 
   // AI for deciding what basic ability to use
@@ -49,6 +50,7 @@ class DartGoblin extends EnemyCharacter{
     basicAbility(0, playerTeam.getPlayerTeam().get((int)(Math.random() * playerTeam.getPlayerTeam().size())), playerTeam, enemyTeam);
   }
 
+  // This method is used instead of the original if the EnemyCharacter AI finds a specific Character that is prioritized most
   public void basicAbilityAI(BasicCharacter preferredCharacter, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     System.out.println("DEBUG: Dart Goblin aggressive AI");
     // Likely has aggressive AI behavior, so automatically use Poison Dart
@@ -71,8 +73,11 @@ class DartGoblin extends EnemyCharacter{
   }
   
   // Overrided battle methods
+  // basicAbilityAI handles the decision making, while basicAbility handles the outcome of an ability itself.
+  // Same for specialAbility()
   public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
+      // Poison Dart
       System.out.println(getName() + " shot a poison dart at " + target.getName() + " for " + getAttackStrength() + " HP!");
       boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength());
       System.out.println(target.getSimpleOutput());
@@ -80,6 +85,7 @@ class DartGoblin extends EnemyCharacter{
         StatusEffect.addStatusEffect(target, "Poison", 2);
       }
     } else if(basicAbilityIndex == 1){
+      // Nimble Dodge (shared with Goblin class since they are both speedy Goblin types)
       System.out.println(getName() + " prepared Nimble Dodge for the player's next turn!");
       StatusEffect.addStatusEffect(this, "Nimble", 1);
     }
@@ -87,14 +93,17 @@ class DartGoblin extends EnemyCharacter{
   
   public void specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(specialAbilityIndex == 0){
+      // Poison Dart Volley
       System.out.println(getName() + " shot a poison dart at " + target.getName() + " for " + (getAttackStrength()-1) + " HP!");
       target.changeCurrentHP(getAttackStrength()-1);
       System.out.println(target.getSimpleOutput());
       Thread.sleep(1000);
+      // 25% chance of Poison for 2 turns
       if((int)(Math.random() * 100) < 25){
         StatusEffect.addStatusEffect(target, "Poison", 2);
       }
     } else if(specialAbilityIndex == 1){
+      // TODO: CREATE UNIQUE SECOND SPECIAL ABILITY FOR DART GOBLIN
       System.out.println(getName() + " swiped at " + target.getName() + " for " + getAttackStrength() + " HP!");
       handleEnemyDefense(target, getAttackStrength());
       System.out.println(target.getSimpleOutput());

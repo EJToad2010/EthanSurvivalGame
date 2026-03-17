@@ -1,8 +1,9 @@
 package src;
 import java.util.ArrayList;
-// EnemyCharacters have an xpReward parameter and have adjusted behaviors when attacking players.
+// EnemyCharacters have an xpReward and coinReward parameter and have adjusted behaviors when attacking players.
 // This object should never be created on its own. Only its subclasses will ever be used.
 class EnemyCharacter extends BasicCharacter{
+  // Define EnemyCharacter specific attributes
   private int xpReward;
   private int coinReward;
   private int basicAbilityLimit = 0;
@@ -13,6 +14,7 @@ class EnemyCharacter extends BasicCharacter{
   // RANDOM, AGGRESSIVE, DEFENSIVE
   private String behaviorType;
   
+  // Constructor used if all parameters are given (used by subclasses)
   public EnemyCharacter(String name, double maxHP, double attackStrength, double defenseStrength, double speed, int xpReward, int coinReward, String behaviorType){
     super(name, maxHP, attackStrength, defenseStrength, speed);
     this.xpReward = xpReward;
@@ -21,14 +23,18 @@ class EnemyCharacter extends BasicCharacter{
     setDescription("A basic enemy character.");
   }
   
+  // Constructor used if only a name is provided
   public EnemyCharacter(String name){
     this(name, 100, 25.0, 5.0, 5.0, 50, 20, "RANDOM");
   }
   
+  // Constructor used if only a name and behaviorType are provided
   public EnemyCharacter(String name, String behaviorType){
     this(name, 100, 25.0, 5.0, 5.0, 50, 20, behaviorType);
   }
   
+  // Getter methods
+
   public int getXPReward(){
     return xpReward;
   }
@@ -45,10 +51,14 @@ class EnemyCharacter extends BasicCharacter{
     return specialAbilityLimit;
   }
 
+  // Update if an EnemyCharacter has taken a turn yet
   protected void setHasTakenTurn(boolean newValue){
     hasTakenTurn = newValue;
   }
   
+  // Instead of creating a unique leveling and xp system for each enemy,
+  // adjust its base stats to a similar value as the player's level
+  // Saves time, processing power, and improves simplicity
   public void inflateStats(int playerLevel){
     // +5 MAX HP, +3 ATK, +2 DEF, +2 SPD per playerLevel
     changeMaxHP(5 * playerLevel);
@@ -76,6 +86,7 @@ class EnemyCharacter extends BasicCharacter{
       resetSpecialAbilityCooldowns();
     }
     
+    // Use different behavior patterns for an enemy's defense and basic abilities
     if(!hasTakenTurn){
       if(behaviorType.equals("AGGRESSIVE")){
         aggressive(playerTeam, enemyTeam);
@@ -89,6 +100,7 @@ class EnemyCharacter extends BasicCharacter{
     }
   }
   
+  // Check the EnemyCharacter's shared inventory for situational items
   private void itemAI(PlayerTeam playerTeam, EnemyTeam enemyTeam){
     Inventory enemyInventory = enemyTeam.getEnemyInventory();
     // Selfish AI prioritizes self-heal over team heal
@@ -114,8 +126,9 @@ class EnemyCharacter extends BasicCharacter{
   
   // Intended to be overridden by subclasses since each class has unique basic / special abilities
   public void basicAbilityAI(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{}
-  // Encourage a subclass to select a specific Character to use basic ability on
+  // Perform decision-making, provided a target is clearly defined
   public void basicAbilityAI(BasicCharacter preferredCharacter, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{}
+  // Perform decision-making on special abilities
   public void specialAbilityAI(ArrayList<Integer> availableSpecialAbilityIndices, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{}
   
   // Helper class that returns an ArrayList of special abilities that can be used in the current turn (cooldown of 0)
@@ -129,6 +142,8 @@ class EnemyCharacter extends BasicCharacter{
     return availableSpecialAbilityIndices;
   }
   
+  // Prioritizes killing weaker units.
+  // Uses maximal aggression and no defense
   private void aggressive(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException {
     // Attack the member of playerTeam with the lowest health
     PlayerCharacter lowestPlayer = playerTeam.getPlayerTeam().get(0);
@@ -142,6 +157,7 @@ class EnemyCharacter extends BasicCharacter{
     basicAbilityAI(lowestPlayer, playerTeam, enemyTeam);
   }
   
+  // Prioritize staying alive and safe over offensive abilities
   private void defensive(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     // Focus on staying defended / healing
     if((int)(Math.random() * 100) < 20){
@@ -156,6 +172,7 @@ class EnemyCharacter extends BasicCharacter{
     }
   }
   
+  // Randomly attack or defend with no "smart" decision-making
   private void random(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if((int)(Math.random() * 100) < 60){
       basicAbilityAI(playerTeam, enemyTeam);

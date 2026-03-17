@@ -2,14 +2,18 @@ package src;
 
 // Stores a stack of identical Items
 public class ItemStack {
+    // Item object stored in a stack
     private Item item;
+    // How many copies of that item exists
     private int  quantity;
 
+    // Constructor requires both parameters
     public ItemStack(Item item, int quantity){
         this.item = item;
         this.quantity = quantity;
     }
 
+    // Getter methods
     public Item getItem(){
         return item;
     }
@@ -18,6 +22,7 @@ public class ItemStack {
         return quantity;
     }
 
+    // Setter methods modifying quantity
     public void add(int amount){
         quantity += amount;
     }
