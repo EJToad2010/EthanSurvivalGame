@@ -83,4 +83,41 @@ class Knight extends PlayerCharacter {
       System.out.println(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() + " HP!");
     }
   }
+
+  // The Trial of Strength minigame that appears in the Tournament
+  // Returns then amount of damage that the Knight did on the target
+  public double chargeAttackMinigame(){
+    // Hidden variable that decreases every time the attack is charged.
+    // If at zero or less, the attack will miss.
+    int stamina = 100;
+    while(true){
+      GameManager.clearScreen();
+      if(stamina > 50){
+        System.out.println(getName() + " looks at the punching bag with excited rage.");
+      } else if(stamina > 25){
+        System.out.println(getName() + " looks at the puncing bag with tired excitement.");
+      } else if(stamina > 0){
+        System.out.println(getName() + " looks at the punching bag with weary eyes.");
+      } else{
+        System.out.println(getName() + " collapses with pure exhaustion.");
+        return 0.0;
+      }
+      String message = "What would you like to do?\n1: Charge Attack\n2: Release Attack";
+      int decisionInput = GameManager.obtainInput(message, 1, 2, false);
+      if(decisionInput == 1){
+        // Decrease stamina by a random amount
+        System.out.println(getName() + " charges their attack.");
+        stamina -= (int)(Math.random() * 10) + 5;
+      } else{
+        // Randomly decrease stamina so that the printed messages can be misleading
+        System.out.println(getName() + " releases their attack!");
+        stamina -= (int)(Math.random() * 15) + 5;
+        break;
+      }
+    }
+    double charge = (100 - stamina) / 100.0;
+    // Exponential multiplier of power
+    double multiplier = 1 + (charge * charge * 3.5);
+    return getAttackStrength() * multiplier;
+  }
 }

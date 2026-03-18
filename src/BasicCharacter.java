@@ -356,6 +356,10 @@ public class BasicCharacter {
     } else{
       actualDamage = attack - target.defenseStrength;
     }
+    // Avoid negative defensive strength which can happen from status effects
+    if(target.defenseStrength <= 0){
+      actualDamage = attack;
+    }
     if(playerTeam.getIndexOfProtectedCharacter(target) != -1){
       int index = playerTeam.getIndexOfProtectedCharacter(target);
       System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");

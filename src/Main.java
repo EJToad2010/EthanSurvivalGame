@@ -1,4 +1,5 @@
 package src;
+import java.io.IOException;
 public class Main {
   // Game architecture
   // Superclass: BasicCharacter
@@ -17,7 +18,7 @@ public class Main {
   // Class: PlayerTeam
   // Class: EnemyTeam
   // Class: GameManager
-  public static void main(String[] args) throws InterruptedException{
+  public static void main(String[] args) throws IOException, InterruptedException{
     GameManager gm = new GameManager();
     GameManager.clearScreen();
     System.out.println("Welcome to Ethan's AP CSA Survival Game!");

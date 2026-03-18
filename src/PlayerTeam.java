@@ -13,7 +13,7 @@ class PlayerTeam {
   private ArrayList<Double> protectedCharacterAmounts = new ArrayList<Double>();
   
   // How many coins the player's team currently has
-  private int coinBalance = 0;
+  private int coinBalance = 25;
   
   // Constructor that takes in an exisiting ArrayList and modifies its components into a player
   public PlayerTeam(ArrayList<PlayerCharacter> playerTeam, Inventory playerInventory){

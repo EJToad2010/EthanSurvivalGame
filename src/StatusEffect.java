@@ -4,7 +4,7 @@ import java.util.ArrayList;
 // Static class that can be used flexibly across all other classes
 class StatusEffect {
   // All types of status effects in the game
-  private static String[] effectTypes = new String[]{"Soft", "Bleed", "Poison", "Slow", "Stun", "Nimble", "Taunt", "Burn"};
+  private static String[] effectTypes = new String[]{"Soft", "Bleed", "Poison", "Slow", "Stun", "Nimble", "Taunt", "Burn", "Pierce"};
   // How each status effect affects a target
   private static String[] applyTypes = new String[]{"One-time", "Passive", "Passive", "One-time", "One-time", "Other", "Other", "Passive"};
   
@@ -12,7 +12,8 @@ class StatusEffect {
   private static ArrayList<BasicCharacter> affectedCharacters = new ArrayList<BasicCharacter>();
   private static ArrayList<String> affectedTypes = new ArrayList<String>();
   private static ArrayList<Double> affectedTurnsLeft = new ArrayList<Double>();
-  
+  // Allow each status effect to store one Double value, which can be used in more complex operations
+  private static ArrayList<Double> affectedRandomStats = new ArrayList<Double>();
   public StatusEffect(){}
   
   // Add a status effect for a specific character for the specified amount of turns
@@ -36,6 +37,7 @@ class StatusEffect {
       affectedCharacters.add(c);
       affectedTypes.add(type);
       affectedTurnsLeft.add((double)totalTurns);
+      affectedRandomStats.add(0.0);
     }
     // Message to confirm addition of StatusEffect
     System.out.println(c.getName() + " has gained [" + type.toUpperCase() + "] for " + totalTurns + " turns!");
@@ -60,6 +62,7 @@ class StatusEffect {
       affectedCharacters.remove(i);
       affectedTypes.remove(i);
       affectedTurnsLeft.remove(i);
+      affectedRandomStats.remove(i);
       i--;
     }
   }
@@ -80,6 +83,8 @@ class StatusEffect {
       c.changeSpeed(-15);
     } else if(type.equals("Soft")){
       c.changeAttackStrength(-10);
+    } else if(type.equals("Pierce")){
+      c.changeDefenseStrength(-10);
     }
   }
   
@@ -89,6 +94,8 @@ class StatusEffect {
       c.changeSpeed(15);
     } else if(type.equals("Soft")){
       c.changeAttackStrength(10);
+    } else if(type.equals("Pierce")){
+      c.changeDefenseStrength(10);
     }
   }
   
@@ -155,6 +162,7 @@ class StatusEffect {
         affectedCharacters.remove(i);
         affectedTypes.remove(i);
         affectedTurnsLeft.remove(i);
+        affectedRandomStats.remove(i);
         i--;
         continue;
       }
@@ -168,6 +176,7 @@ class StatusEffect {
         affectedCharacters.remove(i);
         affectedTypes.remove(i);
         affectedTurnsLeft.remove(i);
+        affectedRandomStats.remove(i);
         i--;
       }
     }

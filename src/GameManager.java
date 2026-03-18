@@ -1,5 +1,6 @@
 package src;
 import java.util.*;
+import java.io.IOException;
 // Controls the gameplay loop, which includes the battle loop, shop loop, etc.
 class GameManager {
   // Scanner used in static methods. It is declared here so that it doesn't have to use close()
@@ -66,7 +67,7 @@ class GameManager {
   }
   
   // Broad method that contains the entire gameplay
-  public void run() throws InterruptedException {
+  public void run() throws IOException, InterruptedException {
     clearScreen();
     playerTeam.clearPlayerTeam();
     // Brief description of the game given at the very start
@@ -88,6 +89,11 @@ class GameManager {
       initialize();
 
       // Exploration phase
+      if(playerTeam.getCoinBalance() >= 25){
+        clearScreen();
+        handleTournament();
+        clearScreen();
+      }
 
       // Battle phase
       System.out.println("You have encountered an enemy team!\n");
@@ -263,12 +269,34 @@ class GameManager {
       System.out.println("You have decided to enter the shop.");
       Thread.sleep(1000);
       Shop shop = new Shop();
+      clearScreen();
       shop.handleShopLoop(playerTeam);
     } else{
       System.out.println("You have decided to avoid the shop.");
       Thread.sleep(1000);
     }
   }
+
+  // Prompt the user if they are interested in entering a tournament.
+  // The tournament logic itself is handled in Tournament.java
+  private void handleTournament() throws IOException, InterruptedException{
+    String message = "You have encountered a tournament! Would you like to visit?\n";
+    message += "1: YES\n";
+    message += "2: NO";
+    int input = GameManager.obtainInput(message, 1, 2, false);
+    
+    if(input==1){
+      System.out.println("You have decided to enter the tournament.");
+      Thread.sleep(1000);
+      Tournament t = new Tournament();
+      clearScreen();
+      t.handleTournamentLoop(playerTeam);
+    } else{
+      System.out.println("You have decided to avoid the tournament.");
+      Thread.sleep(1000);
+    }
+  }
+
   /* Battle loop
   // Increase turnNum by 1
   // currentPlayer = player
@@ -622,28 +650,16 @@ class GameManager {
         // Basic abilities target a different number of enemies depending on the behavior of the Character.
         // Obtain the number of enemies the chosen basic ability targets
         if(selectedCharacter.getBasicAbilityEnemyCount(index) > 0){
-          System.out.println(selectedCharacter.getBasicAbilityNames().get(index) + " may target up to " + selectedCharacter.getBasicAbilityEnemyCount(index) + " enemies.");
+          if(selectedCharacter.getSpecialAbilityEnemyCount(index) != 999){
+            System.out.println(selectedCharacter.getSpecialAbilityNames().get(index) + " may target up to " + selectedCharacter.getSpecialAbilityEnemyCount(index) + " enemies.");
+          }
           if(selectedCharacter.getBasicAbilityEnemyCount(index) <= enemyTeam.getNumAlive()){
             // There are enough enemies to fully utilize the basic ability
             // The user must choose which enemies to target.
             // Prompt the user for their enemy choices.
             ArrayList<Integer> selectedEnemyIndices = new ArrayList<Integer>();
             for(int i = 0; i < selectedCharacter.getBasicAbilityEnemyCount(index); i++){
-              String message = "Select an enemy to attack:\n";
-              message += enemyTeam.getEnemyTeamNumFormat(selectedEnemyIndices);
-              int selectedEnemyIndex;
-              while(true){
-                selectedEnemyIndex = GameManager.obtainInput(message, 1, enemyTeam.getEnemyTeam().size(), true);
-                if(enemyTeam.getEnemyTeam().get(selectedEnemyIndex).getIsDead()){
-                  System.out.println("Invalid input. This character is dead!");
-                } else{
-                  if(selectedEnemyIndices.contains(selectedEnemyIndex)){
-                    System.out.println("Invalid input. This character has already been chosen!");
-                  } else{
-                    break;
-                  }
-                }
-              }
+              int selectedEnemyIndex = selectApplicableEnemy(selectedEnemyIndices);
               selectedEnemyIndices.add(selectedEnemyIndex);
             }
 
@@ -691,21 +707,7 @@ class GameManager {
           // Prompt the user for their enemy choices.
           ArrayList<Integer> selectedEnemyIndices = new ArrayList<Integer>();
           for(int i = 0; i < selectedCharacter.getSpecialAbilityEnemyCount(index); i++){
-            String message = "Select an enemy to attack:\n";
-          	message += enemyTeam.getEnemyTeamNumFormat(selectedEnemyIndices);
-            int selectedEnemyIndex;
-            while(true){
-              selectedEnemyIndex = GameManager.obtainInput(message, 1, enemyTeam.getEnemyTeam().size(), true);
-              if(enemyTeam.getEnemyTeam().get(selectedEnemyIndex).getIsDead()){
-                System.out.println("Invalid input. This character is dead!");
-              } else{
-                if(selectedEnemyIndices.contains(selectedEnemyIndex)){
-                  System.out.println("Invalid input. This character has already been chosen!");
-                } else{
-                  break;
-                }
-              }
-            }
+            int selectedEnemyIndex = selectApplicableEnemy(selectedEnemyIndices);
             selectedEnemyIndices.add(selectedEnemyIndex);
           }
 
@@ -738,6 +740,26 @@ class GameManager {
         currentActionPoints++;
       }
     }
+  }
+
+  // Obtain an input for ane enemy to target, keeping in mind if they are dead or have already been chosen
+  private int selectApplicableEnemy(ArrayList<Integer> selectedEnemyIndices){
+    int selectedEnemyIndex;
+    String message = "Select an enemy to attack:\n";
+    message += enemyTeam.getEnemyTeamNumFormat(selectedEnemyIndices);
+    while(true){
+      selectedEnemyIndex = GameManager.obtainInput(message, 1, enemyTeam.getEnemyTeam().size(), true);
+      if(enemyTeam.getEnemyTeam().get(selectedEnemyIndex).getIsDead()){
+        System.out.println("Invalid input. This character is dead!");
+      } else{
+        if(selectedEnemyIndices.contains(selectedEnemyIndex)){
+          System.out.println("Invalid input. This character has already been chosen!");
+        } else{
+          break;
+        }
+      }
+    }
+    return selectedEnemyIndex;
   }
   
   // Print a character's core stats, descriptions, and all applicable attacks

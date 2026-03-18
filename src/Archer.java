@@ -14,9 +14,9 @@ class Archer extends PlayerCharacter {
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 2});
-    addToArrayList(getSpecialAbilityNames(), new String[]{"Volley", "Crippling Arrow"});
+    addToArrayList(getSpecialAbilityNames(), new String[]{"Volley", "Armor Piercer"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Fires an arrow at every enemy, dealing moderate damage. Each enemy has a 10% chance of being burned for 1 turn.",
-                                                               "Deals moderate damage to a single target. The target has a 50% chance of being slowed for 2 turns."});
+                                                               "Deals moderate damage to a single target. The enemy has a 50% chance of receiving reduced defensive strength for 2 turns."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
@@ -58,10 +58,11 @@ class Archer extends PlayerCharacter {
       }
     } else if(specialAbilityIndex == 1){
       // Crippling Arrow
-      System.out.println(getName() + " fired a crippling arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
-      if((int)(Math.random() * 100) < 50 && wasEnemyHit){
-        StatusEffect.addStatusEffect(target, "Slow", 2);
+      // 50% chance of receiving PIERCE status effect regardless of if they received any damage
+      System.out.println(getName() + " fired an armor piercing arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!");
+      handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam);
+      if((int)(Math.random() * 100) < 50){
+        StatusEffect.addStatusEffect(target, "Pierce", 2);
       }
     }
     System.out.println(target.getSimpleOutput());
@@ -81,10 +82,9 @@ class Archer extends PlayerCharacter {
   // A precision minigame that is not implemented yet
   // The user must aim their shot towards the center of the bar
   // Returns how many spaces the user was away from the "perfect" spot, the center of the bar
-  public int aimMinigame() throws IOException, InterruptedException{
+  public int aimMinigame(int barSize) throws IOException, InterruptedException{
     int pos = 0;
     boolean isIncreasing = true;
-    int barSize = 13;
     while(true){
       if(isIncreasing){
         pos++;

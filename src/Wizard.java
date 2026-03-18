@@ -87,7 +87,7 @@ class Wizard extends PlayerCharacter {
   // Generate a random numerical code with length digits.
   // Prompt the user to memorize the code and reproduce it from memory.
   // Return the number of digits that are correct and placed in the right location. (<=length)
-  private int promptMemorizationCode(int length){
+  public int promptMemorizationCode(int length){
       String code = "";
       for(int i = 0; i < length; i++){
         int random_digit = (int)(Math.random() * 10);
