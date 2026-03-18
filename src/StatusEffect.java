@@ -150,6 +150,15 @@ class StatusEffect {
           applyPassiveEffect(affectedCharacters.get(i), affectedTypes.get(i));
       }
 
+      // Remove a status effect if a Character is dead
+      if(affectedCharacters.get(i).getIsDead()){
+        affectedCharacters.remove(i);
+        affectedTypes.remove(i);
+        affectedTurnsLeft.remove(i);
+        i--;
+        continue;
+      }
+
       // Remove a status effect if its turn timer runs out
       if(affectedTurnsLeft.get(i) <= 0){
         System.out.println(affectedCharacters.get(i).getName() + " lost the [" + affectedTypes.get(i).toUpperCase() + "] effect!");
