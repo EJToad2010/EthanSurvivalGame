@@ -67,7 +67,7 @@ class EnemyCharacter extends BasicCharacter{
     changeDefenseStrength(2 * playerLevel);
     changeSpeed(2 * playerLevel);
     xpReward *= (int) Math.pow(1.25, Math.max(playerLevel-1, 0));
-    coinReward *= (int) Math.pow(1.25, Math.max(playerLevel-1, 0));
+    coinReward *= (int) Math.pow(2, Math.max(playerLevel-1, 0));
     basicAbilityLimit += Math.min(getBasicAbilityNames().size(), playerLevel / 2);
     specialAbilityLimit += Math.min(getBasicAbilityNames().size(), playerLevel / 2);
   }
@@ -136,7 +136,7 @@ class EnemyCharacter extends BasicCharacter{
     ArrayList<Integer> availableSpecialAbilityIndices = new ArrayList<Integer>();
     for(int i = 0; i < Math.min(specialAbilityLimit+1, getCurrentSpecialAbilityCooldowns().size()); i++){
       if(getCurrentSpecialAbilityCooldowns().get(i) == 0){
-        availableSpecialAbilityIndices.add(getCurrentSpecialAbilityCooldowns().get(i));
+        availableSpecialAbilityIndices.add(i);
       }
     }
     return availableSpecialAbilityIndices;

@@ -12,8 +12,8 @@ class DartGoblin extends EnemyCharacter{
                                                              "During the player's turn, all attacks toward the Goblin deal 25% less damage."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
-    addToArrayList(getSpecialAbilityNames(), new String[]{"Poison Dart Volley", "Pickpocket"});
-    addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Shoot slightly weaker poison darts at all targets. 25% chance for each target to be poisoned for 2 turns.",
+    addToArrayList(getSpecialAbilityNames(), new String[]{"Dart Volley", "Pickpocket"});
+    addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Shoot slightly weaker darts at all targets. 10% chance for each target to be poisoned for 2 turns.",
                                                                "Attack two targets for moderate damage. The Goblin has a 25% to steal an item from the player."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 2});
@@ -93,9 +93,7 @@ class DartGoblin extends EnemyCharacter{
   public void specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(specialAbilityIndex == 0){
       // Poison Dart Volley
-      System.out.println(getName() + " shot a poison dart at " + target.getName() + " for " + (getAttackStrength()-1) + " HP!");
-      target.changeCurrentHP(getAttackStrength()-1);
-      System.out.println(target.getSimpleOutput());
+      System.out.println(getName() + " shot a dart at " + target.getName() + " for " + (getAttackStrength()-5) + " HP!");
       Thread.sleep(1000);
       // 25% chance of Poison for 2 turns
       if((int)(Math.random() * 100) < 25){

@@ -637,7 +637,11 @@ class GameManager {
                 if(enemyTeam.getEnemyTeam().get(selectedEnemyIndex).getIsDead()){
                   System.out.println("Invalid input. This character is dead!");
                 } else{
-                  break;
+                  if(selectedEnemyIndices.contains(selectedEnemyIndex)){
+                    System.out.println("Invalid input. This character has already been chosen!");
+                  } else{
+                    break;
+                  }
                 }
               }
               selectedEnemyIndices.add(selectedEnemyIndex);
@@ -695,7 +699,11 @@ class GameManager {
               if(enemyTeam.getEnemyTeam().get(selectedEnemyIndex).getIsDead()){
                 System.out.println("Invalid input. This character is dead!");
               } else{
-                break;
+                if(selectedEnemyIndices.contains(selectedEnemyIndex)){
+                  System.out.println("Invalid input. This character has already been chosen!");
+                } else{
+                  break;
+                }
               }
             }
             selectedEnemyIndices.add(selectedEnemyIndex);
