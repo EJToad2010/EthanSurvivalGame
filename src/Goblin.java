@@ -9,7 +9,7 @@ class Goblin extends EnemyCharacter{
     setDescription("A weak enemy focused on annoying the player and causing chaos.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Rusty Dagger", "Nimble Dodge"});
     addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto a single target. 10% chance to inflict bleed.",
-                                                             "During the player's turn, all attacks toward the Goblin deal 50% less damage."});
+                                                             "During the player's turn, all attacks toward the Goblin deal 25% less damage."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Taunt", "Pickpocket"});

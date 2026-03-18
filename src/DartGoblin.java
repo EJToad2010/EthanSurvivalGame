@@ -8,8 +8,8 @@ class DartGoblin extends EnemyCharacter{
     super(name, 60.0, 8.0, 5.0, 35.0, 50, 20, behaviorType);
     setDescription("A fast, ranged, weak enemy who focuses on dealing poison damage to the player's team.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Poison Dart", "Nimble Dodge"});
-    addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto one target, ignoring their defense. 50% to poison the character for two turns.",
-                                                             "During the player's turn, all attacks toward the Goblin deal 50% less damage."});
+    addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto one target, ignoring their defense. 25% to poison the character for two turns.",
+                                                             "During the player's turn, all attacks toward the Goblin deal 25% less damage."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Poison Dart Volley", "Pickpocket"});
@@ -80,8 +80,7 @@ class DartGoblin extends EnemyCharacter{
       // Poison Dart
       System.out.println(getName() + " shot a poison dart at " + target.getName() + " for " + getAttackStrength() + " HP!");
       boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
-      System.out.println(target.getSimpleOutput());
-      if((int)(Math.random() * 100) < 50 && wasEnemyHit){
+      if((int)(Math.random() * 100) < 25 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Poison", 2);
       }
     } else if(basicAbilityIndex == 1){

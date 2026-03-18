@@ -282,6 +282,7 @@ class GameManager {
   private void runBattleLoop() throws InterruptedException{
     playerActionPoints = playerBattleCapacity;
     enemyActionPoints = enemyBattleCapacity;
+    playerTeam.resetPlayerCooldowns();
     // Quick print message which shows the beginning states of both teams
     System.out.println(playerTeam);
     Thread.sleep(1500);

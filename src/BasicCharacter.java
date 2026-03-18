@@ -359,6 +359,7 @@ public class BasicCharacter {
     if(playerTeam.getIndexOfProtectedCharacter(target) != -1){
       int index = playerTeam.getIndexOfProtectedCharacter(target);
       System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
+      actualDamage -= playerTeam.getProtectedCharacterAmounts().get(index);
     }
     return Math.max(actualDamage, 0);
   }
