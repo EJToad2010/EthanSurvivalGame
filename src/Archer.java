@@ -1,5 +1,9 @@
 package src;
+import java.io.IOException;
+import java.util.Scanner;
 class Archer extends PlayerCharacter {
+  // Used in a precision minigame
+  private Scanner s = new Scanner(System.in);
   public Archer(String name){
     super(name, 90.0, 20.0, 10.0, 30.0);
     // Set the names, descriptions, and cooldowns of all the Archer's abilities.
@@ -72,5 +76,61 @@ class Archer extends PlayerCharacter {
     } else{
       System.out.println(getName() + " lightly dodged " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
     }
+  }
+
+  // A precision minigame that is not implemented yet
+  // The user must aim their shot towards the center of the bar
+  // Returns how many spaces the user was away from the "perfect" spot, the center of the bar
+  public int aimMinigame() throws IOException, InterruptedException{
+    int pos = 0;
+    boolean isIncreasing = true;
+    int barSize = 13;
+    while(true){
+      if(isIncreasing){
+        pos++;
+      }else{
+        pos--;
+      }
+      if(pos>barSize-1){
+        pos=barSize-1;
+        pos--;
+        isIncreasing = false;
+      } else if(pos < 0){
+        pos = 0;
+        pos++;
+        isIncreasing = true;
+      }
+      GameManager.clearScreen();
+      System.out.println("Aim for the center of the bar!");
+      System.out.println("Press ENTER to shoot!");
+      System.out.println(printBar(pos, barSize));
+      if(System.in.available() > 0){
+        s.nextLine();
+        System.out.println("Loop breaked.");
+        return Math.abs(pos-(barSize/2));
+      }
+      Thread.sleep(100);
+    }
+  }
+  
+  // Prints the bar, as well as where the user's aimpoint currently is
+  // EX: [---o-|-|-|-----]
+  private String printBar(int pos, int barSize){
+    int center = (barSize/2);
+    String output = "";
+    output += "[";
+    for(int i = 0; i < barSize; i++){
+      if(i == pos){
+        output += "o";
+      } else if(i == center){
+        output += "|";
+      } else if(i == center-2 || i == center+2){
+        output += "∣";
+      } else{
+        output += "-";
+      }
+    }
+    output += "]";
+    return output;
   }
 }

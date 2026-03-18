@@ -82,6 +82,7 @@ class GameManager {
     while(true){
       // Announce a new day
       StatusEffect.resetStatusEffects();
+      clearScreen();
       System.out.println("\nDay " + dayNum);
       Thread.sleep(1000);
       initialize();
@@ -101,6 +102,7 @@ class GameManager {
         break;
       }
       anythingToContinue();
+      clearScreen();
       handleEnemyRewards();
       clearScreen();
 
@@ -108,6 +110,7 @@ class GameManager {
       handleShop();
       
       // I have plans to expand on the evening phase, but it is not implemented yet,
+      clearScreen();
       System.out.println("It is now the evening.");
       Thread.sleep(1000);
       System.out.println("Your characters have constructed a small campsite to stay for the night.");

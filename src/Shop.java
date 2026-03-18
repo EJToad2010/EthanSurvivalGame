@@ -22,11 +22,12 @@ class Shop {
   public void resetStock(){
     shopInventory.clear();
     if(shopType.equals("Adventure")){
-      // Adventure type shops contain healing items and items used outside of battle.
+      // Adventure type shops contain healing items.
       shopInventory.add(new HealthPotion(20, 20.0), 3);
       shopInventory.add(new HealthPotion(45, 50.0), 1);
       shopInventory.add(new HealthPool(30, 10.0), 3);
       shopInventory.add(new HealthPool(65, 25.0), 1);
+      shopInventory.add(new HealthPotion((int)(Math.random() * 75) + 25, (int)(Math.random() * 55) + 20), (int)(Math.random() * 5) + 1);
     }
   }
   
