@@ -126,7 +126,7 @@ public class Tournament {
         // Tutorial of the Trial of Strength
         System.out.println("Welcome to the TRIAL OF STRENGTH.");
         Thread.sleep(2000);
-        System.out.println(selectedKnight.getName() + " will be given a puncing bag.");
+        System.out.println(selectedKnight.getName() + " will be given a punching bag.");
         Thread.sleep(1000);
         System.out.println("They must hit this bag as hard as possible to win.");
         Thread.sleep(1000);
@@ -147,6 +147,49 @@ public class Tournament {
             GameManager.clearScreen();
             System.out.println("ROUND " + i);
             printPlayerTurnNumber();
+            for(int j = 0; j < allScores.length; j++){
+                GameManager.clearScreen();
+                if(j+1 == playersTurn){
+                    // Player Turn
+                    System.out.println("It is your turn!\n");
+                    Thread.sleep(1000);
+                    double score = selectedKnight.chargeAttackMinigame();
+                    score = GameManager.truncate(score, 2);
+                    if(score == 0){
+                        System.out.println(selectedKnight.getName() + " missed their attack!");
+                    } else{
+                        System.out.println(selectedKnight.getName() + " hit the punching bag for " + score + " HP!");
+                        allScores[j] += score;
+                    }
+                } else{
+                    // AI Turn
+                    System.out.println("It is " + contestantNames[j] + "'s turn!");
+                    Thread.sleep(2000);
+                    // Difficulty 1 is 30.0 base atk, Diff 2 is 39.0, Diff 3 is 48.0, Diff 4 is 57.0
+                    double aiBaseAttackStrength = 30.0 * 1+(0.3 * (difficulty-1));
+                    // Chance that an AI misses their attack
+                    double missChance = 0.5 - (difficulty / 10);
+
+                    if(Math.random() < missChance){
+                        // AI missed their attack
+                        System.out.println(contestantNames[j] + " missed their attack!");
+                    } else{
+                        // Use the same damage calculations as the Player based on a randomly generated stamina level
+                        int stamina = (int)(Math.random() * (100/difficulty)) + 1;
+                        double charge = (100 - stamina) / 100.0;
+                        double multiplier = 1 + (charge * charge * 3.5);
+                        double score = aiBaseAttackStrength * multiplier;
+                        score = GameManager.truncate(score, 2);
+                        allScores[j] += score;
+                        System.out.println(contestantNames[j] + " hit the punching bag for " + score + " HP!");
+                    }
+                }
+                // Print leaderboard after every turn
+                Thread.sleep(1000);
+                GameManager.anythingToContinue();
+                printStandings();
+                GameManager.anythingToContinue();
+            }
         }
         return -1;
     }
@@ -189,9 +232,6 @@ public class Tournament {
                     int score = Math.max(10-offset, 0);
                     System.out.println("You have scored " + score + " points!");
                     allScores[j] += score;
-                    GameManager.anythingToContinue();
-                    printStandings();
-                    GameManager.anythingToContinue();
                 } else{
                     // AI turn
                     GameManager.clearScreen();
@@ -202,10 +242,12 @@ public class Tournament {
                     aiScore = Math.min(10, aiScore);
                     System.out.println(contestantNames[j] + " has scored " + aiScore + " points!");
                     allScores[j] += aiScore;
-                    GameManager.anythingToContinue();
-                    printStandings();
-                    GameManager.anythingToContinue();
                 }
+                // Print leaderboard after every turn
+                Thread.sleep(1000);
+                GameManager.anythingToContinue();
+                printStandings();
+                GameManager.anythingToContinue();
             }
         }
         System.out.println("The game has ended!");
@@ -285,6 +327,7 @@ public class Tournament {
                         System.out.println(contestantNames[i] + " will move on to the next round!\n");
                         Thread.sleep(1000);
                     }
+                    GameManager.anythingToContinue();
                 }
                 if(getPlayerRankEliminated(true) == 1 || !allEliminationStatus[playersTurn-1]){
                     break;

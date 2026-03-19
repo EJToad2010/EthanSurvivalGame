@@ -650,8 +650,8 @@ class GameManager {
         // Basic abilities target a different number of enemies depending on the behavior of the Character.
         // Obtain the number of enemies the chosen basic ability targets
         if(selectedCharacter.getBasicAbilityEnemyCount(index) > 0){
-          if(selectedCharacter.getSpecialAbilityEnemyCount(index) != 999){
-            System.out.println(selectedCharacter.getSpecialAbilityNames().get(index) + " may target up to " + selectedCharacter.getSpecialAbilityEnemyCount(index) + " enemies.");
+          if(selectedCharacter.getBasicAbilityEnemyCount(index) != 999){
+            System.out.println(selectedCharacter.getBasicAbilityNames().get(index) + " may target up to " + selectedCharacter.getSpecialAbilityEnemyCount(index) + " enemies.");
           }
           if(selectedCharacter.getBasicAbilityEnemyCount(index) <= enemyTeam.getNumAlive()){
             // There are enough enemies to fully utilize the basic ability
@@ -909,6 +909,20 @@ class GameManager {
   public static void clearScreen(){
     for(int i = 0; i < 100; i++){
       System.out.println();
+    }
+  }
+
+  // Truncate a double value to n decimal points
+  public static double truncate(double value, int n){
+    String strValue = Double.toString(value);
+    int periodIndex = strValue.indexOf(".");
+    if(periodIndex == -1){
+      return value;
+    } else{
+      String numBeforeDecimal = strValue.substring(0, periodIndex);
+      String numAfterDecimal = strValue.substring(periodIndex, Math.min(strValue.length(), periodIndex + n + 1));
+      String output = numBeforeDecimal + numAfterDecimal;
+      return Double.parseDouble(output);
     }
   }
   
