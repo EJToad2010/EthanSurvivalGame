@@ -17,7 +17,7 @@ class Wizard extends PlayerCharacter {
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Deals heavy damage to a single target and has a 25% chance to burn the enemy.",
                                                                "The Wizard calls on the spirits to unleash a powerful attack. The player must memorize a seven digit code and retype it. If they correctly memorized the code, attack power will be doubled towards a target. Otherwise, attack power will be reduced."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
-    addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 3});
+    addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 4});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});

@@ -15,7 +15,7 @@ class Knight extends PlayerCharacter {
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Deals +10 damage from Sword Swing. Deals an additional 50% damage if the enemy is below 50% HP.",
                                                                "Attack power is doubled from Sword Swing, but lose HP equal to 25% of your doubled attack power."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
-    addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 3});
+    addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 4});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 2});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 2});

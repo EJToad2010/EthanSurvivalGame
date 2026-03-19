@@ -15,7 +15,7 @@ public class Tournament {
 
     // Constructor that takes no parameters
     public Tournament(){
-        for(int i = 0; i < 4; i++){
+        for(int i = 0; i < allScores.length; i++){
             allScores[i] = 0.0;
             allEliminationStatus[i] = true;
             contestantNames[i] = "Contestant " + (i+1);
@@ -167,38 +167,41 @@ public class Tournament {
         Thread.sleep(1000);
         System.out.println("How accurate is " + selectedArcher.getName() + " under pressure?");
         Thread.sleep(2000);
-        System.out.println("There will be seven rounds.");
+        System.out.println("There will be five rounds.");
         Thread.sleep(1000);
         System.out.println("There will be three other Archers competing. Score the most points to win.");
         Thread.sleep(1000);
         GameManager.anythingToContinue();
 
         // Seven rounds
-        for(int i = 1; i <= 7; i++){
+        for(int i = 1; i <= 5; i++){
             GameManager.clearScreen();
             System.out.println("ROUND " + i);
             printPlayerTurnNumber();
+            GameManager.anythingToContinue();
             for(int j = 0; j < allScores.length; j++){
                 if(j+1 == playersTurn){
                     // Player turn
+                    GameManager.clearScreen();
                     System.out.println("It is your turn!\n");
                     Thread.sleep(1000);
-                    int offset = selectedArcher.aimMinigame(13 + (difficulty*5));
+                    int offset = selectedArcher.aimMinigame(15 + (difficulty*5));
                     int score = Math.max(10-offset, 0);
                     System.out.println("You have scored " + score + " points!");
-                    allScores[i] += score;
+                    allScores[j] += score;
                     GameManager.anythingToContinue();
                     printStandings();
                     GameManager.anythingToContinue();
                 } else{
                     // AI turn
-                    System.out.println("It is " + contestantNames[i] + "'s turn!");
+                    GameManager.clearScreen();
+                    System.out.println("It is " + contestantNames[j] + "'s turn!");
                     Thread.sleep(2000);
                     int aiScore = 5+difficulty;
                     aiScore += (int)(Math.random() * 3) - 1;
                     aiScore = Math.min(10, aiScore);
-                    System.out.println(contestantNames[i] + " has scored " + aiScore + " points!");
-                    allScores[i] += aiScore;
+                    System.out.println(contestantNames[j] + " has scored " + aiScore + " points!");
+                    allScores[j] += aiScore;
                     GameManager.anythingToContinue();
                     printStandings();
                     GameManager.anythingToContinue();
@@ -238,10 +241,12 @@ public class Tournament {
             GameManager.clearScreen();
             System.out.println("ROUND " + round);
             printPlayerTurnNumber();
+            GameManager.anythingToContinue();
             // Handle each contestant's turn, distinguishing between Player and AI
             for(int i = 0; i < allScores.length; i++){
                 if((i+1) == playersTurn){
                     // Player's turn
+                    GameManager.clearScreen();
                     System.out.println("It is your turn!\n");
                     Thread.sleep(1000);
                     int digits = (difficulty*2)+(round);
@@ -255,8 +260,9 @@ public class Tournament {
                         System.out.println("\nYou have been eliminated.");
                     }
                     GameManager.anythingToContinue();
-                } else{
-                    // AI's turn
+                } else if(allEliminationStatus[i]){
+                    // Alive AI's turn
+                    GameManager.clearScreen();
                     System.out.println("It is " + contestantNames[i] + "'s turn!");
                     // Chance that an AI fails that round
                     double probabilityOfDeath = 0.4 - ((double)(difficulty)/10);
@@ -269,7 +275,7 @@ public class Tournament {
                         System.out.println(contestantNames[i] + " has been eliminated!\n");
                         allEliminationStatus[i] = false;
                         Thread.sleep(1000);
-                        if(getPlayerRankEliminated() == 1){
+                        if(getPlayerRankEliminated(true) == 1){
                             System.out.println("All other contestants have been eliminated!");
                         }
                     } else{
@@ -280,16 +286,16 @@ public class Tournament {
                         Thread.sleep(1000);
                     }
                 }
-                if(getPlayerRankEliminated() == 1 || !allEliminationStatus[playersTurn-1]){
+                if(getPlayerRankEliminated(true) == 1 || !allEliminationStatus[playersTurn-1]){
                     break;
                 }
             }
             round++;
-            if(getPlayerRankEliminated() == 1 || !allEliminationStatus[playersTurn-1]){
+            if(getPlayerRankEliminated(true) == 1 || !allEliminationStatus[playersTurn-1]){
                 break;
             }
         }
-        return getPlayerRankEliminated();
+        return getPlayerRankEliminated(allEliminationStatus[playersTurn-1]);
     }
 
     // Print when a player is performing their turn based on their turn number
@@ -340,26 +346,27 @@ public class Tournament {
 
     // Get the rank of the Player 1-4 after being eliminated.
     // Achieve this by looking at allEliminationStatus
-    private int getPlayerRankEliminated(){
-        int rank = allEliminationStatus.length;
+    private int getPlayerRankEliminated(boolean isPlayerAlive){
+        int aliveCount = 0;
         for(int i = 0; i < allEliminationStatus.length; i++){
-            if((i+1) != playersTurn){
-                if(!allEliminationStatus[i]){
-                    rank--;
-                }
+            if(allEliminationStatus[i]){
+                aliveCount++;
             }
         }
-        return rank;
+        if(isPlayerAlive){
+            return aliveCount;
+        }
+        return aliveCount + 1;
     }
 
     // Get the rank of the Player 1-4 based on scores
     private int getPlayerRankStandings(){
-        int rank = allEliminationStatus.length;
+        int rank = 1;
         double playerScore = allScores[playersTurn - 1];
         for(int i = 0; i < rank; i++){
             if((i+1) != playersTurn){
-                if(allScores[i] < playerScore){
-                    rank--;
+                if(allScores[i] > playerScore){
+                    rank++;
                 }
             }
         }

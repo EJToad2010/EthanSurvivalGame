@@ -1,6 +1,7 @@
 package src;
 // A consumable item that can be used by both Players and Enemies with no differences
 // Stores a singular item
+// TODO: Add offensive items to add to an offensive Shop
 class Item {
   // Attributes for an Item
   private String name;

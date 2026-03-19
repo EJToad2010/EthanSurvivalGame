@@ -18,7 +18,7 @@ class Archer extends PlayerCharacter {
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Fires an arrow at every enemy, dealing moderate damage. Each enemy has a 10% chance of being burned for 1 turn.",
                                                                "Deals moderate damage to a single target. The enemy has a 50% chance of receiving reduced defensive strength for 2 turns."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
-    addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 3});
+    addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 4});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 2});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 2});
@@ -106,10 +106,9 @@ class Archer extends PlayerCharacter {
       System.out.println(printBar(pos, barSize));
       if(System.in.available() > 0){
         s.nextLine();
-        System.out.println("Loop breaked.");
         return Math.abs(pos-(barSize/2));
       }
-      Thread.sleep(100);
+      Thread.sleep(50);
     }
   }
   
