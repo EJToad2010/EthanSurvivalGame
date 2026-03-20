@@ -108,6 +108,14 @@ class GameManager {
 
       // Tournament phase
       // Tournaments appear once every two days and on day 3 if the player has enough coins.
+      // An NPC spawns in the first day a tournament is available to gift the minimum required entry fee.
+      // This way, no players accidentally miss the Tournament feature
+      if(dayNum == 2 && playerTeam.getCoinBalance() < 25){
+        System.out.println("A stranger approaches you, giving you 25 coins.");
+        System.out.println("Good luck on your journey out there, he says.");
+        playerTeam.increaseCoinBalance(25);
+        anythingToContinue();
+      }
       if(playerTeam.getCoinBalance() >= 25 && (dayNum%2 == 0 || dayNum == 3)){
         clearScreen();
         handleTournament();
