@@ -12,11 +12,11 @@ class DartGoblin extends EnemyCharacter{
                                                              "During the player's turn, all attacks toward the Goblin deal 25% less damage."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
-    addToArrayList(getSpecialAbilityNames(), new String[]{"Dart Volley", "Pickpocket"});
+    addToArrayList(getSpecialAbilityNames(), new String[]{"Dart Volley", "Poison Mark"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Shoot slightly weaker darts at all targets. 10% chance for each target to be poisoned for 2 turns.",
-                                                               "Attack two targets for moderate damage. The Goblin has a 25% to steal an item from the player."});
+                                                               "Shoot a poison dart at a target. This target gets a 75% chance to be poisoned for 3 turns."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
-    addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 2});
+    addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 2});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
   }
@@ -83,6 +83,7 @@ class DartGoblin extends EnemyCharacter{
       if((int)(Math.random() * 100) < 25 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Poison", 2);
       }
+      System.out.println(target.getSimpleOutput());
     } else if(basicAbilityIndex == 1){
       // Nimble Dodge (shared with Goblin class since they are both speedy Goblin types)
       System.out.println(getName() + " prepared Nimble Dodge for the player's next turn!");
@@ -96,16 +97,17 @@ class DartGoblin extends EnemyCharacter{
       System.out.println(getName() + " shot a dart at " + target.getName() + " for " + (getAttackStrength()-5) + " HP!");
       Thread.sleep(1000);
       // 25% chance of Poison for 2 turns
-      if((int)(Math.random() * 100) < 25){
+      if((int)(Math.random() * 100) < 10){
         StatusEffect.addStatusEffect(target, "Poison", 2);
       }
-    } else if(specialAbilityIndex == 1){
-      // TODO: CREATE UNIQUE SECOND SPECIAL ABILITY FOR DART GOBLIN
-      System.out.println(getName() + " swiped at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
-      if(enemyTeam.getEnemyInventory().getInventory().size() > 0 && (int)(Math.random() * 100) < 25){
-        
+    } else if(specialAbilityIndex == 1){
+      // Poison Mark
+      System.out.println(getName() + " marked " + target.getName() + " with poison for " + getAttackStrength() + " HP!");
+      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      System.out.println(target.getSimpleOutput());
+      if((int)(Math.random() * 100) < 75 && wasEnemyHit){
+        StatusEffect.addStatusEffect(target, "Poison", 3);
       }
     }
     System.out.println(target.getSimpleOutput());

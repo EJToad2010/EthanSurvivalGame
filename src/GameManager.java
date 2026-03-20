@@ -7,15 +7,17 @@ class GameManager {
   // and cause an error (I forgot what it was called)
   static Scanner inputScanner = new Scanner(System.in);
   // Manually set this to true during repeated playtesting
-  private boolean skipTutorial = true;
+  public static boolean skipTutorial = true;
   // Local Scanner used outside of specialized methods
   private Scanner s = new Scanner(System.in);
   // Arrays used to track enemy difficulty progression through their class types.
   // Influences the probability that each class will be chosen
-  private String[] earlyGameEnemies = new String[]{"Goblin", "Goblin", "Dart Goblin"};
+  private String[] earlyGameEnemies = new String[]{"Goblin", "Goblin", "DartGoblin"};
   // Enemy behaviors change as the game progresses, adding more complex roles.
   // This simulates the AI getting smarter.
   private String[] earlyGameEnemyBehaviors = new String[]{"RANDOM", "RANDOM", "RANDOM", "AGGRESSIVE", "DEFENSIVE"};
+  // Enemy items are basic early on
+  private String[] earlyGameEnemyItems = new String[]{"HealthPotion", "HealthPotion", "HealthPool"};
   
   // Attributes needed for Player and Enemy classes outside of battle
   private int playerBattleCapacity = 2;
@@ -76,6 +78,8 @@ class GameManager {
       Thread.sleep(1000);
       System.out.println("Train skilled fighters and survive as long as possible!");
       Thread.sleep(1000);
+      System.out.println("During gameplay, you will be asked to type a number input in response to questions.");
+      Thread.sleep(1000);
       anythingToContinue();
     }
     
@@ -86,10 +90,23 @@ class GameManager {
       clearScreen();
       System.out.println("\nDay " + dayNum);
       Thread.sleep(1000);
+      // Restore player HP after every night
+      if(dayNum > 1){
+        System.out.println("Your characters restored 10.0 HP overnight.");
+        Thread.sleep(1000);
+        for(PlayerCharacter c : playerTeam.getPlayerTeam()){
+          c.changeCurrentHP(10);
+          System.out.println(c.getSimpleOutput());
+        }
+        Thread.sleep(1000);
+        anythingToContinue();
+        clearScreen();
+      }
       initialize();
 
-      // Exploration phase
-      if(playerTeam.getCoinBalance() >= 25){
+      // Tournament phase
+      // Tournaments appear once every two days if the player has enough coins.
+      if(playerTeam.getCoinBalance() >= 25 && dayNum%2 == 0){
         clearScreen();
         handleTournament();
         clearScreen();
@@ -115,7 +132,7 @@ class GameManager {
       // Shop is guaranteed to appear after battle
       handleShop();
       
-      // I have plans to expand on the evening phase, but it is not implemented yet,
+      // TODO: Expand on this campfire phase
       clearScreen();
       System.out.println("It is now the evening.");
       Thread.sleep(1000);
@@ -134,6 +151,10 @@ class GameManager {
   
   // Prompt a user to create new Character(s) and their classes until they reach their battle capacity.
   private void initializePlayer() throws InterruptedException{
+    // The player can earn a new Character once every four days
+    if(dayNum%4==0){
+      playerBattleCapacity++;
+    }
     // Calculate how many more Characters the user can add
     int allowedCharacters = playerBattleCapacity - playerTeam.getPlayerTeam().size();
     if(allowedCharacters > 0){
@@ -212,7 +233,9 @@ class GameManager {
   
   // Create a new set of EnemyCharacters equal to enemyBattleCapacity
   private void initializeEnemy(){
+    // Clear previous encounter's enemy team data
     enemyTeam.clearEnemyTeam();
+    enemyTeam.getEnemyInventory().clear();
     // enemyBattleCapacity can be between playerBattleCapacity - 1 and playerBattleCapacity + 1
     enemyBattleCapacity = playerBattleCapacity;
     enemyBattleCapacity += (int)(Math.random() * 3) - 1;
@@ -229,8 +252,25 @@ class GameManager {
       String chosenEnemyBehavior = earlyGameEnemyBehaviors[(int)(Math.random() * earlyGameEnemyBehaviors.length)];
       if(chosenEnemyType.equals("Goblin")){
         enemyTeam.addEnemy(new Goblin(nameEnemy("Goblin"), chosenEnemyBehavior), playerTeam.getHighestLevel());
-      } else if(chosenEnemyType.equals("Dart Goblin")){
+      } else if(chosenEnemyType.equals("DartGoblin")){
         enemyTeam.addEnemy(new DartGoblin(nameEnemy("Dart Goblin"), chosenEnemyBehavior), playerTeam.getHighestLevel());
+      }
+    }
+    // Add randomly generated items to the enemy team's inventory
+    // Currently unlocks items starting from day 3
+    if(dayNum >=3){
+      // 1 allowed item from day 3 and on
+      int allowedItems = (dayNum-2);
+      for(int i = 0; i < allowedItems; i++){
+        // Choose a random item from the predetermined rates defined in GameManager
+        String randomItemStr = earlyGameEnemyItems[(int)(Math.random() * earlyGameEnemyItems.length)];
+        if(randomItemStr.equals("HealthPotion")){
+          // Health Potion can be 20, 30, 40, or 50
+          enemyTeam.getEnemyInventory().add(new HealthPotion(((int)(Math.random() * 4) + 2) * 10), 1);
+        } else if(randomItemStr.equals("HealthPool")){
+          // Health Pool can be 10, 20, 30, or 40
+          enemyTeam.getEnemyInventory().add(new HealthPool(((int)(Math.random() * 3) + 1) * 10), 1);
+        }
       }
     }
   }
@@ -343,9 +383,12 @@ class GameManager {
       Thread.sleep(2000);
       System.out.println("Basic abilities are standard abilities that may be performed as often as you want.");
       Thread.sleep(2000);
-      System.out.println("Special abilities can only be used once every few turns, so you must use them wisely.");
+      System.out.println("Special abilities can only be used once every few turns, so you must use them wisely. They also cannot be used at the beginning of battle.");
       Thread.sleep(2000);
-      System.out.println("You may also choose to use an item or increase a character's defense for that turn.");
+      System.out.println("Using an item costs an action. Use them at a beneficial timing during battle!");
+      Thread.sleep(2000);
+      System.out.println("You can choose to put a Character on defense. They can defend themselves to double their defense strength that turn, or");
+      System.out.println("provide additional defense to a different Character. This is useful for protecting weaker Characters.");
       Thread.sleep(2000);
       System.out.println("Enter HELP at any time if you want to view a character's stats and abilities.");
       anythingToContinue();
@@ -414,10 +457,23 @@ class GameManager {
   // Each alive EnemyCharacter performs one action
   private void handleEnemyTurn() throws InterruptedException {
     for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
-      if(!e.getIsDead()){
-        e.takeTurn(playerTeam, enemyTeam);
-      	Thread.sleep(1000);
-        anythingToContinue();
+      if(!e.getIsDead() && !StatusEffect.hasStatusEffect(e, "Stun")){
+        while(true){
+          e.takeTurn(playerTeam, enemyTeam);
+          Thread.sleep(1000);
+          anythingToContinue();
+
+          // Random chance for enemy to gain another action based on their speed
+          if((Math.random() * 100) < Math.min(e.getSpeed()/2, 50)){
+            Thread.sleep(1000);
+            System.out.println(e.getName() + " has earned another action due to their speed!");
+            Thread.sleep(500);
+            System.out.println("(" + Math.min(e.getSpeed()/2, 50) + "% chance)");
+            Thread.sleep(1000);
+          } else{
+            break;
+          }
+        }
       }
     }
   }
@@ -459,7 +515,8 @@ class GameManager {
         boolean canGainAnotherAction;
         while(currentActionPoints >= actionPointsLeft){
           canGainAnotherAction = true;
-          System.out.println("\nSelected character: " + selectedCharacter.getName());
+          System.out.println("\nSelected character: ");
+          System.out.println(selectedCharacter.getSimpleOutput());
           // Obtain an action from the chosen character
           message = "What would you like to do?\n";
           if(StatusEffect.hasStatusEffect(selectedCharacter, "Taunt")){
@@ -772,9 +829,11 @@ class GameManager {
     } else{
       listLimit = selectedCharacter.getHighestIndexBasic() + 1;
     }
+    // List a character's name, description, and core stats
     System.out.println(selectedCharacter);
     System.out.println(selectedCharacter.getDescription());
     Thread.sleep(1000);
+    // List all unlocked basic abilities
     System.out.println("\nBasic abilities: ");
     for(int i = 0; i < listLimit; i++){
       System.out.print(selectedCharacter.getBasicAbilityNames().get(i) + ": ");
@@ -783,11 +842,11 @@ class GameManager {
       Thread.sleep(1000);
     }
     
-    // Special message if the character does not have all the basic abilities
     if(listLimit < selectedCharacter.getBasicAbilityNames().size()){
       if(listLimit <= 0){
         System.out.println("None");
       }
+      // Special message if the character does not have all the basic abilities
       System.out.println("Unlock more basic abilities by leveling up!");
       Thread.sleep(1000);
     }
@@ -798,6 +857,7 @@ class GameManager {
       listLimit = selectedCharacter.getHighestIndexSpecial() + 1;
     }
     Thread.sleep(1000);
+    // List all unlocked special abilities
     System.out.println("\nSpecial abilities: ");
     for(int i = 0; i < listLimit; i++){
       System.out.print(selectedCharacter.getSpecialAbilityNames().get(i) + ": ");
@@ -853,7 +913,6 @@ class GameManager {
   // Used to obtain an input for general messages
   public static int obtainInput(String message, int min, int max, boolean applyIndexOffset){
     String input = "";
-    //message += "\n";
     while(true){
       System.out.println(message);
       System.out.print(">>> ");
@@ -875,7 +934,6 @@ class GameManager {
   // Cancelling returns -1
   public static int obtainInputWithCancel(String message, int min, int max, boolean applyIndexOffset){
     String input = "";
-    //message += "\n";
     while(true){
       System.out.print(message);
       System.out.println(max + 1 + ": Cancel");
@@ -913,6 +971,8 @@ class GameManager {
   }
 
   // Truncate a double value to n decimal points
+  // If there is no decimal point, return value
+  // If the number of trailing decimal points < n, return value
   public static double truncate(double value, int n){
     String strValue = Double.toString(value);
     int periodIndex = strValue.indexOf(".");
@@ -920,8 +980,8 @@ class GameManager {
       return value;
     } else{
       String numBeforeDecimal = strValue.substring(0, periodIndex);
-      String numAfterDecimal = strValue.substring(periodIndex, Math.min(strValue.length(), periodIndex + n + 1));
-      String output = numBeforeDecimal + numAfterDecimal;
+      String numAfterDecimal = strValue.substring(periodIndex+1, Math.min(strValue.length(), periodIndex + n + 1));
+      String output = numBeforeDecimal + "." + numAfterDecimal;
       return Double.parseDouble(output);
     }
   }

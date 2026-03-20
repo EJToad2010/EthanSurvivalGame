@@ -185,6 +185,9 @@ class PlayerTeam {
   
   public void increaseCoinBalance(int amount){
     coinBalance += amount;
+    if(coinBalance < 0){
+      coinBalance = 0;
+    }
   }
   
   // Reset each Player's defense to passive defense whenever a new turn begins

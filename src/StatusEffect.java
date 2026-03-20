@@ -51,6 +51,26 @@ class StatusEffect {
       applyOneTimeEffect(c, type);
     }
   }
+
+  // Search for an exact combination of Character and type in the ArrayLists
+  // If found, remove them
+  // If not found, do nothing
+  public static void removeStatusEffect(BasicCharacter c, String type){
+    for(int i = 0; i < affectedCharacters.size(); i++){
+      if(affectedCharacters.get(i) == c && affectedTypes.get(i).equals(type)){
+        System.out.println(affectedCharacters.get(i).getName() + " lost the [" + affectedTypes.get(i).toUpperCase() + "] effect!");
+        if(applyTypes[indexOfType(affectedTypes.get(i))].equals("One-time")){
+          reverseOneTimeEffect(affectedCharacters.get(i), affectedTypes.get(i));
+        }
+        affectedCharacters.remove(i);
+        affectedTypes.remove(i);
+        affectedTurnsLeft.remove(i);
+        affectedRandomStats.remove(i);
+        i--;
+        break;
+      }
+    }
+  }
   
   // Remove a character's status effect
   // One-time effects are reverted to their original state

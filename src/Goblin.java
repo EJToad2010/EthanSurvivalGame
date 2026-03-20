@@ -14,11 +14,11 @@ class Goblin extends EnemyCharacter{
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Taunt", "Pickpocket"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Target a single character. The target cannot use an ability next turn.",
-                                                               "Attack two targets for moderate damage. The Goblin has a 25% to steal gold from the player."});
+                                                               "Attack a single character for moderate damage. The Goblin has a 25% to steal gold from the player. The Goblin consumes the gold to heal."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
-    addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 2});
-    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{3, 2});
-    addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{3, 2});
+    addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
+    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{3, 3});
+    addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{3, 3});
   }
   
   // Overrided getType method
@@ -86,6 +86,8 @@ class Goblin extends EnemyCharacter{
       }
     } else if(randomAbilityIndex == 1){
       // Pickpocket ability
+      // Target random player
+      specialAbility(1, playerTeam.getPlayerTeam().get((int)(Math.random() * playerTeam.getPlayerTeam().size())), playerTeam, enemyTeam);
     }
   }
 
@@ -110,16 +112,27 @@ class Goblin extends EnemyCharacter{
   public void specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     resetSpecialAbilityCooldowns();
     if(specialAbilityIndex == 0){
+      // Taunt
       System.out.println(getName() + " taunted " + target.getName() + "!");
       Thread.sleep(1000);
       System.out.println(target.getName() + " cannot use an ability next turn!");
       StatusEffect.addStatusEffect(target, "Taunt", 1);
     } else if(specialAbilityIndex == 1){
-      System.out.println(getName() + " swiped at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      // Pickpocket
+      System.out.println(getName() + " swiped at " + target.getName() + " for " + getAttackStrength()+5 + " HP!");
+      handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
       if(playerTeam.getCoinBalance() > 0 && (int)(Math.random() * 100) < 25){
-        
+        int stolenCoins = (int)(Math.random() * 50) + 25;
+        stolenCoins = Math.min(stolenCoins, playerTeam.getCoinBalance());
+        System.out.println(getName() + " pickpocketed " + stolenCoins + "g from your team!");
+        playerTeam.increaseCoinBalance(-stolenCoins);
+        Thread.sleep(1000);
+        System.out.println("Balance: "+playerTeam.getCoinBalance());
+        Thread.sleep(1000);
+        System.out.println(getName() + " ate the coins to heal " + (double)(stolenCoins)/2 + " HP!");
+        changeCurrentHP((double)(stolenCoins)/2);
+        System.out.println(getSimpleOutput());
       }
     }
     System.out.println(target.getSimpleOutput());

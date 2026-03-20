@@ -86,15 +86,20 @@ class Knight extends PlayerCharacter {
 
   // The Trial of Strength minigame that appears in the Tournament
   // Returns then amount of damage that the Knight did on the target
-  public double chargeAttackMinigame(){
+  public double chargeAttackMinigame() throws InterruptedException{
     // Hidden variable that decreases every time the attack is charged.
     // If at zero or less, the attack will miss.
     int stamina = 100;
+    boolean isFirstLoop = true;
     while(true){
       GameManager.clearScreen();
-      if(stamina > 50){
+      if(!isFirstLoop){
+        System.out.println("You have decided to charge your attack further.");
+      }
+      Thread.sleep(500);
+      if(stamina > 30){
         System.out.println(getName() + " looks at the punching bag with excited rage.");
-      } else if(stamina > 25){
+      } else if(stamina > 10){
         System.out.println(getName() + " looks at the puncing bag with tired excitement.");
       } else if(stamina > 0){
         System.out.println(getName() + " looks at the punching bag with weary eyes.");
@@ -114,6 +119,7 @@ class Knight extends PlayerCharacter {
         stamina -= (int)(Math.random() * 15) + 5;
         break;
       }
+      isFirstLoop = false;
     }
     double charge = (100 - stamina) / 100.0;
     // Exponential multiplier of power

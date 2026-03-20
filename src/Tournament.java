@@ -1,6 +1,6 @@
 package src;
 import java.io.IOException;
-// A tournament is an area where Characters can gamble coins for a chance to earn XP and more money.
+// A tournament is an area where Characters can gamble coins for a chance to earn a large sum of money
 // Tournaments are skill-based, with each Character type having a unique mini-game.
 public class Tournament {
     // Determines how difficult it is to win the tournament and earn money
@@ -36,7 +36,7 @@ public class Tournament {
         message += "1: Novice\n2: Intermediate\n3: Advanced\n4: Elite";
         while(true){
             boolean success;
-            int selectedDifficultyIndex = GameManager.obtainInput(message, 1, 4, false);
+            int selectedDifficultyIndex = GameManager.obtainInputWithCancel(message, 1, 5, false);
             System.out.println("");
             if(selectedDifficultyIndex == 1){
                 entryFee = 25;
@@ -47,9 +47,13 @@ public class Tournament {
             } else if(selectedDifficultyIndex == 3){
                 entryFee = 100;
                 success = promptSpendingCoins(100, playerTeam);
-            } else{
+            } else if(selectedDifficultyIndex == 4){
                 entryFee = 250;
                 success = promptSpendingCoins(250, playerTeam);
+            } else{
+                System.out.println("You have chosen to leave the tournament.");
+                GameManager.anythingToContinue();
+                return;
             }
             if(success){
                 difficulty = selectedDifficultyIndex;
@@ -57,6 +61,7 @@ public class Tournament {
             }
             System.out.println("");
         }
+        // Confirm selected difficulty choice
         if(difficulty == 1){
             System.out.println("You have entered the Novice division.");
         } else if(difficulty == 2){
@@ -92,6 +97,7 @@ public class Tournament {
         double difficultyMultiplier = 1 + ((double) difficulty * 0.5);
         // Reward multiplier based on placement
         double placementMultiplier;
+        // Print placement results
         Thread.sleep(1000);
         if(playerRank == 1){
             System.out.println("Congratulations! You have won!");
@@ -102,14 +108,20 @@ public class Tournament {
         } else if(playerRank == 3){
             System.out.println("You have received third.");
             placementMultiplier = 0.5;
-        } else{
+        } else if(playerRank == 4){
             System.out.println("You have received fourth.");
+            placementMultiplier = 0;
+        } else{
+            // Debug
+            System.out.println("Calculation error: " + playerRank);
+            System.out.println(allScores[playersTurn-1]);
             placementMultiplier = 0;
         }
         System.out.println("");
         Thread.sleep(1000);
         GameManager.anythingToContinue();
 
+        // Handle giving rewards
         int reward = (int)(entryFee * difficultyMultiplier * placementMultiplier);
         if(reward >= entryFee){
             System.out.println("\nCongratulations! You have won " + reward + "g.");
@@ -118,35 +130,46 @@ public class Tournament {
         }
         playerTeam.increaseCoinBalance(reward);
         GameManager.anythingToContinue();
+        GameManager.clearScreen();
+        if(playerRank > 3){
+            System.out.println("Your team walks away from the tournament excited of their winnings.");
+        } else{
+            System.out.println("Your team walks away from the tournament disappointed in their performance.");
+        }
+        GameManager.anythingToContinue();
     }
 
     // Run Knight minigame and AI
     // Trial of Strength
     private int knightMinigame(Knight selectedKnight, PlayerTeam playerTeam) throws InterruptedException{
         // Tutorial of the Trial of Strength
-        System.out.println("Welcome to the TRIAL OF STRENGTH.");
-        Thread.sleep(2000);
-        System.out.println(selectedKnight.getName() + " will be given a punching bag.");
-        Thread.sleep(1000);
-        System.out.println("They must hit this bag as hard as possible to win.");
-        Thread.sleep(1000);
-        System.out.println("Every turn, you will be given the chance to either charge " + selectedKnight.getName() + "'s attack or release their strength.");
-        Thread.sleep(1000);
-        System.out.println("Charging an attack increases your Knight's strength, at the risk of losing accuracy.");
-        Thread.sleep(1000);
-        System.out.println("How far can you push " + selectedKnight.getName() + "'s limits before failing?");
-        Thread.sleep(2000);
-        System.out.println("There will be three rounds.");
-        Thread.sleep(1000);
-        System.out.println("There will be three other Knights competing. Be the strongest and most accurate to win.");
-        Thread.sleep(1000);
-        GameManager.anythingToContinue();
+        if(!GameManager.skipTutorial){
+            System.out.println("Welcome to the TRIAL OF STRENGTH.");
+            Thread.sleep(2000);
+            System.out.println(selectedKnight.getName() + " will be given a punching bag.");
+            Thread.sleep(1000);
+            System.out.println("They must hit this bag as hard as possible to win.");
+            Thread.sleep(1000);
+            System.out.println("Every turn, you will be given the chance to either charge " + selectedKnight.getName() + "'s attack or release their strength.");
+            Thread.sleep(1000);
+            System.out.println("Charging an attack increases your Knight's strength, at the risk of losing accuracy.");
+            Thread.sleep(1000);
+            System.out.println("How far can you push " + selectedKnight.getName() + "'s limits before failing?");
+            Thread.sleep(2000);
+            System.out.println("There will be three rounds.");
+            Thread.sleep(1000);
+            System.out.println("There will be three other Knights competing. Be the strongest and most accurate to win.");
+            Thread.sleep(1000);
+            GameManager.anythingToContinue();
+        }
 
         // Three rounds
         for(int i = 1; i <= 3; i++){
             GameManager.clearScreen();
             System.out.println("ROUND " + i);
-            printPlayerTurnNumber();
+            if(i == 1){
+                printPlayerTurnNumber();
+            }
             for(int j = 0; j < allScores.length; j++){
                 GameManager.clearScreen();
                 if(j+1 == playersTurn){
@@ -168,14 +191,18 @@ public class Tournament {
                     // Difficulty 1 is 30.0 base atk, Diff 2 is 39.0, Diff 3 is 48.0, Diff 4 is 57.0
                     double aiBaseAttackStrength = 30.0 * 1+(0.3 * (difficulty-1));
                     // Chance that an AI misses their attack
-                    double missChance = 0.5 - (difficulty / 10);
+                    double missChance = 0.5 - (difficulty / 15);
+                    // In Elite difficulty, the AI will never miss
+                    if(difficulty == 4){
+                        missChance = 0;
+                    }
 
                     if(Math.random() < missChance){
                         // AI missed their attack
                         System.out.println(contestantNames[j] + " missed their attack!");
                     } else{
                         // Use the same damage calculations as the Player based on a randomly generated stamina level
-                        int stamina = (int)(Math.random() * (100/difficulty)) + 1;
+                        int stamina = (int)(Math.random() * (75/difficulty)) + 1;
                         double charge = (100 - stamina) / 100.0;
                         double multiplier = 1 + (charge * charge * 3.5);
                         double score = aiBaseAttackStrength * multiplier;
@@ -191,36 +218,40 @@ public class Tournament {
                 GameManager.anythingToContinue();
             }
         }
-        return -1;
+        return getPlayerRankStandings();
     }
 
     // Run Archer minigame and AI
     // Trial of Precision
     private int archerMinigame(Archer selectedArcher, PlayerTeam playerTeam) throws IOException, InterruptedException{
         // Tutorial of the Trial of Precision
-        System.out.println("Welcome to the TRIAL OF PRECISION.");
-        Thread.sleep(2000);
-        System.out.println(selectedArcher.getName() + " will be given a target to shoot at.");
-        Thread.sleep(1000);
-        System.out.println("They must aim for the bullseye to score as many points as possible..");
-        Thread.sleep(1000);
-        System.out.println("Every round, you will be shown a moving target in a bar, representing " + selectedArcher.getName() + "'s bow and arrow.");
-        Thread.sleep(1000);
-        System.out.println("You must press ENTER when the target is at the center of the bar.");
-        Thread.sleep(1000);
-        System.out.println("How accurate is " + selectedArcher.getName() + " under pressure?");
-        Thread.sleep(2000);
-        System.out.println("There will be five rounds.");
-        Thread.sleep(1000);
-        System.out.println("There will be three other Archers competing. Score the most points to win.");
-        Thread.sleep(1000);
-        GameManager.anythingToContinue();
+        if(!GameManager.skipTutorial){
+            System.out.println("Welcome to the TRIAL OF PRECISION.");
+            Thread.sleep(2000);
+            System.out.println(selectedArcher.getName() + " will be given a target to shoot at.");
+            Thread.sleep(1000);
+            System.out.println("They must aim for the bullseye to score as many points as possible..");
+            Thread.sleep(1000);
+            System.out.println("Every round, you will be shown a moving target in a bar, representing " + selectedArcher.getName() + "'s bow and arrow.");
+            Thread.sleep(1000);
+            System.out.println("You must press ENTER when the target is at the center of the bar.");
+            Thread.sleep(1000);
+            System.out.println("How accurate is " + selectedArcher.getName() + " under pressure?");
+            Thread.sleep(2000);
+            System.out.println("There will be five rounds.");
+            Thread.sleep(1000);
+            System.out.println("There will be three other Archers competing. Score the most points to win.");
+            Thread.sleep(1000);
+            GameManager.anythingToContinue();
+        }
 
         // Seven rounds
         for(int i = 1; i <= 5; i++){
             GameManager.clearScreen();
             System.out.println("ROUND " + i);
-            printPlayerTurnNumber();
+            if(i==1){
+                printPlayerTurnNumber();
+            }
             GameManager.anythingToContinue();
             for(int j = 0; j < allScores.length; j++){
                 if(j+1 == playersTurn){
@@ -259,30 +290,35 @@ public class Tournament {
     // Trial of Intellect
     private int wizardMinigame(Wizard selectedWizard, PlayerTeam playerTeam) throws InterruptedException{
         // Tutorial of the Trial of Intellect
-        System.out.println("Welcome to the TRIAL OF INTELLECT.");
-        Thread.sleep(2000);
-        System.out.println(selectedWizard.getName() + " will be given an ancient book full of obscure spells.");
-        Thread.sleep(1000);
-        System.out.println("They must memorize the spells they are given and reproduce them accurately to win.");
-        Thread.sleep(1000);
-        System.out.println("Every turn, you will be shown a numerical code, representing the spell you must memorize.");
-        Thread.sleep(1000);
-        System.out.println("After pressing ENTER, the screen will be cleared and you must retype the code yoou memorized.");
-        Thread.sleep(1000);
-        System.out.println("How far can you push " + selectedWizard.getName() + "'s intellect before failing?");
-        Thread.sleep(2000);
-        System.out.println("The game will end when only one Wizard is left standing.");
-        Thread.sleep(1000);
-        System.out.println("There will be three other Wizards competing. Be the wisest to win.");
-        Thread.sleep(1000);
-        GameManager.anythingToContinue();
+        if(!GameManager.skipTutorial){
+            System.out.println("Welcome to the TRIAL OF INTELLECT.");
+            Thread.sleep(2000);
+            System.out.println(selectedWizard.getName() + " will be given an ancient book full of obscure spells.");
+            Thread.sleep(1000);
+            System.out.println("They must memorize the spells they are given and reproduce them accurately to win.");
+            Thread.sleep(1000);
+            System.out.println("Every turn, you will be shown a numerical code, representing the spell you must memorize.");
+            Thread.sleep(1000);
+            System.out.println("After pressing ENTER, the screen will be cleared and you must retype the code you memorized.");
+            Thread.sleep(1000);
+            System.out.println("How far can you push " + selectedWizard.getName() + "'s intellect before failing?");
+            Thread.sleep(2000);
+            System.out.println("The game will end when only one Wizard is left standing.");
+            Thread.sleep(1000);
+            System.out.println("There will be three other Wizards competing. Be the wisest to win.");
+            Thread.sleep(1000);
+            GameManager.anythingToContinue();
+        }
+        
 
         // Technically infinite rounds
         int round = 1;
         while(true){
             GameManager.clearScreen();
             System.out.println("ROUND " + round);
-            printPlayerTurnNumber();
+            if(round == 1){
+                printPlayerTurnNumber();
+            }
             GameManager.anythingToContinue();
             // Handle each contestant's turn, distinguishing between Player and AI
             for(int i = 0; i < allScores.length; i++){
@@ -307,7 +343,8 @@ public class Tournament {
                     GameManager.clearScreen();
                     System.out.println("It is " + contestantNames[i] + "'s turn!");
                     // Chance that an AI fails that round
-                    double probabilityOfDeath = 0.4 - ((double)(difficulty)/10);
+                    // Change the numbers here to change the probability that an AI loses
+                    double probabilityOfDeath = 0.3 - ((double)(difficulty)/15);
                     probabilityOfDeath += 0.05 * round;
                     Thread.sleep(2000);
                     if(Math.random() < probabilityOfDeath){
@@ -406,7 +443,7 @@ public class Tournament {
     private int getPlayerRankStandings(){
         int rank = 1;
         double playerScore = allScores[playersTurn - 1];
-        for(int i = 0; i < rank; i++){
+        for(int i = 0; i < allScores.length; i++){
             if((i+1) != playersTurn){
                 if(allScores[i] > playerScore){
                     rank++;

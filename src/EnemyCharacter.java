@@ -2,6 +2,7 @@ package src;
 import java.util.ArrayList;
 // EnemyCharacters have an xpReward and coinReward parameter and have adjusted behaviors when attacking players.
 // This object should never be created on its own. Only its subclasses will ever be used.
+// TODO: Implement GoblinTank EnemyCharacter subclass
 class EnemyCharacter extends BasicCharacter{
   // Define EnemyCharacter specific attributes
   private int xpReward;
@@ -67,7 +68,7 @@ class EnemyCharacter extends BasicCharacter{
     changeDefenseStrength(2 * playerLevel);
     changeSpeed(2 * playerLevel);
     xpReward *= (int) Math.pow(1.25, Math.max(playerLevel-1, 0));
-    coinReward *= (int) Math.pow(2, Math.max(playerLevel-1, 0));
+    coinReward *= (int) Math.pow(1.5, Math.max(playerLevel-1, 0));
     basicAbilityLimit += Math.min(getBasicAbilityNames().size(), playerLevel / 2);
     specialAbilityLimit += Math.min(getBasicAbilityNames().size(), playerLevel / 2);
   }
