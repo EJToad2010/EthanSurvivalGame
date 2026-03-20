@@ -28,10 +28,16 @@ class EnemyTeam {
   // Convert the isEnemyCharacter automatically to true to prevent confusion
   // Manually keeping track of each enemy's xp and levels are too complicated.
   // Their stats and ability limits are artificially inflated based on the player team's highest level character
-  public void addEnemy(EnemyCharacter c, int highestPlayerLevel){
+  public void addEnemy(EnemyCharacter c, int highestPlayerLevel, double avgPlayerLevel){
     enemyTeam.add(c);
     // Math.max prevents negative inflation of stats in the unlikely case that the highest player level is 0
-    c.inflateStats((int)(Math.random() * 2) + Math.max(0, highestPlayerLevel-1));
+    if(Math.random() < 0.5){
+      // 50% chance of spawning near highest level
+      c.inflateStats((int)(Math.random() * 2) + Math.max(0, highestPlayerLevel-1));
+    } else{
+      // 50% chance of spawning near average level
+      c.inflateStats((int)(Math.random() * 2) + Math.max(0, (int)avgPlayerLevel));
+    }
     convertAllToEnemy();
   }
   

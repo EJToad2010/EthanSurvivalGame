@@ -94,10 +94,10 @@ class GameManager {
       Thread.sleep(1000);
       // Restore player HP after every night
       if(dayNum > 1){
-        System.out.println("Your characters restored 10.0 HP overnight.");
+        System.out.println("Your characters restored 20.0 HP overnight.");
         Thread.sleep(1000);
         for(PlayerCharacter c : playerTeam.getPlayerTeam()){
-          c.changeCurrentHP(10);
+          c.changeCurrentHP(20);
           System.out.println(c.getSimpleOutput());
         }
         Thread.sleep(1000);
@@ -111,7 +111,7 @@ class GameManager {
       // An NPC spawns in the first day a tournament is available to gift the minimum required entry fee.
       // This way, no players accidentally miss the Tournament feature
       if(dayNum == 2 && playerTeam.getCoinBalance() < 25){
-        System.out.println("A stranger approaches you, giving you 25 coins.");
+        System.out.println("A stranger approaches you, giving you 25g.");
         System.out.println("Good luck on your journey out there, he says.");
         playerTeam.increaseCoinBalance(25);
         anythingToContinue();
@@ -268,9 +268,9 @@ class GameManager {
       String chosenEnemyType = earlyGameEnemies[(int)(Math.random() * earlyGameEnemies.length)];
       String chosenEnemyBehavior = earlyGameEnemyBehaviors[(int)(Math.random() * earlyGameEnemyBehaviors.length)];
       if(chosenEnemyType.equals("Goblin")){
-        enemyTeam.addEnemy(new Goblin(nameEnemy("Goblin"), chosenEnemyBehavior), playerTeam.getHighestLevel());
+        enemyTeam.addEnemy(new Goblin(nameEnemy("Goblin"), chosenEnemyBehavior), playerTeam.getHighestLevel(), playerTeam.getAvgLevel());
       } else if(chosenEnemyType.equals("DartGoblin")){
-        enemyTeam.addEnemy(new DartGoblin(nameEnemy("Dart Goblin"), chosenEnemyBehavior), playerTeam.getHighestLevel());
+        enemyTeam.addEnemy(new DartGoblin(nameEnemy("Dart Goblin"), chosenEnemyBehavior), playerTeam.getHighestLevel(), playerTeam.getAvgLevel());
       }
     }
     // Add randomly generated items to the enemy team's inventory
@@ -301,7 +301,7 @@ class GameManager {
   private void handleEnemyRewards() throws InterruptedException{
     for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
       // Drop an enemy's coin reward
-      System.out.println(e.getName() + " dropped " + e.getCoinReward() + " coins!");
+      System.out.println(e.getName() + " dropped " + e.getCoinReward() + "g!");
       playerTeam.increaseCoinBalance(e.getCoinReward());
       Thread.sleep(1000);
       System.out.println("Balance: " + playerTeam.getCoinBalance() + "g");

@@ -77,7 +77,16 @@ public class Tournament {
         // Select a character
         message = "A worker tells you to select one Character to compete in the tournament:\n";
         message += "\nSelect a character: \n" + playerTeam.getPlayerTeamNumFormat();
-        int selectedCharacterIndex = GameManager.obtainInput(message, 1, playerTeam.getPlayerTeam().size(), true);
+        int selectedCharacterIndex;
+        while(true){
+            selectedCharacterIndex = GameManager.obtainInput(message, 1, playerTeam.getPlayerTeam().size(), true);
+            if(playerTeam.getPlayerTeam().get(selectedCharacterIndex).getIsDead()){
+                System.out.println("Invalid input. This character is dead!");
+                GameManager.anythingToContinue();
+            } else{
+                break;
+            }
+        }
         GameManager.clearScreen();
         PlayerCharacter selectedCharacter = playerTeam.getPlayerTeam().get(selectedCharacterIndex);
         // Decide what the player's turn number will be (1-4)
@@ -152,7 +161,7 @@ public class Tournament {
             Thread.sleep(1000);
             System.out.println("Every turn, you will be given the chance to either charge " + selectedKnight.getName() + "'s attack or release their strength.");
             Thread.sleep(1000);
-            System.out.println("Charging an attack increases your Knight's strength, at the risk of losing accuracy.");
+            System.out.println("Charging an attack repeatedly increases your Knight's strength. Don't overwork your Knight, or else they will become exhausted.");
             Thread.sleep(1000);
             System.out.println("How far can you push " + selectedKnight.getName() + "'s limits before failing?");
             Thread.sleep(2000);
@@ -191,11 +200,8 @@ public class Tournament {
                     // Difficulty 1 is 30.0 base atk, Diff 2 is 39.0, Diff 3 is 48.0, Diff 4 is 57.0
                     double aiBaseAttackStrength = 30.0 * 1+(0.3 * (difficulty-1));
                     // Chance that an AI misses their attack
-                    double missChance = 0.5 - ((difficulty+1) / 10);
-                    // In Elite difficulty, the AI will never miss
-                    if(difficulty == 4){
-                        missChance = 0;
-                    }
+                    // In Advanced and Elite, the AI will never miss.
+                    double missChance = 0.5 - ((difficulty+2) / 10);
 
                     if(Math.random() < missChance){
                         // AI missed their attack
@@ -268,8 +274,8 @@ public class Tournament {
                     GameManager.clearScreen();
                     System.out.println("It is " + contestantNames[j] + "'s turn!");
                     Thread.sleep(2000);
-                    int aiScore = 5+difficulty;
-                    aiScore += (int)(Math.random() * 3) - 1;
+                    int aiScore = 4+difficulty;
+                    aiScore += (int)(Math.random() * 3);
                     aiScore = Math.min(10, aiScore);
                     System.out.println(contestantNames[j] + " has scored " + aiScore + " points!");
                     allScores[j] += aiScore;
@@ -396,28 +402,28 @@ public class Tournament {
     // Ask a user to pay a given amount of coins.
     // Return true if the transaction was successful. Return false if not.
     private boolean promptSpendingCoins(int amount, PlayerTeam playerTeam){
-        System.out.println("You must pay " + amount + " coins to enter.");
+        System.out.println("You must pay " + amount + "g to enter.");
         if(playerTeam.getCoinBalance() < amount){
             // User does not have enough coins
-            System.out.println("You do not have enough coins to enter this division!");
+            System.out.println("You do not have enough gold to enter this division!");
             GameManager.anythingToContinue();
             return false;
         } else{
             // Prompt YES or NO if the user has enough money
-            String message = "Would you like to pay " + amount + " coins?\n";
+            String message = "Would you like to pay " + amount + "g?\n";
             message += "1: YES\n2: NO\n";
             message += "Balance: " + playerTeam.getCoinBalance() + "g";
             int decisionIndex = GameManager.obtainInput(message, 1, 2, false);
             if(decisionIndex == 1){
                 // User selected YES
-                System.out.println("\nYou have spent " + amount + " coins.");
+                System.out.println("\nYou have spent " + amount + "g.");
                 playerTeam.increaseCoinBalance(-amount);
                 System.out.println("Balance: " + playerTeam.getCoinBalance() + "g\n");
                 GameManager.anythingToContinue();
                 return true;
             } else{
                 // User selected NO
-                System.out.println("\nYou have decided not to spend " + amount + " coins.");
+                System.out.println("\nYou have decided not to spend " + amount + "g.");
                 GameManager.anythingToContinue();
                 return false;
             }

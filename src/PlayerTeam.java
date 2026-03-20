@@ -104,6 +104,15 @@ class PlayerTeam {
     }
     return highest;
   }
+
+  // Find the average level of all PlayerCharacters
+  public double getAvgLevel(){
+    int sum = 0;
+    for(PlayerCharacter p : playerTeam){
+      sum += p.getLevel();
+    }
+    return (double)(sum)/(double)(playerTeam.size());
+  }
   
   // Used in battle messages
   public String getPlayerTeamNumFormat(){

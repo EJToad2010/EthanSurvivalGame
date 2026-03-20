@@ -6,7 +6,7 @@ class StatusEffect {
   // All types of status effects in the game
   private static String[] effectTypes = new String[]{"Soft", "Bleed", "Poison", "Slow", "Stun", "Nimble", "Taunt", "Burn", "Pierce"};
   // How each status effect affects a target
-  private static String[] applyTypes = new String[]{"One-time", "Passive", "Passive", "One-time", "One-time", "Other", "Other", "Passive"};
+  private static String[] applyTypes = new String[]{"One-time", "Passive", "Passive", "One-time", "One-time", "Other", "Other", "Passive", "One-time"};
   
   // These three lists all have corresponding index values
   private static ArrayList<BasicCharacter> affectedCharacters = new ArrayList<BasicCharacter>();
@@ -104,7 +104,7 @@ class StatusEffect {
     } else if(type.equals("Soft")){
       c.changeAttackStrength(-10);
     } else if(type.equals("Pierce")){
-      c.changeDefenseStrength(-10);
+      c.changeDefenseStrength(-15);
     }
   }
   
@@ -115,7 +115,7 @@ class StatusEffect {
     } else if(type.equals("Soft")){
       c.changeAttackStrength(10);
     } else if(type.equals("Pierce")){
-      c.changeDefenseStrength(10);
+      c.changeDefenseStrength(15);
     }
   }
   

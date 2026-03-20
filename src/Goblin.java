@@ -5,7 +5,7 @@ import java.util.ArrayList;
 class Goblin extends EnemyCharacter{
   // Items that the Goblin steals from the player. They are not used by the Goblin and will be returned on death.
   public Goblin(String name, String behaviorType){
-    super(name, 70.0, 14.0, 4.0, 30.0, 50, 20, behaviorType);
+    super(name, 60.0, 10.0, 4.0, 30.0, 50, 20, behaviorType);
     setDescription("A weak enemy focused on annoying the player and causing chaos.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Rusty Dagger", "Nimble Dodge"});
     addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto a single target. 10% chance to inflict bleed.",
@@ -129,7 +129,7 @@ class Goblin extends EnemyCharacter{
         Thread.sleep(1000);
         System.out.println("Balance: "+playerTeam.getCoinBalance());
         Thread.sleep(1000);
-        System.out.println(getName() + " ate the coins to heal " + (double)(stolenCoins)/2 + " HP!");
+        System.out.println(getName() + " ate the gold to heal " + (double)(stolenCoins)/2 + " HP!");
         changeCurrentHP((double)(stolenCoins)/2);
         System.out.println(getSimpleOutput());
       }
