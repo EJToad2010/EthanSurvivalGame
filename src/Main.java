@@ -14,6 +14,8 @@ public class Main {
   // Class: Shop
   
   // Class: StatusEffect
+
+  // Class: Tournament
   
   // Class: PlayerTeam
   // Class: EnemyTeam

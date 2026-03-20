@@ -227,6 +227,11 @@ public class BasicCharacter {
   // changeCurrentHP will be used the most often
   // Other setter methods are more niche, but can be used for special interactions
   public void changeCurrentHP(double amount){
+    // If already dead, cannot heal
+    if(currentHP <= 0.0){
+      return;
+    }
+    
     currentHP += amount;
     if(currentHP < 0.0){
       currentHP = 0.0;

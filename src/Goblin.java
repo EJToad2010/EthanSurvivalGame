@@ -121,7 +121,6 @@ class Goblin extends EnemyCharacter{
       // Pickpocket
       System.out.println(getName() + " swiped at " + target.getName() + " for " + getAttackStrength()+5 + " HP!");
       handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam);
-      System.out.println(target.getSimpleOutput());
       if(playerTeam.getCoinBalance() > 0 && (int)(Math.random() * 100) < 25){
         int stolenCoins = (int)(Math.random() * 50) + 25;
         stolenCoins = Math.min(stolenCoins, playerTeam.getCoinBalance());

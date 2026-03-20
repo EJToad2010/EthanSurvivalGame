@@ -33,7 +33,7 @@ public class Tournament {
         GameManager.anythingToContinue();
         // Select a difficulty
         String message = "\nA worker asks you to select a division to compete in:\n";
-        message += "1: Novice\n2: Intermediate\n3: Advanced\n4: Elite";
+        message += "1: Novice\n2: Intermediate\n3: Advanced\n4: Elite\n";
         while(true){
             boolean success;
             int selectedDifficultyIndex = GameManager.obtainInputWithCancel(message, 1, 5, false);
@@ -94,20 +94,20 @@ public class Tournament {
         }
         // Reward multiplier based on difficulty
         // 1: 1.5, 2: 2, 3: 2.5, 4: 3
-        double difficultyMultiplier = 1 + ((double) difficulty * 0.5);
+        double difficultyMultiplier = 1 + ((double) (difficulty) * 0.25);
         // Reward multiplier based on placement
         double placementMultiplier;
         // Print placement results
         Thread.sleep(1000);
         if(playerRank == 1){
             System.out.println("Congratulations! You have won!");
-            placementMultiplier = 2.5;
+            placementMultiplier = 2;
         } else if(playerRank == 2){
             System.out.println("You have received second.");
-            placementMultiplier = 1.5;
+            placementMultiplier = 1.25;
         } else if(playerRank == 3){
             System.out.println("You have received third.");
-            placementMultiplier = 0.5;
+            placementMultiplier = 0.25;
         } else if(playerRank == 4){
             System.out.println("You have received fourth.");
             placementMultiplier = 0;
@@ -131,7 +131,7 @@ public class Tournament {
         playerTeam.increaseCoinBalance(reward);
         GameManager.anythingToContinue();
         GameManager.clearScreen();
-        if(playerRank > 3){
+        if(playerRank < 3){
             System.out.println("Your team walks away from the tournament excited of their winnings.");
         } else{
             System.out.println("Your team walks away from the tournament disappointed in their performance.");
@@ -191,7 +191,7 @@ public class Tournament {
                     // Difficulty 1 is 30.0 base atk, Diff 2 is 39.0, Diff 3 is 48.0, Diff 4 is 57.0
                     double aiBaseAttackStrength = 30.0 * 1+(0.3 * (difficulty-1));
                     // Chance that an AI misses their attack
-                    double missChance = 0.5 - (difficulty / 15);
+                    double missChance = 0.5 - ((difficulty+1) / 10);
                     // In Elite difficulty, the AI will never miss
                     if(difficulty == 4){
                         missChance = 0;
@@ -259,7 +259,7 @@ public class Tournament {
                     GameManager.clearScreen();
                     System.out.println("It is your turn!\n");
                     Thread.sleep(1000);
-                    int offset = selectedArcher.aimMinigame(15 + (difficulty*5));
+                    int offset = selectedArcher.aimMinigame(15 + (difficulty*6));
                     int score = Math.max(10-offset, 0);
                     System.out.println("You have scored " + score + " points!");
                     allScores[j] += score;

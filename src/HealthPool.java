@@ -25,10 +25,19 @@ class HealthPool extends Item{
     return healStrength;
   }
   
+  // Heal all members of the character's team
   public void useItem(BasicCharacter c, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     System.out.println(c.getName() + " used " + getName() + " to heal their team!");
-    for(PlayerCharacter p : playerTeam.getPlayerTeam()){
-      System.out.println(p.getName() + " was healed for " + Math.min(healStrength, p.getMaxHP() - p.getCurrentHP()) + " HP!");
+    if(c.getIsEnemyCharacter()){
+      for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
+        System.out.println(e.getName() + " was healed for " + Math.min(healStrength, e.getMaxHP() - e.getCurrentHP()) + " HP!");
+        e.changeCurrentHP(healStrength);
+      }
+    } else{
+      for(PlayerCharacter p : playerTeam.getPlayerTeam()){
+        System.out.println(p.getName() + " was healed for " + Math.min(healStrength, p.getMaxHP() - p.getCurrentHP()) + " HP!");
+        p.changeCurrentHP(healStrength);
+      }
     }
   }
   

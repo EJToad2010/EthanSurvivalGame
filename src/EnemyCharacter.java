@@ -64,7 +64,7 @@ class EnemyCharacter extends BasicCharacter{
     // +5 MAX HP, +3 ATK, +2 DEF, +2 SPD per playerLevel
     changeMaxHP(5 * playerLevel);
     changeCurrentHP(5 * playerLevel);
-    changeAttackStrength(5 * playerLevel);
+    changeAttackStrength(3 * playerLevel);
     changeDefenseStrength(2 * playerLevel);
     changeSpeed(2 * playerLevel);
     xpReward *= (int) Math.pow(1.25, Math.max(playerLevel-1, 0));

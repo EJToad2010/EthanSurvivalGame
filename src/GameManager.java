@@ -7,7 +7,7 @@ class GameManager {
   // and cause an error (I forgot what it was called)
   static Scanner inputScanner = new Scanner(System.in);
   // Manually set this to true during repeated playtesting
-  public static boolean skipTutorial = true;
+  public static boolean skipTutorial = false;
   // Local Scanner used outside of specialized methods
   private Scanner s = new Scanner(System.in);
   // Arrays used to track enemy difficulty progression through their class types.
@@ -80,6 +80,8 @@ class GameManager {
       Thread.sleep(1000);
       System.out.println("During gameplay, you will be asked to type a number input in response to questions.");
       Thread.sleep(1000);
+      System.out.println("Make skilled decisions. They will have a major impact on your success.");
+      Thread.sleep(1000);
       anythingToContinue();
     }
     
@@ -105,14 +107,15 @@ class GameManager {
       initialize();
 
       // Tournament phase
-      // Tournaments appear once every two days if the player has enough coins.
-      if(playerTeam.getCoinBalance() >= 25 && dayNum%2 == 0){
+      // Tournaments appear once every two days and on day 3 if the player has enough coins.
+      if(playerTeam.getCoinBalance() >= 25 && (dayNum%2 == 0 || dayNum == 3)){
         clearScreen();
         handleTournament();
         clearScreen();
       }
 
       // Battle phase
+      clearScreen();
       System.out.println("You have encountered an enemy team!\n");
       Thread.sleep(1000);
       runBattleLoop();
@@ -170,6 +173,7 @@ class GameManager {
     // if allowedCharacters > 1
     boolean isFirstLoop = true;
     while(playerTeam.getPlayerTeam().size() < playerBattleCapacity){
+      clearScreen();
       if(!isFirstLoop){
         System.out.println("You may create another character.");
       }
@@ -194,13 +198,16 @@ class GameManager {
         printCharacterInfo(new Wizard("Wizard"), false);
         Thread.sleep(1000);
         anythingToContinue();
-        System.out.println("\nHEALER:");
+        // TODO: Implement the Cleric class
+        /* 
+        System.out.println("\nCLERIC:");
         Thread.sleep(1000);
-        anythingToContinue();
+        anythingToContinue();*/
         continue;
       }
       
       // Prompt the user for a Character name
+      clearScreen();
       if(classInput == 1){
         System.out.println("Selected class: Knight");
       } else if(classInput == 2){
@@ -219,11 +226,12 @@ class GameManager {
       } else if(classInput == 3){
         playerTeam.addCharacter(new Wizard(name));
       }
-      System.out.println(playerTeam);
+      System.out.println("\n"+playerTeam);
       Thread.sleep(1000);
+      anythingToContinue();
       if(dayNum == 1 && playerTeam.getPlayerTeam().size() == 2){
         // Part of the in-game tutorial if it is the user's first time making Characters
-        System.out.println("Congratulations! You have trained your first fighters.");
+        System.out.println("\nCongratulations! You have trained your first fighters.");
         Thread.sleep(1000);
         anythingToContinue();
       }
@@ -243,8 +251,9 @@ class GameManager {
     // dayNum is an int so it will automatically round down
 	  enemyBattleCapacity += dayNum/3;
     // On the first day, it is guaranteed that there will only be one enemy to act as a tutorial
-    if(dayNum == 1){
-      enemyBattleCapacity = 1;
+    // On the second day, it is guaranteed that there will be two enemies to force difficulty progression
+    if(dayNum == 1 || dayNum == 2){
+      enemyBattleCapacity = dayNum;
     }
     for(int i = 0; i < enemyBattleCapacity; i++){
       // Currently limited to the earlyGameEnemy set until more difficult enemy types are added into the game.
@@ -360,17 +369,6 @@ class GameManager {
     Thread.sleep(1500);
     anythingToContinue();
 
-    turnNum = 0;
-    String turnPriority;
-    // Detect who gets to start first which depends on speed
-    if(playerTeam.getTotalSpeed() >= enemyTeam.getTotalSpeed()){
-      System.out.println("The player's team has the higher combined speed and will go first!");
-      turnPriority = "Player";
-    } else{
-      System.out.println("The enemy's team has the higher combined speed and will go first!");
-      turnPriority = "Enemy";
-    }
-    Thread.sleep(1000);
     if(dayNum == 1 && !skipTutorial){
       // Teaches a user how a battle works for the first time
       System.out.println("\nBattle tutorial:");
@@ -392,7 +390,20 @@ class GameManager {
       Thread.sleep(2000);
       System.out.println("Enter HELP at any time if you want to view a character's stats and abilities.");
       anythingToContinue();
+      clearScreen();
     }
+
+    turnNum = 0;
+    String turnPriority;
+    // Detect who gets to start first which depends on speed
+    if(playerTeam.getTotalSpeed() >= enemyTeam.getTotalSpeed()){
+      System.out.println("The player's team has the higher combined speed and will go first!");
+      turnPriority = "Player";
+    } else{
+      System.out.println("The enemy's team has the higher combined speed and will go first!");
+      turnPriority = "Enemy";
+    }
+    Thread.sleep(1000);
     
     // Handle the initialization and logic of each party's turn until the battle ends
     while(!hasPlayerWon() && !hasEnemyWon()){
@@ -464,11 +475,12 @@ class GameManager {
           anythingToContinue();
 
           // Random chance for enemy to gain another action based on their speed
-          if((Math.random() * 100) < Math.min(e.getSpeed()/2, 50)){
+          // Enemies are half as likely to gain another action because it feels unfair to the player
+          if((Math.random() * 100) < Math.min(e.getSpeed()/4, 50)){
             Thread.sleep(1000);
             System.out.println(e.getName() + " has earned another action due to their speed!");
             Thread.sleep(500);
-            System.out.println("(" + Math.min(e.getSpeed()/2, 50) + "% chance)");
+            System.out.println("(" + Math.min(e.getSpeed()/4, 50) + "% chance)");
             Thread.sleep(1000);
           } else{
             break;
@@ -708,7 +720,7 @@ class GameManager {
         // Obtain the number of enemies the chosen basic ability targets
         if(selectedCharacter.getBasicAbilityEnemyCount(index) > 0){
           if(selectedCharacter.getBasicAbilityEnemyCount(index) != 999){
-            System.out.println(selectedCharacter.getBasicAbilityNames().get(index) + " may target up to " + selectedCharacter.getSpecialAbilityEnemyCount(index) + " enemies.");
+            System.out.println(selectedCharacter.getBasicAbilityNames().get(index) + " may target up to " + selectedCharacter.getBasicAbilityEnemyCount(index) + " enemies.");
           }
           if(selectedCharacter.getBasicAbilityEnemyCount(index) <= enemyTeam.getNumAlive()){
             // There are enough enemies to fully utilize the basic ability
