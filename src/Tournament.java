@@ -36,7 +36,7 @@ public class Tournament {
         message += "1: Novice\n2: Intermediate\n3: Advanced\n4: Elite\n";
         while(true){
             boolean success;
-            int selectedDifficultyIndex = GameManager.obtainInputWithCancel(message, 1, 5, false);
+            int selectedDifficultyIndex = GameManager.obtainInputWithCancel(message, 1, 4, false);
             System.out.println("");
             if(selectedDifficultyIndex == 1){
                 entryFee = 25;
