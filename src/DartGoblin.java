@@ -5,7 +5,7 @@ import java.util.ArrayList;
 class DartGoblin extends EnemyCharacter{
   public DartGoblin(String name, String behaviorType){
     // Set the names, descriptions, and cooldowns of the Dart Goblin.
-    super(name, 50.0, 8.0, 3.0, 35.0, 50, 20, behaviorType);
+    super(name, 50.0, 8.0, 3.0, 25.0, 50, 20, behaviorType);
     setDescription("A fast, ranged, weak enemy who focuses on dealing poison damage to the player's team.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Poison Dart", "Nimble Dodge"});
     addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto one target, ignoring their defense. 25% to poison the character for two turns.",
@@ -13,11 +13,11 @@ class DartGoblin extends EnemyCharacter{
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Poison Cloud", "Poison Mark"});
-    addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Shoot slightly weaker poison clouds at all targets. 25% chance for each target to be poisoned for 2 turns.",
+    addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Shoot slightly weaker poison clouds at all targets. 33% chance for each target to be poisoned for 2 turns.",
                                                                "Shoot a poison dart at a target. This target gets a 75% chance to be poisoned for 3 turns."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
-    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 2});
+    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
   }
   
@@ -28,6 +28,8 @@ class DartGoblin extends EnemyCharacter{
 
   // AI for deciding what basic ability to use
   public void basicAbilityAI(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+    // Fetch alive Characters from playerTeam
+    ArrayList<PlayerCharacter> aliveCharacters = playerTeam.getAliveCharacters();
     // System.out.println("DEBUG: Dart Goblin basic ability AI");
     int basicAbilityLimit = getBasicAbilityLimit();
     if(basicAbilityLimit >= 1){
@@ -47,7 +49,7 @@ class DartGoblin extends EnemyCharacter{
       }
     }
     // Use Poison Dart on a random Character if all other options are exhausted
-    basicAbility(0, playerTeam.getPlayerTeam().get((int)(Math.random() * playerTeam.getPlayerTeam().size())), playerTeam, enemyTeam);
+    basicAbility(0, aliveCharacters.get((int)(Math.random() * aliveCharacters.size())), playerTeam, enemyTeam);
   }
 
   // This method is used instead of the original if the EnemyCharacter AI finds a specific Character that is prioritized most
@@ -59,11 +61,13 @@ class DartGoblin extends EnemyCharacter{
 
   // AI for deciding a special ability to use
   public void specialAbilityAI(ArrayList<Integer> availableSpecialAbilityIndices, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+    // Fetch alive Characters from playerTeam
+    ArrayList<PlayerCharacter> aliveCharacters = playerTeam.getAliveCharacters();
     resetSpecialAbilityCooldowns();
     int randomAbilityIndex = availableSpecialAbilityIndices.get((int)(Math.random() * availableSpecialAbilityIndices.size()));
     if(randomAbilityIndex == 0){
       // Poison Dart Volley automatically targets all characters. No special decision making needed.
-      for(PlayerCharacter c : playerTeam.getPlayerTeam()){
+      for(PlayerCharacter c : aliveCharacters){
         specialAbility(0, c, playerTeam, enemyTeam);
       }
     } else if(randomAbilityIndex == 1){
@@ -93,11 +97,11 @@ class DartGoblin extends EnemyCharacter{
   public void specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(specialAbilityIndex == 0){
       // Poison Cloud
-      System.out.println(getName() + " shot a poison cloud at " + target.getName() + " for " + (getAttackStrength()-3) + " HP!");
-      handleEnemyDefense(target, getAttackStrength()-3, playerTeam, enemyTeam);
+      System.out.println(getName() + " shot a poison cloud at " + target.getName() + " for " + (getAttackStrength()-5) + " HP!");
+      handleEnemyDefense(target, getAttackStrength()-5, playerTeam, enemyTeam);
       Thread.sleep(1000);
       // 25% chance of Poison for 2 turns
-      if((int)(Math.random() * 100) < 25){
+      if((int)(Math.random() * 100) < 33){
         StatusEffect.addStatusEffect(target, "Poison", 2);
       }
     } else if(specialAbilityIndex == 1){

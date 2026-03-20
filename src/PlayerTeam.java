@@ -72,6 +72,17 @@ class PlayerTeam {
     }
   }
 
+  // Return an ArrayList of all PlayerCharacters that are alive
+  public ArrayList<PlayerCharacter> getAliveCharacters(){
+    ArrayList<PlayerCharacter> aliveCharacters = new ArrayList<PlayerCharacter>();
+    for(PlayerCharacter c : playerTeam){
+      if(!c.getIsDead()){
+        aliveCharacters.add(c);
+      }
+    }
+    return aliveCharacters;
+  }
+
   // Remove all protected Characters
   // Used at the start of the next turn
   public void resetProtectedCharacters(){

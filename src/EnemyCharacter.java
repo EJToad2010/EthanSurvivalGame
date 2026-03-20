@@ -64,7 +64,7 @@ class EnemyCharacter extends BasicCharacter{
     // +5 MAX HP, +3 ATK, +2 DEF, +2 SPD per playerLevel
     changeMaxHP(5 * playerLevel);
     changeCurrentHP(5 * playerLevel);
-    changeAttackStrength(3 * playerLevel);
+    changeAttackStrength(2 * playerLevel);
     changeDefenseStrength(2 * playerLevel);
     changeSpeed(2 * playerLevel);
     xpReward *= (int) Math.pow(1.25, Math.max(playerLevel-1, 0));
@@ -146,10 +146,12 @@ class EnemyCharacter extends BasicCharacter{
   // Prioritizes killing weaker units.
   // Uses maximal aggression and no defense
   private void aggressive(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException {
+    // Fetch alive Characters from playerTeam
+    ArrayList<PlayerCharacter> aliveCharacters = playerTeam.getAliveCharacters();
     // Attack the member of playerTeam with the lowest health
-    PlayerCharacter lowestPlayer = playerTeam.getPlayerTeam().get(0);
+    PlayerCharacter lowestPlayer = aliveCharacters.get(0);
     double lowestHealth = lowestPlayer.getCurrentHP();
-    for(PlayerCharacter pc : playerTeam.getPlayerTeam()){
+    for(PlayerCharacter pc : aliveCharacters){
       if(pc.getCurrentHP() < lowestHealth){
         lowestPlayer = pc;
         lowestHealth = pc.getCurrentHP();

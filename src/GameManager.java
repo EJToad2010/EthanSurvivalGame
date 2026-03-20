@@ -2,12 +2,13 @@ package src;
 import java.util.*;
 import java.io.IOException;
 // Controls the gameplay loop, which includes the battle loop, shop loop, etc.
+// TODO: Rework this class and split its methods into other helper classes
 class GameManager {
   // Scanner used in static methods. It is declared here so that it doesn't have to use close()
   // and cause an error (I forgot what it was called)
   static Scanner inputScanner = new Scanner(System.in);
   // Manually set this to true during repeated playtesting
-  public static boolean skipTutorial = false;
+  public static boolean skipTutorial = true;
   // Local Scanner used outside of specialized methods
   private Scanner s = new Scanner(System.in);
   // Arrays used to track enemy difficulty progression through their class types.
@@ -479,7 +480,6 @@ class GameManager {
       if(!e.getIsDead() && !StatusEffect.hasStatusEffect(e, "Stun")){
         while(true){
           e.takeTurn(playerTeam, enemyTeam);
-          Thread.sleep(1000);
           anythingToContinue();
 
           // Random chance for enemy to gain another action based on their speed

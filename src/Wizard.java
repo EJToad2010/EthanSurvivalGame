@@ -32,8 +32,8 @@ class Wizard extends PlayerCharacter {
   public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
       // Magic Zap
-      System.out.println(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()-5) + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, (getAttackStrength()-5), playerTeam, enemyTeam);
+      System.out.println(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()) + " HP!");
+      boolean wasEnemyHit = handleEnemyDefense(target, (getAttackStrength()), playerTeam, enemyTeam);
       if((int)(Math.random() * 100) < 10 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Stun", 1);
       }

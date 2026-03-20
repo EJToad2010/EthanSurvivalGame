@@ -9,14 +9,14 @@ class Archer extends PlayerCharacter {
     // Set the names, descriptions, and cooldowns of all the Archer's abilities.
     setDescription("A quick fighter who can attack multiple enemies and control the battlefield.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Softening Arrow", "Double Shot"});
-    addToArrayList(getBasicAbilityDescriptions(), new String[]{"A single ranged attack that has a 25% chance to reduce the enemy's attack strength for 2 turns.",
+    addToArrayList(getBasicAbilityDescriptions(), new String[]{"A single ranged attack that has a 33% chance to reduce the enemy's attack strength for 2 turns.",
                                                              "A slightly weaker attack that targets two enemies."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 2});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Volley", "Armor Piercer"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Fires an arrow at every enemy, dealing moderate damage. Each enemy has a 10% chance of being burned for 1 turn.",
-                                                               "Deals moderate damage to a single target. The enemy has a 50% chance of receiving reduced defensive strength for 2 turns."});
+                                                               "Deals moderate damage to a single target. The enemy has a 50% chance of receiving massively reduced defensive strength for 2 turns."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 4});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
@@ -35,7 +35,7 @@ class Archer extends PlayerCharacter {
       // Softening Arrow
       System.out.println(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
       boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
-      if((int)(Math.random() * 100) < 25 && wasEnemyHit){
+      if((int)(Math.random() * 100) < 33 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Soft", 2);
       }
       System.out.println(target.getSimpleOutput());

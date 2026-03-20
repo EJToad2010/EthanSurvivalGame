@@ -17,8 +17,8 @@ class Knight extends PlayerCharacter {
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 4});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
-    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 2});
-    addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 2});
+    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
+    addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
   }
   
   // Overrided getType method
@@ -44,8 +44,8 @@ class Knight extends PlayerCharacter {
       }
     } else if(basicAbilityIndex == 1){
       // Cautious Attack
-      System.out.println(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 5) + " HP!");
-      handleEnemyDefense(target, getAttackStrength() - 5, playerTeam, enemyTeam);
+      System.out.println(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 8) + " HP!");
+      handleEnemyDefense(target, getAttackStrength() - 8, playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
     }
   }

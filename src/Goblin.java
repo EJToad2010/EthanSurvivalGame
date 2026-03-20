@@ -5,7 +5,7 @@ import java.util.ArrayList;
 class Goblin extends EnemyCharacter{
   // Items that the Goblin steals from the player. They are not used by the Goblin and will be returned on death.
   public Goblin(String name, String behaviorType){
-    super(name, 60.0, 10.0, 4.0, 30.0, 50, 20, behaviorType);
+    super(name, 60.0, 10.0, 4.0, 20.0, 50, 20, behaviorType);
     setDescription("A weak enemy focused on annoying the player and causing chaos.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Rusty Dagger", "Nimble Dodge"});
     addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto a single target. 10% chance to inflict bleed.",
@@ -27,6 +27,8 @@ class Goblin extends EnemyCharacter{
   }
 
   public void basicAbilityAI(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+    // Fetch alive Characters from playerTeam
+    ArrayList<PlayerCharacter> aliveCharacters = playerTeam.getAliveCharacters();
     // System.out.println("DEBUG: Goblin Basic Ability AI");
     int basicAbilityLimit = getBasicAbilityLimit();
     if(basicAbilityLimit >= 1){
@@ -46,7 +48,7 @@ class Goblin extends EnemyCharacter{
       }
     }
     // Use Rusty Dagger on a random Character if all other options are exhausted
-    basicAbility(0, playerTeam.getPlayerTeam().get((int)(Math.random() * playerTeam.getPlayerTeam().size())), playerTeam, enemyTeam);
+    basicAbility(0, aliveCharacters.get((int)(Math.random() * aliveCharacters.size())), playerTeam, enemyTeam);
   }
 
   public void basicAbilityAI(BasicCharacter preferredCharacter, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
@@ -57,37 +59,39 @@ class Goblin extends EnemyCharacter{
 
   // AI for deciding a special ability to use
   public void specialAbilityAI(ArrayList<Integer> availableSpecialAbilityIndices, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+    // Fetch alive Characters from playerTeam
+    ArrayList<PlayerCharacter> aliveCharacters = playerTeam.getAliveCharacters();
     int randomAbilityIndex = availableSpecialAbilityIndices.get((int)(Math.random() * availableSpecialAbilityIndices.size()));
     if(randomAbilityIndex == 0){
       // Taunt ability
       // Choose either the player with the highest HP remaining or the highest attackStrength
-      double highestHP = playerTeam.getPlayerTeam().get(0).getCurrentHP();
+      double highestHP = aliveCharacters.get(0).getCurrentHP();
       int highestHPIndex = 0;
-      double highestAttack = playerTeam.getPlayerTeam().get(0).getAttackStrength();
+      double highestAttack = aliveCharacters.get(0).getAttackStrength();
       int highestAttackIndex = 0;
       if((Math.random() * 100) < 50){
         // Choose highest HP
-        for(int i = 0; i < playerTeam.getPlayerTeam().size(); i++){
-          if(playerTeam.getPlayerTeam().get(i).getCurrentHP() > highestHP){
-            highestHP = playerTeam.getPlayerTeam().get(i).getCurrentHP();
+        for(int i = 0; i < aliveCharacters.size(); i++){
+          if(aliveCharacters.get(i).getCurrentHP() > highestHP){
+            highestHP = aliveCharacters.get(i).getCurrentHP();
             highestHPIndex = i;
           }
         }
-        specialAbility(0, playerTeam.getPlayerTeam().get(highestHPIndex), playerTeam, enemyTeam);
+        specialAbility(0, aliveCharacters.get(highestHPIndex), playerTeam, enemyTeam);
       } else{
         // Choose highest Attack Strength
-        for(int i = 0; i < playerTeam.getPlayerTeam().size(); i++){
-          if(playerTeam.getPlayerTeam().get(i).getAttackStrength() > highestAttack){
-            highestAttack = playerTeam.getPlayerTeam().get(i).getAttackStrength();
+        for(int i = 0; i < aliveCharacters.size(); i++){
+          if(aliveCharacters.get(i).getAttackStrength() > highestAttack){
+            highestAttack = aliveCharacters.get(i).getAttackStrength();
             highestAttackIndex = i;
           }
         }
-        specialAbility(0, playerTeam.getPlayerTeam().get(highestAttackIndex), playerTeam, enemyTeam);
+        specialAbility(0, aliveCharacters.get(highestAttackIndex), playerTeam, enemyTeam);
       }
     } else if(randomAbilityIndex == 1){
       // Pickpocket ability
       // Target random player
-      specialAbility(1, playerTeam.getPlayerTeam().get((int)(Math.random() * playerTeam.getPlayerTeam().size())), playerTeam, enemyTeam);
+      specialAbility(1, aliveCharacters.get((int)(Math.random() * aliveCharacters.size())), playerTeam, enemyTeam);
     }
   }
 

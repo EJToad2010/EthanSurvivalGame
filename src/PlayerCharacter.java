@@ -98,8 +98,8 @@ class PlayerCharacter extends BasicCharacter {
   private void updatePlayerStats(){
     System.out.println("+5 MAX HP");
     changeMaxHP(5);
-    System.out.println("+3 ATK");
-    changeAttackStrength(3);
+    System.out.println("+2 ATK");
+    changeAttackStrength(2);
     System.out.println("+2 DEF");
     changeDefenseStrength(2);
     System.out.println("+2 SPD");
