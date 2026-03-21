@@ -50,8 +50,8 @@ class Wizard extends PlayerCharacter {
   public void specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(specialAbilityIndex == 0){
       // Fireball
-      System.out.println(getName() + " launched a fireball at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      System.out.println(getName() + " launched a fireball at " + target.getName() + " for " + getAttackStrength()+5 + " HP!");
+      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam);
       if((int)(Math.random() * 100) < 25 && wasEnemyHit){
         StatusEffect.addStatusEffect(target, "Burn", 2);
       }

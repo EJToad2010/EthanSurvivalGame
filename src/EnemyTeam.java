@@ -36,7 +36,7 @@ class EnemyTeam {
       c.inflateStats((int)(Math.random() * 2) + Math.max(0, highestPlayerLevel-1));
     } else{
       // 50% chance of spawning near average level
-      c.inflateStats((int)(Math.random() * 2) + Math.max(0, (int)avgPlayerLevel));
+      c.inflateStats((int)(Math.random() * 2) + Math.max(0, (int)(avgPlayerLevel)+1));
     }
     convertAllToEnemy();
   }
