@@ -8,7 +8,7 @@ class GameManager {
   // and cause an error (I forgot what it was called)
   static Scanner inputScanner = new Scanner(System.in);
   // Manually set this to true during repeated playtesting
-  public static boolean skipTutorial = true;
+  public static boolean skipTutorial = false;
   // Local Scanner used outside of specialized methods
   private Scanner s = new Scanner(System.in);
   // Arrays used to track enemy difficulty progression through their class types.
