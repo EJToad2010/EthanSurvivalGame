@@ -41,8 +41,8 @@ class Archer extends PlayerCharacter {
       System.out.println(target.getSimpleOutput());
     } else if(basicAbilityIndex == 1){
       // Double Shot
-      System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + (getAttackStrength() - 5) + " HP!");
-      handleEnemyDefense(target, getAttackStrength() - 5, playerTeam, enemyTeam);
+      System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + (getAttackStrength() - 3) + " HP!");
+      handleEnemyDefense(target, getAttackStrength() - 3, playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
     }
   }

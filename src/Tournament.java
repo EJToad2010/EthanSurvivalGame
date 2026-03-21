@@ -110,10 +110,10 @@ public class Tournament {
         Thread.sleep(1000);
         if(playerRank == 1){
             System.out.println("Congratulations! You have won!");
-            placementMultiplier = 2;
+            placementMultiplier = 2.5;
         } else if(playerRank == 2){
             System.out.println("You have received second.");
-            placementMultiplier = 1.25;
+            placementMultiplier = 1.5;
         } else if(playerRank == 3){
             System.out.println("You have received third.");
             placementMultiplier = 0.25;
