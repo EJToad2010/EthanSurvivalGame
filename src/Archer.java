@@ -124,7 +124,7 @@ class Archer extends PlayerCharacter {
       } else if(i == center){
         output += "|";
       } else if(i == center-2 || i == center+2){
-        output += "∣";
+        output += "|";
       } else{
         output += "-";
       }
