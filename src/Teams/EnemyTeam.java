@@ -1,10 +1,16 @@
-package src;
+package src.Teams;
 import java.util.ArrayList;
+
+import src.Characters.BasicCharacter;
+import src.Characters.EnemyCharacter;
+import src.ItemManager.Inventory;
+import src.ItemManager.Item;
+import src.ItemManager.ItemStack;
 
 // Represents the main opponent, who controls multiple enemies and performs their actions
 // This class and PlayerTeam share a lot of similar logic, but they are kept in separate classes
 // because they deal with separate object types.
-class EnemyTeam {
+public class EnemyTeam {
   // This ArrayList contains the raw enemy characters that are a part of the team.
   private ArrayList<EnemyCharacter> enemyTeam;
   // The EnemyTeam has one shared inventory.

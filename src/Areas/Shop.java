@@ -1,8 +1,17 @@
-package src;
+package src.Areas;
+
+import src.GameManagement.GameManager;
+import src.ItemManager.Inventory;
+import src.ItemManager.Item;
+import src.ItemManager.ItemStack;
+import src.ItemManager.Items.HealthPool;
+import src.ItemManager.Items.HealthPotion;
+import src.Teams.PlayerTeam;
+
 // A shop is a special designated area where the Player can buy Items
 // with the coins that they have earned.
 // It has a special type of inventory.
-class Shop {
+public class Shop {
   // All the items that are available in the shop
   private Inventory shopInventory;
   // Types: Adventure, Offense, Defense, Rare

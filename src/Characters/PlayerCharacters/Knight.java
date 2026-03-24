@@ -1,6 +1,13 @@
-package src;
+package src.Characters.PlayerCharacters;
+
+import src.Characters.BasicCharacter;
+import src.Characters.PlayerCharacter;
+import src.GameManagement.GameManager;
+import src.Teams.EnemyTeam;
+import src.Teams.PlayerTeam;
+
 // High health and ability, low defense and healing
-class Knight extends PlayerCharacter {
+public class Knight extends PlayerCharacter {
   public Knight(String name){
     super(name, 100.0, 30.0, 15.0, 5.0);
     // Set the names, descriptions, and cooldowns of all the Knight's abilities.

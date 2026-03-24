@@ -1,9 +1,27 @@
-package src;
+package src.GameManagement;
 import java.util.*;
+
+import src.Areas.Shop;
+import src.Areas.Tournament;
+import src.Characters.BasicCharacter;
+import src.Characters.EnemyCharacter;
+import src.Characters.PlayerCharacter;
+import src.Characters.EnemyCharacters.DartGoblin;
+import src.Characters.EnemyCharacters.Goblin;
+import src.Characters.PlayerCharacters.Archer;
+import src.Characters.PlayerCharacters.Knight;
+import src.Characters.PlayerCharacters.Wizard;
+import src.ItemManager.Items.HealthPool;
+import src.ItemManager.Items.HealthPotion;
+import src.Misc.Data;
+import src.Misc.StatusEffect;
+import src.Teams.EnemyTeam;
+import src.Teams.PlayerTeam;
+
 import java.io.IOException;
 // Controls the gameplay loop, which includes the battle loop, shop loop, etc.
 // TODO: Rework this class and split its methods into other helper classes
-class GameManager {
+public class GameManager {
   // Scanner used in static methods. It is declared here so that it doesn't have to use close()
   // and cause an error (I forgot what it was called)
   static Scanner inputScanner = new Scanner(System.in);

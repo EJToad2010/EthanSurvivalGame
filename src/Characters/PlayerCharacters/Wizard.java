@@ -1,7 +1,14 @@
-package src;
+package src.Characters.PlayerCharacters;
 import java.util.Scanner;
 
-class Wizard extends PlayerCharacter {
+import src.Characters.BasicCharacter;
+import src.Characters.PlayerCharacter;
+import src.GameManagement.GameManager;
+import src.Misc.StatusEffect;
+import src.Teams.EnemyTeam;
+import src.Teams.PlayerTeam;
+
+public class Wizard extends PlayerCharacter {
   private Scanner s = new Scanner(System.in);
   public Wizard(String name){
     super(name, 80.0, 40.0, 5.0, 15.0);

@@ -1,4 +1,4 @@
-package src;
+package src.ItemManager;
 
 // Stores a stack of identical Items
 public class ItemStack {

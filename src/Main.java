@@ -1,5 +1,7 @@
 package src;
 import java.io.IOException;
+
+import src.GameManagement.GameManager;
 public class Main {
   // Game architecture
   // Superclass: BasicCharacter

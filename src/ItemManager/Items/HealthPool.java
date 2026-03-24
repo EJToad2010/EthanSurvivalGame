@@ -1,6 +1,15 @@
-package src;
+package src.ItemManager.Items;
+
+import src.Characters.BasicCharacter;
+import src.Characters.EnemyCharacter;
+import src.Characters.PlayerCharacter;
+import src.ItemManager.Item;
+import src.ItemManager.ItemStack;
+import src.Teams.EnemyTeam;
+import src.Teams.PlayerTeam;
+
 // An item that heals all members of a Player's team by a given amount
-class HealthPool extends Item{
+public class HealthPool extends Item{
   // Attributes needed just for a Health Pool
   private double healStrength;
   

@@ -1,5 +1,12 @@
-package src;
+package src.Areas;
 import java.io.IOException;
+
+import src.Characters.PlayerCharacter;
+import src.Characters.PlayerCharacters.Archer;
+import src.Characters.PlayerCharacters.Knight;
+import src.Characters.PlayerCharacters.Wizard;
+import src.GameManagement.GameManager;
+import src.Teams.PlayerTeam;
 // A tournament is an area where Characters can gamble coins for a chance to earn a large sum of money
 // Tournaments are skill-based, with each Character type having a unique mini-game.
 public class Tournament {

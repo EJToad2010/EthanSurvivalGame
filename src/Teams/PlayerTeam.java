@@ -1,10 +1,16 @@
-package src;
+package src.Teams;
 import java.util.ArrayList;
+
+import src.Characters.BasicCharacter;
+import src.Characters.PlayerCharacter;
+import src.ItemManager.Inventory;
+import src.ItemManager.Item;
+import src.ItemManager.ItemStack;
 
 // Represents the user, who controls multiple characters and performs their actions
 // This class and EnemyTeam share a lot of similar logic, but they are kept in separate classes
 // because they deal with separate object types.
-class PlayerTeam {
+public class PlayerTeam {
   // One main variable, which stores all characters that the player currently controls
   private ArrayList<PlayerCharacter> playerTeam;
   private Inventory playerInventory;

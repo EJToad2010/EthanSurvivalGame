@@ -1,8 +1,8 @@
-package src;
+package src.Characters;
 import java.util.ArrayList;
 // PlayerCharacters have unique attributes such as a shared inventory, xp, and levels
 // This object should never be created on its own. Only its subclasses will ever be used.
-class PlayerCharacter extends BasicCharacter {
+public class PlayerCharacter extends BasicCharacter {
   // How many levels are needed to unlock a PlayerCharacter's corresponding basic abilitiess
   // Length must equal all other basic ability ArrayLists in Character.java
   private ArrayList<Integer> basicAbilityUnlockLevels = new ArrayList<Integer>();

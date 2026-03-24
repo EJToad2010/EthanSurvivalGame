@@ -1,8 +1,13 @@
-package src;
+package src.ItemManager;
+
+import src.Characters.BasicCharacter;
+import src.Teams.EnemyTeam;
+import src.Teams.PlayerTeam;
+
 // A consumable item that can be used by both Players and Enemies with no differences
 // Stores a singular item
 // TODO: Add offensive items to add to an offensive Shop
-class Item {
+public class Item {
   // Attributes for an Item
   private String name;
   private String description;

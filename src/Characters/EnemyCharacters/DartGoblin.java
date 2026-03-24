@@ -1,8 +1,15 @@
-package src;
+package src.Characters.EnemyCharacters;
 
 import java.util.ArrayList;
 
-class DartGoblin extends EnemyCharacter{
+import src.Characters.BasicCharacter;
+import src.Characters.EnemyCharacter;
+import src.Characters.PlayerCharacter;
+import src.Misc.StatusEffect;
+import src.Teams.EnemyTeam;
+import src.Teams.PlayerTeam;
+
+public class DartGoblin extends EnemyCharacter{
   public DartGoblin(String name, String behaviorType){
     // Set the names, descriptions, and cooldowns of the Dart Goblin.
     super(name, 50.0, 8.0, 3.0, 25.0, 50, 20, behaviorType);

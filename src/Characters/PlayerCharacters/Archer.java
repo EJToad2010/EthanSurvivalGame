@@ -1,7 +1,14 @@
-package src;
+package src.Characters.PlayerCharacters;
 import java.io.IOException;
 import java.util.Scanner;
-class Archer extends PlayerCharacter {
+
+import src.Characters.BasicCharacter;
+import src.Characters.PlayerCharacter;
+import src.GameManagement.GameManager;
+import src.Misc.StatusEffect;
+import src.Teams.EnemyTeam;
+import src.Teams.PlayerTeam;
+public class Archer extends PlayerCharacter {
   // Used in a precision minigame
   private Scanner s = new Scanner(System.in);
   public Archer(String name){

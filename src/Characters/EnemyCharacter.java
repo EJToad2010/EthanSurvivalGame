@@ -1,9 +1,15 @@
-package src;
+package src.Characters;
 import java.util.ArrayList;
+
+import src.ItemManager.Inventory;
+import src.ItemManager.Items.HealthPool;
+import src.ItemManager.Items.HealthPotion;
+import src.Teams.EnemyTeam;
+import src.Teams.PlayerTeam;
 // EnemyCharacters have an xpReward and coinReward parameter and have adjusted behaviors when attacking players.
 // This object should never be created on its own. Only its subclasses will ever be used.
 // TODO: Implement GoblinTank EnemyCharacter subclass
-class EnemyCharacter extends BasicCharacter{
+public class EnemyCharacter extends BasicCharacter{
   // Define EnemyCharacter specific attributes
   private int xpReward;
   private int coinReward;

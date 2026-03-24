@@ -1,8 +1,10 @@
-package src;
+package src.Misc;
 import java.util.ArrayList;
+
+import src.Characters.BasicCharacter;
 // Handles all status effects that both players and enemies experience
 // Static class that can be used flexibly across all other classes
-class StatusEffect {
+public class StatusEffect {
   // All types of status effects in the game
   private static String[] effectTypes = new String[]{"Soft", "Bleed", "Poison", "Slow", "Stun", "Nimble", "Taunt", "Burn", "Pierce"};
   // How each status effect affects a target

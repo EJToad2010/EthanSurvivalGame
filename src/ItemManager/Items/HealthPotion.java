@@ -1,6 +1,13 @@
-package src;
+package src.ItemManager.Items;
+
+import src.Characters.BasicCharacter;
+import src.ItemManager.Item;
+import src.ItemManager.ItemStack;
+import src.Teams.EnemyTeam;
+import src.Teams.PlayerTeam;
+
 // An item that heals one character by a given amount
-class HealthPotion extends Item {
+public class HealthPotion extends Item {
   // Attributes needed just for a Health Potion
   private double healStrength;
   

@@ -1,8 +1,15 @@
-package src;
+package src.Characters.EnemyCharacters;
 
 import java.util.ArrayList;
 
-class Goblin extends EnemyCharacter{
+import src.Characters.BasicCharacter;
+import src.Characters.EnemyCharacter;
+import src.Characters.PlayerCharacter;
+import src.Misc.StatusEffect;
+import src.Teams.EnemyTeam;
+import src.Teams.PlayerTeam;
+
+public class Goblin extends EnemyCharacter{
   // Items that the Goblin steals from the player. They are not used by the Goblin and will be returned on death.
   public Goblin(String name, String behaviorType){
     super(name, 60.0, 10.0, 4.0, 20.0, 50, 20, behaviorType);

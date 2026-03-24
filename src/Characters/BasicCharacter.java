@@ -1,5 +1,9 @@
-package src;
+package src.Characters;
 import java.util.ArrayList;
+
+import src.Misc.StatusEffect;
+import src.Teams.EnemyTeam;
+import src.Teams.PlayerTeam;
 
 // Represents a default Character with generic attributes, acting as a superclass for all character types
 // Used by both the user's characters and the enemy's characters

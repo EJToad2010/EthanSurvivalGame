@@ -1,8 +1,8 @@
-package src;
+package src.ItemManager;
 import java.util.ArrayList;
 // A container for Item objects with specialized methods
 // Contains stacks for Items, which each contain individual items
-class Inventory {
+public class Inventory {
   // The container itself
   private ArrayList<ItemStack> inventory;
   
