@@ -19,7 +19,7 @@ import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
 
 import java.io.IOException;
-// Controls the gameplay loop, which includes the battle loop, shop loop, etc.
+// THIS IS A TEMPORARY CLASS THAT WILL EXIST UNTIL A TRANSITION IS FINISHED TO IMPLEMENT GRAPHICS
 // TODO: Rework this class and split its methods into other helper classes
 public class GameManager {
   // Scanner used in static methods. It is declared here so that it doesn't have to use close()
@@ -127,14 +127,6 @@ public class GameManager {
 
       // Tournament phase
       // Tournaments appear once every two days and on day 3 if the player has enough coins.
-      // An NPC spawns in the first day a tournament is available to gift the minimum required entry fee.
-      // This way, no players accidentally miss the Tournament feature
-      if(dayNum == 2 && playerTeam.getCoinBalance() < 25){
-        System.out.println("A stranger approaches you, giving you 25g.");
-        System.out.println("Good luck on your journey out there, he says.");
-        playerTeam.increaseCoinBalance(25);
-        anythingToContinue();
-      }
       if(playerTeam.getCoinBalance() >= 25 && (dayNum%2 == 0 || dayNum == 3)){
         clearScreen();
         handleTournament();
@@ -164,6 +156,16 @@ public class GameManager {
       
       // TODO: Expand on this campfire phase
       clearScreen();
+
+      // An NPC spawns in the first day a tournament is available to gift the minimum required entry fee.
+      // This way, no players accidentally miss the Tournament feature
+      if(dayNum == 1 && playerTeam.getCoinBalance() < 25){
+        System.out.println("A stranger approaches you, giving you 25g.");
+        System.out.println("Good luck on your journey out there, he says.");
+        playerTeam.increaseCoinBalance(25);
+        anythingToContinue();
+      }
+
       System.out.println("It is now the evening.");
       Thread.sleep(1000);
       System.out.println("Your characters have constructed a small campsite to stay for the night.");
