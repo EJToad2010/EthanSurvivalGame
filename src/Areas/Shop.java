@@ -6,6 +6,7 @@ import src.ItemManager.Item;
 import src.ItemManager.ItemStack;
 import src.ItemManager.Items.HealthPool;
 import src.ItemManager.Items.HealthPotion;
+import src.ItemManager.Items.Antidote;
 import src.Teams.PlayerTeam;
 
 // A shop is a special designated area where the Player can buy Items
@@ -38,6 +39,7 @@ public class Shop {
       shopInventory.add(new HealthPotion(45, 50.0), 1);
       shopInventory.add(new HealthPool(30, 10.0), 3);
       shopInventory.add(new HealthPool(50, 25.0), 1);
+      shopInventory.add(new Antidote(20), 3);
     }
   }
   
