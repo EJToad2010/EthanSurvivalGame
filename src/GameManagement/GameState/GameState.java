@@ -1,17 +1,20 @@
 package src.GameManagement.GameState;
 // Import graphics and event handling libraries
-import javax.swing.*;
 
 import src.GameManagement.Game;
+import src.GameManagement.UI.GamePanel;
 
 import java.awt.*;
-import java.awt.event.*;
 
 // A singular class that can be called to execute a specific "phase" of the game
 // Contains both the logic and graphics of a phase
+// Each GameState has support for smaller "steps," which change the flow of logic without changing the entire screen
 public class GameState {
     // Store a reference to the running Game instance
     protected Game game;
+
+    // Store an integer value of the current "step"
+    protected int currentStep = 0;
     
     // Constructor
     public GameState(Game game){
@@ -22,5 +25,31 @@ public class GameState {
     // Handles all logic of a panel
     public void update(){}
     // Handles all graphics of a panel
-    public void draw(Graphics graphics){}
+    // Redirect to drawStep()
+    public void draw(Graphics graphics){
+        drawStep(currentStep, graphics);
+    }
+
+    // Move to the next stpe
+    protected void nextStep(){
+        currentStep++;
+    }
+
+    // Set a specific step
+    protected void setStep(int newStep){
+        currentStep = newStep;
+    }
+
+    // Subclasses must override these
+    protected void handleStep(int step, int keyCode){}
+    protected void drawStep(int step, Graphics graphics){}
+    // Calls once when panel is first loaded
+    public void onEnter(GamePanel panel){}
+    // Calls once when panel is unloaded
+    public void onExit(GamePanel panel){}
+
+    // Call every time a key is pressed
+    public void keyPressed(int keyCode){
+        handleStep(currentStep, keyCode);
+    }
 }
