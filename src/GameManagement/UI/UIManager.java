@@ -36,7 +36,7 @@ public class UIManager {
 
         int drawX = x + (width-textWidth) / 2;
         int drawY = y + (height - textHeight) / 2;
-
+        
         graphics.drawString(text, drawX, drawY);
     }
 
