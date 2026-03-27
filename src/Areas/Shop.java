@@ -7,6 +7,7 @@ import src.ItemManager.ItemStack;
 import src.ItemManager.Items.Antidote;
 import src.ItemManager.Items.HealthPool;
 import src.ItemManager.Items.HealthPotion;
+import src.ItemManager.Items.Antidote;
 import src.Teams.PlayerTeam;
 
 // A shop is a special designated area where the Player can buy Items
