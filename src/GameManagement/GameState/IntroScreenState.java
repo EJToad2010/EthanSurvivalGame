@@ -2,19 +2,18 @@ package src.GameManagement.GameState;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
 import src.GameManagement.Game;
-import src.GameManagement.UI.Button;
 import src.GameManagement.UI.DialogManager;
 import src.GameManagement.UI.GamePanel;
 
 public class IntroScreenState extends GameState{
     // Used to control the flow of text displayed on screen
     int ticksPassed = 0;
+    // Enter screen start off black, with bars disappearing from top to bottom
+    int blackBarsVisible = 10;
     private DialogManager introDialog = new DialogManager();
     
     public IntroScreenState(Game g){
@@ -25,30 +24,49 @@ public class IntroScreenState extends GameState{
         introDialog.add("Good luck on your journey...");
     }
 
-    // Go to the next step around once per second
     public void update(){
-        if(super.currentStep < 4){
+        if(super.currentStep == 0){
+            // Transition animation
             ticksPassed++;
-            if(ticksPassed % 60 == 0){
-                nextStep();
+            if(ticksPassed % 5 == 0){
+                blackBarsVisible--;
+            }
+            if(blackBarsVisible < 1){
+                super.currentStep++;
             }
         }
     }
 
     // Update dialog after every time ENTER is pressed
     protected void handleStep(int step, int keyCode){
-        // If dialog is still active, wait until the next line is reached
-        if(introDialog.getIsActive()){
-            if(keyCode == KeyEvent.VK_ENTER){
-                introDialog.nextLine();
+        if(step > 0){
+            // If dialog is still active, wait until the next line is reached
+            if(introDialog.getIsActive()){
+                if(keyCode == KeyEvent.VK_ENTER){
+                    introDialog.nextLine();
+                    if(!introDialog.getIsActive()){
+                        game.setCurrentGameState(new CharacterSelectState(game));
+                    }
+                }
+            }
+            // If dialog is over, wait for the user to advance to the next screen
+            else{
+                game.setCurrentGameState(new CharacterSelectState(game));
             }
         }
-        // If dialog is over, wait for the user to advance to the next screen
     }
 
     // Draw dialog
     protected void drawStep(int step, Graphics graphics){
-        introDialog.draw(graphics);
+        if(step > 0){
+            introDialog.draw(graphics);
+        } else{
+            // Transition animation
+            for(int i = 10-blackBarsVisible; i < 10; i++){
+                graphics.setColor(Color.BLACK);
+                graphics.fillRect(0, i*72, 1280, 72);
+            }
+        }
     }
 
     // Calls once when panel is first loaded

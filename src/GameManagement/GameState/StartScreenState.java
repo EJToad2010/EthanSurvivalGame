@@ -42,14 +42,14 @@ public class StartScreenState extends GameState{
         graphics.drawImage(castle, (1280 - castle.getWidth(null))/2 - 40, 100, null);
         if(step == -1){
             UIManager.setTextColor(graphics, Color.GRAY);
-            UIManager.setFontSize(32);
+            UIManager.setFontSize(28);
             UIManager.refreshText(graphics);
             UIManager.drawCenteredStringInBox(graphics, "Options are not implemented yet.", 0, 600, 1280, 100);
             UIManager.setTextColor(graphics, Color.BLACK);
         }
         if(step == 0){
             UIManager.setTextColor(graphics, Color.GRAY);
-            UIManager.setFontSize(28);
+            UIManager.setFontSize(25);
             UIManager.refreshText(graphics);
             UIManager.drawCenteredStringInBox(graphics, "Use the left and right arrow keys to move between options. Press ENTER to select.", 0, 600, 1280, 100);
             UIManager.setTextColor(graphics, Color.BLACK);
