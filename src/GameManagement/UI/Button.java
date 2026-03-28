@@ -35,10 +35,6 @@ public class Button {
         UIManager.setFontSize(fontSize);
         UIManager.refreshText(graphics);
         FontMetrics fontMetrics = graphics.getFontMetrics(UIManager.getFont());
-        // Obtain the width and height of the text
-        int textWidth = fontMetrics.stringWidth(text);
-        int textHeight = fontMetrics.getHeight();
-
         // Draw the box around the button
         Color bgColor;
         if(selected){
@@ -47,12 +43,30 @@ public class Button {
             bgColor = Color.WHITE;
         }
         graphics.setColor(bgColor);
-        graphics.fillRoundRect(x-HORIZONTAL_GAP, y-VERTICAL_GAP, textWidth+(HORIZONTAL_GAP*2), textHeight+(VERTICAL_GAP*2), fontSize, fontSize);
+        int[] cornerCoords = getCornerCoords(graphics, fontSize);
+        graphics.fillRoundRect(cornerCoords[0], cornerCoords[1], cornerCoords[2], cornerCoords[3], fontSize, fontSize);
 
         // Draw the text
         UIManager.setTextColor(graphics, Color.BLACK);
         UIManager.refreshText(graphics);
-        UIManager.drawCenteredStringInBox(graphics, text, x, y+fontMetrics.getAscent(), textWidth, textHeight);
+        int[] bounds = getBounds(graphics, fontSize);
+        UIManager.drawCenteredStringInBox(graphics, text, x, y+fontMetrics.getAscent(), bounds[0], bounds[1]);
+    }
+
+    // Return the width and height of a button
+    public int[] getBounds(Graphics graphics, int fontSize){
+        UIManager.setFontSize(fontSize);
+        FontMetrics fontMetrics = graphics.getFontMetrics(UIManager.getFont());
+        int textWidth = fontMetrics.stringWidth(text);
+        int textHeight = fontMetrics.getHeight();
+        return new int[]{textWidth, textHeight};
+    }
+
+    // Return the coordinates of the top left corner and bottom right corner of a button
+    // [x1, y1, x2, y2]
+    public int[] getCornerCoords(Graphics graphics, int fontSize){
+        int[] bounds = getBounds(graphics, fontSize);
+        return new int[]{x-HORIZONTAL_GAP, y-VERTICAL_GAP, bounds[0] + (HORIZONTAL_GAP * 2), bounds[1]+(VERTICAL_GAP * 2)};
     }
 
     public int getID(){

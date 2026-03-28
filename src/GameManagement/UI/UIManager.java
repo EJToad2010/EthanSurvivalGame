@@ -1,5 +1,6 @@
 package src.GameManagement.UI;
 
+import java.util.ArrayList;
 import javax.swing.*;
 import java.awt.*;
 
@@ -39,6 +40,8 @@ public class UIManager {
         
         graphics.drawString(text, drawX, drawY);
     }
+    // Wrap text so it doesn't overflow
+
 
     // Methods that use JLabels
     public static JLabel createCenteredLabel(String text, int x, int y, int width, int height) {

@@ -6,6 +6,7 @@ import src.GameManagement.UI.GamePanel;
 // Runs required actions every frame
 // THIS CLASS SHOULD EVENTUALLY REPLACE GAMEMANAGER WHEN I FINISH RESTRUCTURING
 public class Game {
+    private GameData gameData = new GameData();
     private GameState currentGameState;
     private GamePanel panel;
 
@@ -32,6 +33,11 @@ public class Game {
     // Get the currentState
     public GameState getCurrentGameState(){
         return currentGameState;
+    }
+
+    // Get the object storing game memory
+    public GameData getGameData(){
+        return gameData;
     }
 
     // Set the currentState to a new state

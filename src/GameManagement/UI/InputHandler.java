@@ -45,4 +45,26 @@ public class InputHandler {
             buttons.get(i).draw(g, i==selectedIndex, fontSize);
         }
     }
+
+    // Space all buttons evenly on the same vertical axis.
+    // Calculated by obtaining the bounds of all buttons
+    public void spaceButtons(Graphics g, int fontSize, int width, int y){
+        if(buttons.size() <= 1){
+            return;
+        }
+        // Obtain total width of all buttons
+        int totalButtonWidth = 0;
+        for(Button button : buttons){
+            int[] bounds = button.getBounds(g, fontSize);
+            totalButtonWidth += bounds[0];
+        }
+        int spacing = (width - totalButtonWidth) / (buttons.size() - 1);
+        int totalSpacing = spacing * (buttons.size() - 1);
+        int totalWidth = totalButtonWidth + totalSpacing;
+        int startX = (1280 - totalWidth) / 2;
+        for(Button button : buttons){
+            button.setPosition(startX, y);
+            startX += button.getBounds(g, fontSize)[0] + spacing;
+        }
+    }
 }

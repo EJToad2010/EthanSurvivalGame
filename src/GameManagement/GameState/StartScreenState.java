@@ -30,20 +30,28 @@ public class StartScreenState extends GameState{
     protected void handleStep(int step, int keyCode){
         int input = menu.keyPressed(keyCode);
         if(input == START){
-            game.setCurrentGameState(new CharacterSelectState(game));
+            game.setCurrentGameState(new IntroScreenState(game));
         } else if(input == OPTIONS){
             setStep(-1);
         }
     }
 
     protected void drawStep(int step, Graphics graphics){
+        menu.spaceButtons(graphics, 50, 800, 400);
         menu.draw(graphics, 50);
-        graphics.drawImage(castle, (1280 - castle.getWidth(null))/2, 100, null);
+        graphics.drawImage(castle, (1280 - castle.getWidth(null))/2 - 40, 100, null);
         if(step == -1){
             UIManager.setTextColor(graphics, Color.GRAY);
             UIManager.setFontSize(32);
             UIManager.refreshText(graphics);
             UIManager.drawCenteredStringInBox(graphics, "Options are not implemented yet.", 0, 600, 1280, 100);
+            UIManager.setTextColor(graphics, Color.BLACK);
+        }
+        if(step == 0){
+            UIManager.setTextColor(graphics, Color.GRAY);
+            UIManager.setFontSize(28);
+            UIManager.refreshText(graphics);
+            UIManager.drawCenteredStringInBox(graphics, "Use the left and right arrow keys to move between options. Press ENTER to select.", 0, 600, 1280, 100);
             UIManager.setTextColor(graphics, Color.BLACK);
         }
     }

@@ -24,16 +24,18 @@ public class Main {
   // Class: EnemyTeam
   // Class: GameManager
   public static void main(String[] args) throws IOException, InterruptedException{
+    // Running the restructured game
+    new GameFrame();
+
     // Running the original console game
-    /*GameManager gm = new GameManager();
+    GameManager gm = new GameManager();
     GameManager.clearScreen();
     System.out.println("Welcome to Ethan's AP CSA Survival Game!");
     GameManager.anythingToContinue();
     System.out.println("Starting game...");
     Thread.sleep(1500);
     System.out.println("");
-    gm.run();*/
-    // Running the restructured game
-    new GameFrame();
+    gm.run();
+    
   }
 }
