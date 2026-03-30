@@ -30,7 +30,9 @@ public class GamePanel extends JPanel {
                 game.getCurrentGameState().keyPressed(keyCode);
             }
 
-            public void keyTyped(KeyEvent event){}
+            public void keyTyped(KeyEvent event){
+                game.getCurrentGameState().keyTyped(event.getKeyChar());
+            }
 
             public void keyReleased(KeyEvent event){}
         });

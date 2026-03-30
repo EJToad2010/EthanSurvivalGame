@@ -1,6 +1,7 @@
 package src.GameManagement.GameState;
 
 import src.GameManagement.Game;
+import src.GameManagement.Mechanics.DayManager;
 import src.GameManagement.UI.GamePanel;
 import src.GameManagement.UI.InputHandler;
 import src.GameManagement.UI.UIManager;
@@ -9,7 +10,6 @@ import src.GameManagement.UI.Button;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -21,8 +21,8 @@ public class StartScreenState extends GameState{
     private final int START = 0;
     private final int OPTIONS = 1;
 
-    public StartScreenState(Game g){
-        super(g);
+    public StartScreenState(Game g, DayManager dayManager){
+        super(g, dayManager);
     }
     public void update(){}
 
@@ -30,7 +30,7 @@ public class StartScreenState extends GameState{
     protected void handleStep(int step, int keyCode){
         int input = menu.keyPressed(keyCode);
         if(input == START){
-            game.setCurrentGameState(new IntroScreenState(game));
+            game.setCurrentGameState(new IntroScreenState(game, dayManager));
         } else if(input == OPTIONS){
             setStep(-1);
         }

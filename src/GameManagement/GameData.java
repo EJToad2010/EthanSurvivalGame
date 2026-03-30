@@ -1,7 +1,9 @@
 package src.GameManagement;
 
-import java.util.Scanner;
+import java.util.ArrayList;
 
+import src.Characters.EnemyCharacter;
+import src.Characters.PlayerCharacter;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
 
@@ -36,5 +38,39 @@ public class GameData {
   public GameData(){
     this.playerTeam = new PlayerTeam();
     this.enemyTeam = new EnemyTeam();
+  }
+
+  // Getters
+  public PlayerTeam getPlayerTeamObj(){
+    return playerTeam;
+  }
+
+  public ArrayList<PlayerCharacter> getPlayerTeamArr(){
+    return playerTeam.getPlayerTeam();
+  }
+
+  public EnemyTeam getEnemyTeamObj(){
+    return enemyTeam;
+  }
+
+  public ArrayList<EnemyCharacter> getEnemyTeamArr(){
+    return enemyTeam.getEnemyTeam();
+  }
+
+  public int getPlayerBattleCapacity(){
+    return playerBattleCapacity;
+  }
+  
+  public int getDayNum(){
+    return dayNum;
+  }
+
+  public int getTurnNum(){
+    return turnNum;
+  }
+
+  // Setters
+  public void nextDay(){
+    dayNum++;
   }
 }

@@ -24,9 +24,17 @@ public class DialogManager {
         return isActive;
     }
 
+    // ArrayList functions
+
     public void add(String line){
         dialogSequence.add(line);
         isActive = true;
+    }
+
+    public void clear(){
+        dialogSequence.clear();
+        dialogIndex = 0;
+        isActive = false;
     }
 
     // Advance dialogIndex
@@ -49,7 +57,7 @@ public class DialogManager {
     }
 
     public void draw(Graphics graphics){
-        if(!isActive){
+        if(!isActive || dialogSequence.size() == 0){
             return;
         }
         drawDialogBox(graphics);

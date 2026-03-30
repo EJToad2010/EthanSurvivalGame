@@ -2,6 +2,7 @@ package src.GameManagement.GameState;
 // Import graphics and event handling libraries
 
 import src.GameManagement.Game;
+import src.GameManagement.Mechanics.DayManager;
 import src.GameManagement.UI.GamePanel;
 
 import java.awt.*;
@@ -12,13 +13,19 @@ import java.awt.*;
 public class GameState {
     // Store a reference to the running Game instance
     protected Game game;
+    protected DayManager dayManager;
 
     // Store an integer value of the current "step"
     protected int currentStep = 0;
+
+    // Used to handle typing
+    protected boolean isTyping = false;
+    protected String typedText = "";
     
     // Constructor
-    public GameState(Game game){
+    public GameState(Game game, DayManager dayManager){
         this.game = game;
+        this.dayManager = dayManager;
     }
 
     // Both of these methods should call once per frame but they handle different tasks
@@ -51,5 +58,22 @@ public class GameState {
     // Call every time a key is pressed
     public void keyPressed(int keyCode){
         handleStep(currentStep, keyCode);
+    }
+
+    // Call every time a key is tyoed
+    public void keyTyped(char c){
+        if(!isTyping){
+            return;
+        }
+        // Only allow letters, numbers, or SPACE
+        if(Character.isLetterOrDigit(c) || c == ' '){
+            typedText += c;
+        }
+        // Backspace removes the last letter
+        if(c == '\b'){
+            if(typedText.length() > 0){
+                typedText = typedText.substring(0, typedText.length() - 1);
+            }
+        }
     }
 }

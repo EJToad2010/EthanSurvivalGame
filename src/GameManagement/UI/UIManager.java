@@ -39,6 +39,20 @@ public class UIManager {
             graphics.drawString(lines.get(i), drawX, drawY+i*textHeight);
         }
     }
+    public static void drawCeneterdStringInBoxSeparateLines(Graphics graphics, String[] text, int x, int y, int width, int height){
+        for(String line : text){
+            ArrayList<String> lines = wrapText(line, graphics, width);
+            for(int i = 0; i < lines.size(); i++){
+                FontMetrics fontMetrics = graphics.getFontMetrics(font);
+                int textWidth = fontMetrics.stringWidth(lines.get(i));
+                int textHeight = fontMetrics.getHeight();
+
+                int drawX = x + (width-textWidth) / 2;
+                int drawY = y + (height - textHeight) / 2;
+                graphics.drawString(lines.get(i), drawX, drawY+i*textHeight);
+            }
+        }
+    }
     // Wrap text so it doesn't overflow
     public static ArrayList<String> wrapText(String text, Graphics graphics, int width){
         FontMetrics fontMetrics = graphics.getFontMetrics(font);
