@@ -7,7 +7,6 @@ import javax.imageio.ImageIO;
 
 import src.GameManagement.Game;
 import src.GameManagement.Mechanics.DayManager;
-import src.GameManagement.UI.DialogManager;
 import src.GameManagement.UI.GamePanel;
 
 public class IntroScreenState extends GameState{
@@ -15,14 +14,13 @@ public class IntroScreenState extends GameState{
     int ticksPassed = 0;
     // Enter screen start off black, with bars disappearing from top to bottom
     int blackBarsVisible = 10;
-    private DialogManager introDialog = new DialogManager();
     
     public IntroScreenState(Game g, DayManager dayManager){
         super(g, dayManager);
-        introDialog.add("You have been hired to defeat the enemies attacking your kingdom.");
-        introDialog.add("Train skilled fighters and survive as long as possible!");
-        introDialog.add("Make skilled decisions. They will have a major impact on your success.");
-        introDialog.add("Good luck on your journey...");
+        dialogManager.add("You have been hired to defeat the enemies attacking your kingdom.");
+        dialogManager.add("Train skilled fighters and survive as long as possible!");
+        dialogManager.add("Make skilled decisions. They will have a major impact on your success.");
+        dialogManager.add("Good luck on your journey...");
     }
 
     public void update(){
@@ -52,10 +50,10 @@ public class IntroScreenState extends GameState{
     protected void handleStep(int step, int keyCode){
         if(step == 1){
             // If dialog is still active, wait until the next line is reached
-            if(introDialog.getIsActive()){
+            if(dialogManager.getIsActive()){
                 if(keyCode == KeyEvent.VK_ENTER){
-                    introDialog.nextLine();
-                    if(!introDialog.getIsActive()){
+                    dialogManager.nextLine();
+                    if(!dialogManager.getIsActive()){
                         nextStep();
                     }
                 }
@@ -66,7 +64,7 @@ public class IntroScreenState extends GameState{
     // Draw dialog
     protected void drawStep(int step, Graphics graphics){
         if(step == 1){
-            introDialog.draw(graphics);
+            dialogManager.draw(graphics);
         } else{
             // Transition animation
             for(int i = 10-blackBarsVisible; i < 10; i++){

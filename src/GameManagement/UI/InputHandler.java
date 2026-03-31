@@ -24,14 +24,20 @@ public class InputHandler {
     public int keyPressed(int keyCode){
         if(keyCode == KeyEvent.VK_LEFT){
             selectedIndex--;
-            if(selectedIndex < 0){
-                selectedIndex = buttons.size() - 1;
+            while(!buttons.get(selectedIndex).getIsSelectable()){
+                selectedIndex--;
+                if(selectedIndex < 0){
+                    selectedIndex = buttons.size() - 1;
+                }
             }
         }
         if(keyCode == KeyEvent.VK_RIGHT){
             selectedIndex++;
-            if(selectedIndex >= buttons.size()){
-                selectedIndex = 0;
+            while(!buttons.get(selectedIndex).getIsSelectable()){
+                selectedIndex++;
+                if(selectedIndex >= buttons.size()){
+                    selectedIndex = 0;
+                }
             }
         }
         if(keyCode == KeyEvent.VK_ENTER){

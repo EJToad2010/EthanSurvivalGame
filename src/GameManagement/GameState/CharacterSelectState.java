@@ -24,7 +24,6 @@ import src.Teams.PlayerTeam;
 public class CharacterSelectState extends GameState{
     // Attributes
     private JLabel title;
-    private DialogManager screenInfo = new DialogManager();
     private int allowedCharacters;
     private int createdCharacters = 0;
     private String selectedClass = "";
@@ -37,13 +36,11 @@ public class CharacterSelectState extends GameState{
     private final int CREATION_SUCCESS = 4;
 
     // Define the buttons used to select Character class
-    private InputHandler classHandler = new InputHandler();
     private final int KNIGHT = 0;
     private final int ARCHER = 1;
     private final int WIZARD = 2;
 
     // Define the buttons used to confirm Character choice
-    private InputHandler confirmHandler = new InputHandler();
     private final int YES = 0;
     private final int NO = 1;
 
@@ -54,20 +51,21 @@ public class CharacterSelectState extends GameState{
         GameData data = g.getGameData();
         allowedCharacters = data.getPlayerBattleCapacity() - data.getPlayerTeamArr().size();
         if(allowedCharacters > 1){
-            screenInfo.add("You may add " + allowedCharacters + " new Characters to your team!");
+            dialogManager.add("You may add " + allowedCharacters + " new Characters to your team!");
         } else{
-            screenInfo.add("You may add 1 new Character to your team!");
+            dialogManager.add("You may add 1 new Character to your team!");
         }
     }
 
     // Update dialog after every time ENTER is pressed
     protected void handleStep(int step, int keyCode){
-        // Display screenInfo when state is first loaded
+        // Display dialogManager when state is first loaded
         if(step == SCREEN_INFO){
-            if(screenInfo.getIsActive()){
+            if(dialogManager.getIsActive()){
                 if(keyCode == KeyEvent.VK_ENTER){
-                    screenInfo.nextLine();
-                    if(!screenInfo.getIsActive()){
+                    dialogManager.nextLine();
+                    if(!dialogManager.getIsActive()){
+                        initInputHandlerCharClass();
                         nextStep();
                     }
                 }
@@ -75,7 +73,7 @@ public class CharacterSelectState extends GameState{
         }
         else if(step == SELECT_CLASS){
             // Process the Character class selected
-            int input = classHandler.keyPressed(keyCode);
+            int input = inputHandler.keyPressed(keyCode);
             if(input == -1){
                 return;
             }
@@ -88,11 +86,12 @@ public class CharacterSelectState extends GameState{
                 selectedClass = "Wizard";
             }
             if(!selectedClass.isEmpty()){
+                initInputHandlerConfirmation();
                 nextStep();
             }
         } else if(step == CONFIRM_CLASS){
             // Process the confirmation choice selected
-            int input = confirmHandler.keyPressed(keyCode);
+            int input = inputHandler.keyPressed(keyCode);
             if(input == -1){
                 return;
             }
@@ -102,6 +101,7 @@ public class CharacterSelectState extends GameState{
                 nextStep();
             } else if(input == NO){
                 selectedClass = "";
+                initInputHandlerCharClass();
                 setStep(SELECT_CLASS);
             }
         } else if(step == NAME_CHARACTER){
@@ -121,19 +121,20 @@ public class CharacterSelectState extends GameState{
                     playerTeam.addCharacter(new Wizard(typedText));
                 }
                 createdCharacters++;
-                screenInfo.clear();
-                screenInfo.add("Congratulations! " + typedText + " was added to your team.");
+                dialogManager.clear();
+                dialogManager.add("Congratulations! " + typedText + " was added to your team.");
                 nextStep();
             }
         } else if(step == CREATION_SUCCESS){
-            // Reuse screenInfo to display congratulations message
-            if(screenInfo.getIsActive()){
+            // Reuse dialogManager to display congratulations message
+            if(dialogManager.getIsActive()){
                 if(keyCode == KeyEvent.VK_ENTER){
-                    screenInfo.nextLine();
-                    if(!screenInfo.getIsActive()){
+                    dialogManager.nextLine();
+                    if(!dialogManager.getIsActive()){
                         if(createdCharacters == allowedCharacters){
                             dayManager.nextPhase();
                         } else{
+                            initInputHandlerCharClass();
                             setStep(SELECT_CLASS);
                         }
                     }
@@ -152,7 +153,7 @@ public class CharacterSelectState extends GameState{
         }
         if(step == SCREEN_INFO || step == CREATION_SUCCESS){
             // Draw dialog
-            screenInfo.draw(graphics);
+            dialogManager.draw(graphics);
         }
         else if(step == SELECT_CLASS){
             // Prompt the user to select a Character class
@@ -160,18 +161,18 @@ public class CharacterSelectState extends GameState{
             UIManager.setFontSize(40);
             UIManager.refreshText(graphics);
             UIManager.drawCenteredStringInBox(graphics, "Select a Character class.", 0, 650, 1280, 100);
-            // Draw classHandler buttons
-            classHandler.spaceButtons(graphics, 40, 800, 450);
-            classHandler.draw(graphics, 40);
+            // Draw inputHandler buttons
+            inputHandler.spaceButtons(graphics, 40, 800, 450);
+            inputHandler.draw(graphics, 40);
         } else if(step == CONFIRM_CLASS){
             // Prompt the user to confirm their choice
             UIManager.setTextColor(graphics, Color.WHITE);
             UIManager.setFontSize(40);
             UIManager.refreshText(graphics);
             UIManager.drawCenteredStringInBox(graphics, "Are you sure you want to select " + selectedClass + "?", 0, 650, 1280, 100);
-            // Draw confirmHandler buttons
-            confirmHandler.spaceButtons(graphics, 40, 800, 575);
-            confirmHandler.draw(graphics, 40);
+            // Draw inputHandler buttons
+            inputHandler.spaceButtons(graphics, 40, 800, 575);
+            inputHandler.draw(graphics, 40);
             // Draw a box containing relevant info for the Character class
             graphics.setColor(new Color(60, 60, 60));
             graphics.fillRect(390, 140, 720, 420);
@@ -184,7 +185,7 @@ public class CharacterSelectState extends GameState{
             UIManager.refreshText(graphics);
             UIManager.drawCenteredStringInBox(graphics, "Provide a name for your " + selectedClass + ".", 0, 200, 1280, 100);
             // Draw an empty dialog box, where the user will type their name
-            screenInfo.drawDialogBox(graphics);
+            dialogManager.drawDialogBox(graphics);
             UIManager.setTextColor(graphics, Color.WHITE);
             UIManager.setFontSize(32);
             UIManager.refreshText(graphics);
@@ -205,19 +206,23 @@ public class CharacterSelectState extends GameState{
         title.setFont(UIManager.getFont(60));
         panel.add(title);
         panel.repaint();
-        // Setup classHandler
-        classHandler.clear();
-        classHandler.addButton(new Button("Knight", 0, 500, KNIGHT));
-        classHandler.addButton(new Button("Archer", 0, 500, ARCHER));
-        classHandler.addButton(new Button("Wizard", 0, 500, WIZARD));
-        // Setup confirmHandler
-        confirmHandler.clear();
-        confirmHandler.addButton(new Button("YES", 0, 500, YES));
-        confirmHandler.addButton(new Button("NO", 0, 500, NO));
+        initInputHandlerCharClass();
     }
     // Calls once when panel is unloaded
     public void onExit(GamePanel panel){
         panel.setBackground(new Color(0, 0, 0));
         panel.remove(title);
+    }
+
+    // Reset the inputHandler to include buttons for selecting Character class
+    private void initInputHandlerCharClass(){
+        // Setup inputHandler for Character classes
+        inputHandler = createOptions(new String[]{"Knight", "Archer", "Wizard"}, new int[]{KNIGHT, ARCHER, WIZARD});
+    }
+
+    // Reset the inputHandler to include buttons for selecting confirmtaion
+    private void initInputHandlerConfirmation(){
+        // Setup inputHandler for YES / NO
+        inputHandler = createOptions(new String[]{"YES", "NO"}, new int[]{YES, NO});
     }
 }

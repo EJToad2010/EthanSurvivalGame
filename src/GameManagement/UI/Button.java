@@ -11,17 +11,30 @@ public class Button {
     private int x;
     private int y;
     private int id;
+    private boolean isSelectable = true;
 
     // Constants
     private final int HORIZONTAL_GAP = 20;
     private final int VERTICAL_GAP = 10;
 
-    // Constructor requires all parameters
+    // Constructor requires all parameters except isSelectable, which is true by default
     public Button(String text, int x, int y, int id){
         this.text = text;
         this.x = x;
         this.y = y;
         this.id = id;
+    }
+
+    public Button(String text, int x, int y, int id, boolean isSelectable){
+        this.text = text;
+        this.x = x;
+        this.y = y;
+        this.id = id;
+        this.isSelectable = isSelectable;
+    }
+
+    public boolean getIsSelectable(){
+        return isSelectable;
     }
 
     public void setPosition(int x, int y){
@@ -41,6 +54,9 @@ public class Button {
             bgColor = Color.YELLOW;
         } else{
             bgColor = Color.WHITE;
+        }
+        if(!isSelectable){
+            bgColor = Color.GRAY;
         }
         graphics.setColor(bgColor);
         int[] cornerCoords = getCornerCoords(graphics, fontSize);

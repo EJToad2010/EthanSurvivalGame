@@ -17,7 +17,6 @@ public class StartScreenState extends GameState{
     private JLabel welcomeMessage;
     private Image castle;
     // Define the buttons that will go into the start screen and constants for each button ID
-    private InputHandler menu = new InputHandler();
     private final int START = 0;
     private final int OPTIONS = 1;
 
@@ -28,7 +27,7 @@ public class StartScreenState extends GameState{
 
     // Override
     protected void handleStep(int step, int keyCode){
-        int input = menu.keyPressed(keyCode);
+        int input = inputHandler.keyPressed(keyCode);
         if(input == START){
             game.setCurrentGameState(new IntroScreenState(game, dayManager));
         } else if(input == OPTIONS){
@@ -37,8 +36,8 @@ public class StartScreenState extends GameState{
     }
 
     protected void drawStep(int step, Graphics graphics){
-        menu.spaceButtons(graphics, 50, 800, 400);
-        menu.draw(graphics, 50);
+        inputHandler.spaceButtons(graphics, 50, 800, 400);
+        inputHandler.draw(graphics, 50);
         graphics.drawImage(castle, (1280 - castle.getWidth(null))/2 - 40, 100, null);
         if(step == -1){
             UIManager.setTextColor(graphics, Color.GRAY);
@@ -64,10 +63,10 @@ public class StartScreenState extends GameState{
         welcomeMessage.setFont(UIManager.getFont(60));
         panel.add(welcomeMessage);
         panel.repaint();
-        // Setup menu
-        menu.clear();
-        menu.addButton(new Button("Start", 250, 400, START));
-        menu.addButton(new Button("Options", 900, 400, OPTIONS));
+        // Setup inputHandler
+        inputHandler.clear();
+        inputHandler.addButton(new Button("Start", 250, 400, START));
+        inputHandler.addButton(new Button("Options", 900, 400, OPTIONS));
         panel.repaint();
         // Setup castle image
         try{
