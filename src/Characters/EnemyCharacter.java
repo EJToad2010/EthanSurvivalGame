@@ -77,8 +77,6 @@ public class EnemyCharacter extends BasicCharacter{
 
   public void setEnemyTeam(EnemyTeam enemyTeam){
     this.enemyTeam = enemyTeam;
-    game = enemyTeam.getGame();
-    dialogManager = game.getCurrentGameState().getDialogManager();
   }
   
   // Instead of creating a unique leveling and xp system for each enemy,

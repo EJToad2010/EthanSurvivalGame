@@ -87,12 +87,14 @@ public class GameState {
     protected void nextFrame(){
         if(isAnimating){
             frame++;
+            resetTick();
         }
     }
 
     // Set frame to 0
     protected void resetFrame(){
         frame = 0;
+        resetTick();
     }
 
     // Set frame to a given number
@@ -104,12 +106,16 @@ public class GameState {
     protected void nextScene(){
         if(isAnimating){
             scene++;
+            resetFrame();
+            resetTick();
         }
     }
 
     // Set scene to 0
     protected void resetScene(){
         scene = 0;
+        resetFrame();
+        resetTick();
     }
     
     // Set a specific step

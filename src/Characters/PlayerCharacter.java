@@ -24,8 +24,6 @@ public class PlayerCharacter extends BasicCharacter {
   protected PlayerTeam playerTeam = null;
   // The instance of Game is obtained alongside the playerTeam
   protected Game game;
-  // The instance of dialog used by the current game state that is open
-  protected DialogManager dialogManager;
   
   // Constructor that requires all attributes
   public PlayerCharacter(String name, double maxHP, double attackStrength, double defenseStrength, double speed){
@@ -82,8 +80,6 @@ public class PlayerCharacter extends BasicCharacter {
   // Set to the game's instance of PlayerTeam
   public void setPlayerTeam(PlayerTeam playerTeam){
     this.playerTeam = playerTeam;
-    game = playerTeam.getGame();
-    dialogManager = game.getCurrentGameState().getDialogManager();
   }
   
   public void updateXPToNextLevel() {

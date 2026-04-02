@@ -3,6 +3,7 @@ package src.Characters.PlayerCharacters;
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
+import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.UI.DialogManager;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
@@ -36,7 +37,7 @@ public class Knight extends PlayerCharacter {
   }
   
   // Overrided battle methods
-  public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
       // Sword Swing
       System.out.println(getName() + " swung their sword at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -57,10 +58,11 @@ public class Knight extends PlayerCharacter {
       handleEnemyDefense(target, getAttackStrength() - 8, playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
     }
+    return getActionResult();
   }
   
   // Knight has two special attacks to choose from
-  public void specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(specialAbilityIndex == 0){
       // Last Push
       if(target.getCurrentHP() / target.getMaxHP() < 0.5){
@@ -80,6 +82,7 @@ public class Knight extends PlayerCharacter {
       System.out.println(getSimpleOutput());
     }
     System.out.println(target.getSimpleOutput());
+    return getActionResult();
   }
   
   // Defense function which is called when an enemy targets the Knight

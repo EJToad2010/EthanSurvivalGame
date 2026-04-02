@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import src.Characters.BasicCharacter;
 import src.Characters.EnemyCharacter;
 import src.Characters.PlayerCharacter;
+import src.GameManagement.Mechanics.ActionResult;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
@@ -85,7 +86,7 @@ public class DartGoblin extends EnemyCharacter{
   // Overrided battle methods
   // basicAbilityAI handles the decision making, while basicAbility handles the outcome of an ability itself.
   // Same for specialAbility()
-  public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
       // Poison Dart
       System.out.println(getName() + " shot a poison dart at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -99,9 +100,10 @@ public class DartGoblin extends EnemyCharacter{
       System.out.println(getName() + " prepared Nimble Dodge for the player's next turn!");
       StatusEffect.addStatusEffect(this, "Nimble", 1);
     }
+    return getActionResult();
   }
   
-  public void specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(specialAbilityIndex == 0){
       // Poison Cloud
       System.out.println(getName() + " shot a poison cloud at " + target.getName() + " for " + (getAttackStrength()-5) + " HP!");
@@ -120,6 +122,7 @@ public class DartGoblin extends EnemyCharacter{
       }
     }
     System.out.println(target.getSimpleOutput());
+    return getActionResult();
   }
   
   // Defense function which is called when an enemy targets the Knight

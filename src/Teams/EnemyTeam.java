@@ -18,8 +18,6 @@ public class EnemyTeam {
   private ArrayList<EnemyCharacter> enemyTeam;
   // The EnemyTeam has one shared inventory.
   private Inventory enemyInventory;
-  // Store an instance of the running Game
-  private Game game;
   
   // Constructor that takes in an exisiting ArrayList and modifies its components into an enemy
   public EnemyTeam(ArrayList<EnemyCharacter> enemyTeam, Inventory enemyInventory){
@@ -33,16 +31,6 @@ public class EnemyTeam {
   // Constructor that creates an empty team
   public EnemyTeam(){
     this(new ArrayList<EnemyCharacter>(), new Inventory());
-  }
-
-  // Get the Game object (used by EnemyCharacters)
-  public Game getGame(){
-    return game;
-  }
-
-  // Set the Game object (REQUIRED)
-  public void setGame(Game game){
-    this.game = game;
   }
   
   // Add an enemy

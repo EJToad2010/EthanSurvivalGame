@@ -4,6 +4,7 @@ import java.util.Scanner;
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
+import src.GameManagement.Mechanics.ActionResult;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
@@ -37,7 +38,7 @@ public class Wizard extends PlayerCharacter {
   }
   
   // Overrided battle methods
-  public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
       // Magic Zap
       System.out.println(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()) + " HP!");
@@ -52,10 +53,11 @@ public class Wizard extends PlayerCharacter {
       handleEnemyDefense(target, getAttackStrength() - 15, playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
     }
+    return getActionResult();
   }
   
   // Wizard has two special attacks to choose from
-  public void specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(specialAbilityIndex == 0){
       // Fireball
       System.out.println(getName() + " launched a fireball at " + target.getName() + " for " + getAttackStrength()+5 + " HP!");
@@ -79,6 +81,7 @@ public class Wizard extends PlayerCharacter {
       }
     }
     System.out.println(target.getSimpleOutput());
+    return getActionResult();
   }
   
   // Defense function which is called when an enemy targets the Wizard

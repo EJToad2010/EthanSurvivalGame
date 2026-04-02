@@ -1,10 +1,12 @@
 package src.Characters.PlayerCharacters;
+import java.awt.Desktop.Action;
 import java.io.IOException;
 import java.util.Scanner;
 
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
+import src.GameManagement.Mechanics.ActionResult;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
@@ -38,7 +40,7 @@ public class Archer extends PlayerCharacter {
   }
   
   // Overrided battle methods
-  public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
       // Softening Arrow
       System.out.println(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -53,10 +55,11 @@ public class Archer extends PlayerCharacter {
       handleEnemyDefense(target, getAttackStrength() - 3, playerTeam, enemyTeam);
       System.out.println(target.getSimpleOutput());
     }
+    return getActionResult();
   }
   
   // Archer has two special attacks to choose from
-  public void specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(specialAbilityIndex == 0){
       // Volley
       System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -74,6 +77,7 @@ public class Archer extends PlayerCharacter {
       }
     }
     System.out.println(target.getSimpleOutput());
+    return getActionResult();
   }
   
   // Defense function which is called when an enemy targets the Archer

@@ -19,8 +19,6 @@ public class PlayerTeam {
   // Handle characters who defend each other from enemy attacks
   private ArrayList<PlayerCharacter> protectedCharacters = new ArrayList<PlayerCharacter>();
   private ArrayList<Double> protectedCharacterAmounts = new ArrayList<Double>();
-  // Store an instance of the running Game
-  private Game game;
   
   // How many coins the player's team currently has
   private int coinBalance = 0;
@@ -37,16 +35,6 @@ public class PlayerTeam {
   // Constructor that creates an empty team
   public PlayerTeam(){
     this(new ArrayList<PlayerCharacter>(), new Inventory());
-  }
-
-  // Get the Game object (used by PlayerCharacters)
-  public Game getGame(){
-    return game;
-  }
-
-  // Set the Game object (REQUIRED)
-  public void setGame(Game game){
-    this.game = game;
   }
   
   // Add a player

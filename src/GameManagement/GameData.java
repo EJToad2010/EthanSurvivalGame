@@ -1,6 +1,9 @@
 package src.GameManagement;
 
 import java.util.ArrayList;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 import src.Characters.EnemyCharacter;
 import src.Characters.PlayerCharacter;
@@ -19,6 +22,8 @@ public class GameData {
   private String[] earlyGameEnemyBehaviors = new String[]{"RANDOM", "RANDOM", "RANDOM", "AGGRESSIVE", "DEFENSIVE"};
   // Enemy items are basic early on
   private String[] earlyGameEnemyItems = new String[]{"HealthPotion", "HealthPotion", "HealthPool"};
+  // Used in random name generation
+  private String[] adjectives;
   
   // Attributes needed for Player and Enemy classes outside of battle
   private int playerBattleCapacity = 2;
@@ -38,6 +43,7 @@ public class GameData {
   public GameData(){
     this.playerTeam = new PlayerTeam();
     this.enemyTeam = new EnemyTeam();
+    fillAdjectives();
   }
 
   // Getters
@@ -60,6 +66,10 @@ public class GameData {
   public int getPlayerBattleCapacity(){
     return playerBattleCapacity;
   }
+
+  public int getEnemyBattleCapacity(){
+    return enemyBattleCapacity;
+  }
   
   public int getDayNum(){
     return dayNum;
@@ -69,8 +79,49 @@ public class GameData {
     return turnNum;
   }
 
+  public String[] getAdjectives(){
+    return adjectives;
+  }
+
+  public String[] getEarlyGameEnemies(){
+    return earlyGameEnemies;
+  }
+
+  public String[] getEarlyGameEnemyBehaviors(){
+    return earlyGameEnemyBehaviors;
+  }
+
+  public String[] getEarlyGameEnemyItems(){
+    return earlyGameEnemyItems;
+  }
+
   // Setters
   public void nextDay(){
     dayNum++;
+  }
+
+  public void increaseEnemyBattleCapacity(int amount){
+    enemyBattleCapacity += amount;
+  }
+
+  public void setEnemyBattleCapacity(int enemyBattleCapacity){
+    this.enemyBattleCapacity = enemyBattleCapacity;
+  }
+
+  // Read .txt file of adjectives
+  private void fillAdjectives(){
+    Scanner s;
+    try{
+      s = new Scanner(new File("src/Misc/adjectives.txt"));
+    } catch(FileNotFoundException e){
+      System.out.println("adjectives.txt failed to load.");
+      return;
+    }
+    ArrayList<String> lines = new ArrayList<String>();
+    while(s.hasNextLine()){
+      lines.add(s.nextLine());
+    }
+    adjectives = lines.toArray(new String[0]);
+    s.close();
   }
 }

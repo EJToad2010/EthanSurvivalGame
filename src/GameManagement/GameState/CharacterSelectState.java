@@ -176,7 +176,7 @@ public class CharacterSelectState extends GameState{
             // Draw dialog
             dialogManager.draw(graphics);
         }
-        else if(step == SELECT_CLASS){
+        if(step == SELECT_CLASS){
             // Prompt the user to select a Character class
             UIManager.setTextColor(graphics, Color.WHITE);
             UIManager.setFontSize(40);
@@ -209,14 +209,13 @@ public class CharacterSelectState extends GameState{
             int leftX = inputHandler.getButtonsX()[0];
             graphics.drawImage(selectedImage, leftX-40, 260, null);
         } else if(step == NAME_CHARACTER){
+            dialogManager.drawDialogBox(graphics);
             // Prompt the user to create a name for their Character
             UIManager.setTextColor(graphics, Color.WHITE);
             UIManager.setFontSize(40);
             UIManager.refreshText(graphics);
             UIManager.drawCenteredStringInBox(graphics, "Provide a name for your " + selectedClass + ".", 0, 200, 1280, 100);
             graphics.drawImage(selectedImage, 1280/2 - 80, 260, null);
-            // Draw an empty dialog box, where the user will type their name
-            dialogManager.drawDialogBox(graphics);
             UIManager.setTextColor(graphics, Color.WHITE);
             UIManager.setFontSize(32);
             UIManager.refreshText(graphics);
@@ -226,6 +225,8 @@ public class CharacterSelectState extends GameState{
             UIManager.setFontSize(25);
             UIManager.refreshText(graphics);
             UIManager.drawCenteredStringInBox(graphics, "(Press ENTER to confirm)", 0, 680, 1280, 20);
+        } else if(step == CREATION_SUCCESS){
+            graphics.drawImage(selectedImage, 1280/2 - 80, 260, null);
         }
     }
 

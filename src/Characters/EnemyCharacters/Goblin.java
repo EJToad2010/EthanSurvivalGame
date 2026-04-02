@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import src.Characters.BasicCharacter;
 import src.Characters.EnemyCharacter;
 import src.Characters.PlayerCharacter;
+import src.GameManagement.Mechanics.ActionResult;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
@@ -105,7 +106,7 @@ public class Goblin extends EnemyCharacter{
   // Overrided battle methods
   // basicAbilityAI handles the decision making, while basicAbility handles the outcome of an ability itself.
   // Same for specialAbility()
-  public void basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     if(basicAbilityIndex == 0){
       System.out.println(getName() + " stabbed " + target.getName() + " with their dagger for " + getAttackStrength() + " HP!");
       boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
@@ -118,9 +119,10 @@ public class Goblin extends EnemyCharacter{
       System.out.println(getName() + " prepared Nimble Dodge for the player's next turn!");
       StatusEffect.addStatusEffect(this, "Nimble", 1);
     }
+    return getActionResult();
   }
   
-  public void specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     resetSpecialAbilityCooldowns();
     if(specialAbilityIndex == 0){
       // Taunt
@@ -146,6 +148,7 @@ public class Goblin extends EnemyCharacter{
       }
     }
     System.out.println(target.getSimpleOutput());
+    return getActionResult();
   }
   
   // Defense function which is called when an enemy targets the Knight

@@ -7,8 +7,6 @@ import src.GameManagement.Mechanics.DayManager;
 import src.GameManagement.UI.GamePanel;
 
 public class IntroScreenState extends GameState{
-    // Used to control the flow of text displayed on screen
-    int ticksPassed = 0;
     
     public IntroScreenState(Game g, DayManager dayManager){
         super(g, dayManager);

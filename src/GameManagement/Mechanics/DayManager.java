@@ -35,13 +35,16 @@ public class DayManager {
             currentPhase++;
         }
         // Tournament phases can only happen once every two days
-        if(currentPhase == TOURNAMENT && game.getGameData().getDayNum() % 2 != 0){
+        /*if(currentPhase == TOURNAMENT && game.getGameData().getDayNum() % 2 != 0){
+            currentPhase++;
+        }*/
+        // If on the last phase, automatically start the next day
+        if(currentPhase == TOURNAMENT){
             currentPhase++;
         }
-        // If on the last phase, automatically start the next day
         if(currentPhase > DAY_END){
             game.getGameData().nextDay();
-            currentPhase = 0;
+            currentPhase = NEW_DAY;
         }
         // Load the next phase automatically
         loadPhase();
@@ -55,7 +58,7 @@ public class DayManager {
         } else if(currentPhase == CHARACTER_SELECT){
             game.setCurrentGameState(new CharacterSelectState(game, this));
         } else if(currentPhase == TOURNAMENT){
-            game.setCurrentGameState(new TournamentState(game, this));
+            //game.setCurrentGameState(new TournamentState(game, this));
         } else if(currentPhase == BATTLE){
             game.setCurrentGameState(new BattleState(game, this));
         } else if(currentPhase == SHOP){
