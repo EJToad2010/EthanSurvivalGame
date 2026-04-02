@@ -1,6 +1,5 @@
 package src.ItemManager.Items;
 import src.Characters.BasicCharacter;
-import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
 
 import src.ItemManager.Item;

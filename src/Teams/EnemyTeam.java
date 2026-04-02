@@ -1,8 +1,11 @@
 package src.Teams;
+import java.awt.Graphics;
 import java.util.ArrayList;
 
 import src.Characters.BasicCharacter;
 import src.Characters.EnemyCharacter;
+import src.Characters.PlayerCharacter;
+import src.GameManagement.Game;
 import src.ItemManager.Inventory;
 import src.ItemManager.Item;
 import src.ItemManager.ItemStack;
@@ -15,6 +18,8 @@ public class EnemyTeam {
   private ArrayList<EnemyCharacter> enemyTeam;
   // The EnemyTeam has one shared inventory.
   private Inventory enemyInventory;
+  // Store an instance of the running Game
+  private Game game;
   
   // Constructor that takes in an exisiting ArrayList and modifies its components into an enemy
   public EnemyTeam(ArrayList<EnemyCharacter> enemyTeam, Inventory enemyInventory){
@@ -29,12 +34,23 @@ public class EnemyTeam {
   public EnemyTeam(){
     this(new ArrayList<EnemyCharacter>(), new Inventory());
   }
+
+  // Get the Game object (used by EnemyCharacters)
+  public Game getGame(){
+    return game;
+  }
+
+  // Set the Game object (REQUIRED)
+  public void setGame(Game game){
+    this.game = game;
+  }
   
   // Add an enemy
   // Convert the isEnemyCharacter automatically to true to prevent confusion
   // Manually keeping track of each enemy's xp and levels are too complicated.
   // Their stats and ability limits are artificially inflated based on the player team's highest level character
   public void addEnemy(EnemyCharacter c, int highestPlayerLevel, double avgPlayerLevel){
+    c.setEnemyTeam(this);
     enemyTeam.add(c);
     // Math.max prevents negative inflation of stats in the unlikely case that the highest player level is 0
     if(Math.random() < 0.5){
@@ -175,5 +191,30 @@ public class EnemyTeam {
       output += "\n";
     }
     return output;
+  }
+
+  // Draw each individual EnemyCharacter
+  // (x, y) is the top left corner
+  public void drawEnemyTeam(Graphics graphics, int x, int y, int width){
+    spaceCharacters(x, y, width);
+    for(EnemyCharacter c : enemyTeam){
+      c.drawCharacter(graphics);
+    }
+  }
+
+  // Space all EnemyCharacters evenly to fit the width and have a top-left corner of (x, y)
+  // All characters follow a 160x160 grid, so this size can be assumed
+  public void spaceCharacters(int x, int y, int width){
+    if(enemyTeam.size() <= 1){
+      return;
+    }
+    int totalWidth = 160 * enemyTeam.size();
+    int totalWidthDiff = width - totalWidth;
+    int avgWidthDiff = totalWidthDiff / enemyTeam.size();
+    int currentX = x;
+    for(EnemyCharacter c : enemyTeam){
+      c.setPosition(currentX, y);
+      currentX += 160 + avgWidthDiff;
+    }
   }
 }

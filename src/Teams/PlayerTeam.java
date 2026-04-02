@@ -1,8 +1,10 @@
 package src.Teams;
+import java.awt.Graphics;
 import java.util.ArrayList;
 
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
+import src.GameManagement.Game;
 import src.ItemManager.Inventory;
 import src.ItemManager.Item;
 import src.ItemManager.ItemStack;
@@ -17,6 +19,8 @@ public class PlayerTeam {
   // Handle characters who defend each other from enemy attacks
   private ArrayList<PlayerCharacter> protectedCharacters = new ArrayList<PlayerCharacter>();
   private ArrayList<Double> protectedCharacterAmounts = new ArrayList<Double>();
+  // Store an instance of the running Game
+  private Game game;
   
   // How many coins the player's team currently has
   private int coinBalance = 0;
@@ -34,10 +38,21 @@ public class PlayerTeam {
   public PlayerTeam(){
     this(new ArrayList<PlayerCharacter>(), new Inventory());
   }
+
+  // Get the Game object (used by PlayerCharacters)
+  public Game getGame(){
+    return game;
+  }
+
+  // Set the Game object (REQUIRED)
+  public void setGame(Game game){
+    this.game = game;
+  }
   
   // Add a player
   // Convert the isEnemyCharacter automatically to false to prevent confusion
   public void addCharacter(PlayerCharacter c){
+    c.setPlayerTeam(this);
     playerTeam.add(c);
     convertAllToPlayer();
   }
@@ -262,5 +277,30 @@ public class PlayerTeam {
       output += "\n";
     }
     return output;
+  }
+
+  // Draw each individual PlayerCharacter
+  // (x, y) is the top left corner
+  public void drawPlayerTeam(Graphics graphics, int x, int y, int width){
+    spaceCharacters(x, y, width);
+    for(PlayerCharacter c : playerTeam){
+      c.drawCharacter(graphics);
+    }
+  }
+
+  // Space all PlayerCharacters evenly to fit the width and have a top-left corner of (x, y)
+  // All characters follow a 160x160 grid, so this size can be assumed
+  public void spaceCharacters(int x, int y, int width){
+    if(playerTeam.size() <= 1){
+      return;
+    }
+    int totalWidth = 160 * playerTeam.size();
+    int totalWidthDiff = width - totalWidth;
+    int avgWidthDiff = totalWidthDiff / playerTeam.size();
+    int currentX = x;
+    for(PlayerCharacter c : playerTeam){
+      c.setPosition(currentX, y);
+      currentX += 160 + avgWidthDiff;
+    }
   }
 }

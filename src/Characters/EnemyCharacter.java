@@ -1,6 +1,8 @@
 package src.Characters;
 import java.util.ArrayList;
 
+import src.GameManagement.Game;
+import src.GameManagement.UI.DialogManager;
 import src.ItemManager.Inventory;
 import src.ItemManager.Items.HealthPool;
 import src.ItemManager.Items.HealthPotion;
@@ -20,6 +22,16 @@ public class EnemyCharacter extends BasicCharacter{
   // Possible behaviorTypes:
   // RANDOM, AGGRESSIVE, DEFENSIVE
   private String behaviorType;
+
+  // All of these variables are defined in the same method
+
+  // Stores an instance of the EnemyTeam
+  // Set manually through the setEnemyTeam() method
+  protected EnemyTeam enemyTeam = null;
+  // The instance of Game is obtained alongside the enemyTeam
+  protected Game game;
+   // The instance of dialog used by the current game state that is open
+  protected DialogManager dialogManager;
   
   // Constructor used if all parameters are given (used by subclasses)
   public EnemyCharacter(String name, double maxHP, double attackStrength, double defenseStrength, double speed, int xpReward, int coinReward, String behaviorType){
@@ -61,6 +73,12 @@ public class EnemyCharacter extends BasicCharacter{
   // Update if an EnemyCharacter has taken a turn yet
   protected void setHasTakenTurn(boolean newValue){
     hasTakenTurn = newValue;
+  }
+
+  public void setEnemyTeam(EnemyTeam enemyTeam){
+    this.enemyTeam = enemyTeam;
+    game = enemyTeam.getGame();
+    dialogManager = game.getCurrentGameState().getDialogManager();
   }
   
   // Instead of creating a unique leveling and xp system for each enemy,

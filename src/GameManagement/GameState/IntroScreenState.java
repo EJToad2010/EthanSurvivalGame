@@ -1,9 +1,6 @@
 package src.GameManagement.GameState;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-
-import javax.imageio.ImageIO;
 
 import src.GameManagement.Game;
 import src.GameManagement.Mechanics.DayManager;
@@ -12,8 +9,6 @@ import src.GameManagement.UI.GamePanel;
 public class IntroScreenState extends GameState{
     // Used to control the flow of text displayed on screen
     int ticksPassed = 0;
-    // Enter screen start off black, with bars disappearing from top to bottom
-    int blackBarsVisible = 10;
     
     public IntroScreenState(Game g, DayManager dayManager){
         super(g, dayManager);
@@ -21,43 +16,40 @@ public class IntroScreenState extends GameState{
         dialogManager.add("Train skilled fighters and survive as long as possible!");
         dialogManager.add("Make skilled decisions. They will have a major impact on your success.");
         dialogManager.add("Good luck on your journey...");
+        isAnimating = true;
+        setFrame(10);
     }
 
+    // Handle tick when applicable
     public void update(){
-        if(super.currentStep == 0){
-            // Transition animation
-            ticksPassed++;
-            if(ticksPassed % 5 == 0){
-                blackBarsVisible--;
+        if(currentStep == 0){
+            isAnimating = true;
+            nextTick();
+            if(animationTick % 5 == 0){
+                frame--;
             }
-            if(blackBarsVisible < 0){
-                ticksPassed = 0;
-                super.currentStep++;
+            if(frame < 0){
+                resetTick();
+                currentStep++;
             }
-        } else if(super.currentStep == 2){
-            // Transition animation
-            ticksPassed++;
-            if(ticksPassed % 5 == 0){
-                blackBarsVisible++;
+        } else if(currentStep == 2){
+            isAnimating = true;
+            nextTick();
+            if(animationTick % 5 == 0){
+                frame++;
             }
-            if(blackBarsVisible > 10){
+            if(frame > 10){
                 dayManager.nextPhase();
             }
+        } else{
+            isAnimating = false;
         }
     }
 
     // Update dialog after every time ENTER is pressed
     protected void handleStep(int step, int keyCode){
         if(step == 1){
-            // If dialog is still active, wait until the next line is reached
-            if(dialogManager.getIsActive()){
-                if(keyCode == KeyEvent.VK_ENTER){
-                    dialogManager.nextLine();
-                    if(!dialogManager.getIsActive()){
-                        nextStep();
-                    }
-                }
-            }
+            runDialog(keyCode, true);
         }
     }
 
@@ -66,11 +58,20 @@ public class IntroScreenState extends GameState{
         if(step == 1){
             dialogManager.draw(graphics);
         } else{
-            // Transition animation
-            for(int i = 10-blackBarsVisible; i < 10; i++){
-                graphics.setColor(Color.BLACK);
-                graphics.fillRect(0, i*72, 1280, 72);
-            }
+            drawScene(scene, graphics);
+        }
+    }
+
+    // Call in drawStep if a panel wants to make use of animations
+    protected void drawScene(int scene, Graphics graphics){
+        drawFrame(scene, frame, graphics);
+    }
+    // Call in drawScene to make use of individual frames
+    protected void drawFrame(int scene, int frame, Graphics graphics){
+        // Transition animation
+        for(int i = 10-frame; i < 10; i++){
+            graphics.setColor(Color.BLACK);
+            graphics.fillRect(0, i*72, 1280, 72);
         }
     }
 

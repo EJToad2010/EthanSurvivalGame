@@ -14,6 +14,23 @@ public class InputHandler {
         buttons.add(b);
     }
 
+    // Return the x of the left edge of each button
+    public int[] getButtonsX(){
+        int[] output = new int[buttons.size()];
+        for(int i = 0; i < buttons.size(); i++){
+            output[i] = buttons.get(i).getX() - buttons.get(i).getHorizontalGap();
+        }
+        return output;
+    }
+    // Return the y of the top edge of each button
+    public int[] getButtonsY(){
+        int[] output = new int[buttons.size()];
+        for(int i = 0; i < buttons.size(); i++){
+            output[i] = buttons.get(i).getY() - buttons.get(i).getVerticalGap();
+        }
+        return output;
+    }
+
     public void clear(){
         buttons.clear();
         selectedIndex = 0;
@@ -24,6 +41,9 @@ public class InputHandler {
     public int keyPressed(int keyCode){
         if(keyCode == KeyEvent.VK_LEFT){
             selectedIndex--;
+            if(selectedIndex < 0){
+                selectedIndex = buttons.size() - 1;
+            }
             while(!buttons.get(selectedIndex).getIsSelectable()){
                 selectedIndex--;
                 if(selectedIndex < 0){
@@ -33,6 +53,9 @@ public class InputHandler {
         }
         if(keyCode == KeyEvent.VK_RIGHT){
             selectedIndex++;
+            if(selectedIndex >= buttons.size()){
+                selectedIndex = 0;
+            }
             while(!buttons.get(selectedIndex).getIsSelectable()){
                 selectedIndex++;
                 if(selectedIndex >= buttons.size()){

@@ -1,6 +1,5 @@
 package src.GameManagement.UI;
 import java.awt.*;
-import java.awt.geom.*;
 import src.GameManagement.UI.UIManager;
 
 // A label with a text box that represents an option that can be selected during gameplay
@@ -31,6 +30,23 @@ public class Button {
         this.y = y;
         this.id = id;
         this.isSelectable = isSelectable;
+    }
+
+    // Getters
+    public int getX(){
+        return x;
+    }
+
+    public int getY(){
+        return y;
+    }
+
+    public int getHorizontalGap(){
+        return HORIZONTAL_GAP;
+    }
+
+    public int getVerticalGap(){
+        return VERTICAL_GAP;
     }
 
     public boolean getIsSelectable(){

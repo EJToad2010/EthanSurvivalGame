@@ -2,7 +2,6 @@ package src.GameManagement.GameState;
 // Import graphics and event handling libraries
 
 import src.Characters.BasicCharacter;
-import src.Characters.PlayerCharacter;
 import src.GameManagement.Game;
 import src.GameManagement.Mechanics.DayManager;
 import src.GameManagement.UI.DialogManager;
@@ -11,6 +10,7 @@ import src.GameManagement.UI.InputHandler;
 import src.GameManagement.UI.Button;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 // A singular class that can be called to execute a specific "phase" of the game
@@ -28,6 +28,14 @@ public class GameState {
     // Store an integer value of the current "step"
     protected int currentStep = 0;
 
+    // Variables related to animations in a panel
+    // Each step can have multiple unique scenes, which can have multiple unique frames.
+    // The animation tick controls the flow of animation
+    protected int animationTick = 0;
+    protected boolean isAnimating = false;
+    protected int scene = 0;
+    protected int frame = 0;
+
     // Used to handle typing
     protected boolean isTyping = false;
     protected String typedText = "";
@@ -36,6 +44,15 @@ public class GameState {
     public GameState(Game game, DayManager dayManager){
         this.game = game;
         this.dayManager = dayManager;
+    }
+
+    // Getters
+    public DialogManager getDialogManager(){
+        return dialogManager;
+    }
+
+    public InputHandler getInputHandler(){
+        return inputHandler;
     }
 
     // Both of these methods should call once per frame but they handle different tasks
@@ -49,21 +66,76 @@ public class GameState {
 
     // Move to the next stpe
     protected void nextStep(){
+        onExitStep(currentStep);
+        onEnterStep(currentStep+1);
         currentStep++;
     }
 
+    // Increment the animationTick
+    protected void nextTick(){
+        if(isAnimating){
+            animationTick++;
+        }
+    }
+
+    // Set animationTick to 0
+    protected void resetTick(){
+        animationTick = 0;
+    }
+
+    // Increment the frame number
+    protected void nextFrame(){
+        if(isAnimating){
+            frame++;
+        }
+    }
+
+    // Set frame to 0
+    protected void resetFrame(){
+        frame = 0;
+    }
+
+    // Set frame to a given number
+    protected void setFrame(int frame){
+        this.frame = frame;
+    }
+
+    // Increment the animation scene
+    protected void nextScene(){
+        if(isAnimating){
+            scene++;
+        }
+    }
+
+    // Set scene to 0
+    protected void resetScene(){
+        scene = 0;
+    }
+    
     // Set a specific step
     protected void setStep(int newStep){
+        onExitStep(currentStep);
+        onEnterStep(newStep);
         currentStep = newStep;
     }
 
-    // Subclasses must override these
+    // Subclasses must override these for unique functionality
+    // Handle the flow of logic between steps
     protected void handleStep(int step, int keyCode){}
+    // Draw relevant information of a single step
     protected void drawStep(int step, Graphics graphics){}
+    // Calls once when a new step is first loaded
+    protected void onEnterStep(int step){}
+    // Calls once when the previous step exits
+    protected void onExitStep(int step){}
     // Calls once when panel is first loaded
     public void onEnter(GamePanel panel){}
     // Calls once when panel is unloaded
     public void onExit(GamePanel panel){}
+    // Call in drawStep if a panel wants to make use of animations
+    protected void drawScene(int scene, Graphics graphics){}
+    // Call in drawScene to make use of individual frames
+    protected void drawFrame(int scene, int frame, Graphics graphics){}
 
     // Call every time a key is pressed
     public void keyPressed(int keyCode){
@@ -85,6 +157,25 @@ public class GameState {
                 typedText = typedText.substring(0, typedText.length() - 1);
             }
         }
+    }
+
+    // Automatically process every dialog line, moving on every time the user presses ENTER
+    // If the end of the dialog is reached, moveOn dictates whether or not it should move to the next step
+    // Return 0 if end was reached, -1 if not
+    // (Call inside handleStep to access keyCode)
+    public int runDialog(int keyCode, boolean moveOn){
+        if(dialogManager.getIsActive()){
+            if(keyCode == KeyEvent.VK_ENTER){
+                dialogManager.nextLine();
+                if(!dialogManager.getIsActive()){
+                    if(moveOn){
+                        nextStep();
+                    }
+                    return 0;
+                }
+            }
+        }
+        return -1;
     }
 
     // Automatically create an InputHandler containing the given labels for each Button

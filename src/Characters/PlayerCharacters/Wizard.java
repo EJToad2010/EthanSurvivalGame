@@ -28,6 +28,7 @@ public class Wizard extends PlayerCharacter {
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
+    setCharacterImage("src/Images/wizard.png");
   }
   
   // Overrided getType method

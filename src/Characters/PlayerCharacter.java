@@ -1,5 +1,9 @@
 package src.Characters;
 import java.util.ArrayList;
+
+import src.GameManagement.Game;
+import src.GameManagement.UI.DialogManager;
+import src.Teams.PlayerTeam;
 // PlayerCharacters have unique attributes such as a shared inventory, xp, and levels
 // This object should never be created on its own. Only its subclasses will ever be used.
 public class PlayerCharacter extends BasicCharacter {
@@ -14,6 +18,14 @@ public class PlayerCharacter extends BasicCharacter {
   private int xp = 0;
   private int level = 1;
   private int xpToNextLevel;
+
+  // Stores an instance of the PlayerTeam
+  // Set manually through the setPlayerTeam() method
+  protected PlayerTeam playerTeam = null;
+  // The instance of Game is obtained alongside the playerTeam
+  protected Game game;
+  // The instance of dialog used by the current game state that is open
+  protected DialogManager dialogManager;
   
   // Constructor that requires all attributes
   public PlayerCharacter(String name, double maxHP, double attackStrength, double defenseStrength, double speed){
@@ -65,6 +77,13 @@ public class PlayerCharacter extends BasicCharacter {
       }
     }
     return index;
+  }
+
+  // Set to the game's instance of PlayerTeam
+  public void setPlayerTeam(PlayerTeam playerTeam){
+    this.playerTeam = playerTeam;
+    game = playerTeam.getGame();
+    dialogManager = game.getCurrentGameState().getDialogManager();
   }
   
   public void updateXPToNextLevel() {

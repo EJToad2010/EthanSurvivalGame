@@ -3,6 +3,7 @@ package src.Characters.PlayerCharacters;
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
+import src.GameManagement.UI.DialogManager;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
 
@@ -26,6 +27,7 @@ public class Knight extends PlayerCharacter {
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
+    setCharacterImage("src/Images/knight.png");
   }
   
   // Overrided getType method

@@ -3,15 +3,12 @@ package src.GameManagement.GameState;
 import src.GameManagement.Game;
 import src.GameManagement.Mechanics.DayManager;
 import src.GameManagement.UI.GamePanel;
-import src.GameManagement.UI.InputHandler;
+import src.GameManagement.UI.ImageManager;
 import src.GameManagement.UI.UIManager;
-import src.GameManagement.UI.Button;
 
-import javax.imageio.ImageIO;
+
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 
 public class StartScreenState extends GameState{
     private JLabel welcomeMessage;
@@ -64,16 +61,10 @@ public class StartScreenState extends GameState{
         panel.add(welcomeMessage);
         panel.repaint();
         // Setup inputHandler
-        inputHandler.clear();
-        inputHandler.addButton(new Button("Start", 250, 400, START));
-        inputHandler.addButton(new Button("Options", 900, 400, OPTIONS));
+        inputHandler = createOptions(new String[]{"Start", "Options"}, new int[]{START, OPTIONS});
         panel.repaint();
         // Setup castle image
-        try{
-            castle = ImageIO.read(new File("src/Images/castle.png"));
-        } catch (IOException e){
-            e.printStackTrace();
-        }
+        castle = ImageManager.loadImage("src/Images/castle.png");
     }
     // Calls once when panel is unloaded
     public void onExit(GamePanel panel){

@@ -29,6 +29,7 @@ public class Archer extends PlayerCharacter {
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 2});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 2});
+    setCharacterImage("src/Images/archer.png");
   }
   
   // Overrided getType method

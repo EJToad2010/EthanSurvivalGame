@@ -1,6 +1,9 @@
 package src.Characters;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.util.ArrayList;
 
+import src.GameManagement.UI.ImageManager;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
@@ -17,6 +20,11 @@ public class BasicCharacter {
   private String description;
   private String passiveAbilityName = "";
   private String passiveAbilityDescription = "";
+  private Image characterImage;
+  // Location on screen
+  private int x = 0;
+  private int y = 0;
+
   // Names and descriptions that allow for a Character to have multiple basic abilities
   private ArrayList<String> basicAbilityNames = new ArrayList<String>();
   private ArrayList<String> basicAbilityDescriptions = new ArrayList<String>();
@@ -40,7 +48,6 @@ public class BasicCharacter {
   private double currentHP;
   private double attackStrength;
   private double defenseStrength;
-  // Change healStrength to speed
   private double speed;
   
   // This variable is automatically modified if a Character is added to either
@@ -217,7 +224,15 @@ public class BasicCharacter {
   public ArrayList<String> getSpecialAbilityTypes(){
     return specialAbilityTypes;
   }
+
+  public int getX(){
+    return x;
+  }
   
+  public int getY(){
+    return y;
+  }
+
   // Setter methods
   // Battle-related double values work with both increasing and decreasing
   
@@ -276,6 +291,15 @@ public class BasicCharacter {
     if(isDefending){
       System.out.println(name + " will defend against opponent attacks for one turn.");
     }
+  }
+
+  public void setCharacterImage(String path){
+    characterImage = ImageManager.loadImage(path);
+  }
+
+  public void setPosition(int x, int y){
+    this.x = x;
+    this.y = y;
   }
   
   // Decrease each special attack's cooldown timer by one whenever a new turn happens
@@ -407,6 +431,11 @@ public class BasicCharacter {
     output += getSimpleOutput();
     output += "\nATK: " + attackStrength + ", DEF: " + defenseStrength + ", SPD: " + speed;
     return output;
+  }
+
+  // Draw the given Character sprite at top left corner (x, y)
+  public void drawCharacter(Graphics graphics){
+    graphics.drawImage(characterImage, x, y, null);
   }
 }
 

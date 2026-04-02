@@ -2,6 +2,7 @@ package src.GameManagement.GameState;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 
 import javax.swing.*;
@@ -12,10 +13,8 @@ import src.Characters.PlayerCharacters.Wizard;
 import src.GameManagement.Game;
 import src.GameManagement.GameData;
 import src.GameManagement.Mechanics.DayManager;
-import src.GameManagement.UI.Button;
-import src.GameManagement.UI.DialogManager;
 import src.GameManagement.UI.GamePanel;
-import src.GameManagement.UI.InputHandler;
+import src.GameManagement.UI.ImageManager;
 import src.GameManagement.UI.UIManager;
 import src.Teams.PlayerTeam;
 
@@ -27,6 +26,10 @@ public class CharacterSelectState extends GameState{
     private int allowedCharacters;
     private int createdCharacters = 0;
     private String selectedClass = "";
+    private Image knight;
+    private Image archer;
+    private Image wizard;
+    private Image selectedImage;
 
     // Constants to keep track of steps
     private final int SCREEN_INFO = 0;
@@ -48,28 +51,13 @@ public class CharacterSelectState extends GameState{
     // Fill the dialog and define allowedCharacters here
     public CharacterSelectState(Game g, DayManager dayManager){
         super(g, dayManager);
-        GameData data = g.getGameData();
-        allowedCharacters = data.getPlayerBattleCapacity() - data.getPlayerTeamArr().size();
-        if(allowedCharacters > 1){
-            dialogManager.add("You may add " + allowedCharacters + " new Characters to your team!");
-        } else{
-            dialogManager.add("You may add 1 new Character to your team!");
-        }
     }
 
-    // Update dialog after every time ENTER is pressed
+    // Handle the flow of logic between steps
     protected void handleStep(int step, int keyCode){
         // Display dialogManager when state is first loaded
         if(step == SCREEN_INFO){
-            if(dialogManager.getIsActive()){
-                if(keyCode == KeyEvent.VK_ENTER){
-                    dialogManager.nextLine();
-                    if(!dialogManager.getIsActive()){
-                        initInputHandlerCharClass();
-                        nextStep();
-                    }
-                }
-            }
+            runDialog(keyCode, true);
         }
         else if(step == SELECT_CLASS){
             // Process the Character class selected
@@ -77,6 +65,7 @@ public class CharacterSelectState extends GameState{
             if(input == -1){
                 return;
             }
+            // Update selectedClass to reflect user's choice
             if(input == KNIGHT){
                 selectedClass = "Knight";
             }
@@ -85,10 +74,7 @@ public class CharacterSelectState extends GameState{
             } else if(input == WIZARD){
                 selectedClass = "Wizard";
             }
-            if(!selectedClass.isEmpty()){
-                initInputHandlerConfirmation();
-                nextStep();
-            }
+            nextStep();
         } else if(step == CONFIRM_CLASS){
             // Process the confirmation choice selected
             int input = inputHandler.keyPressed(keyCode);
@@ -96,12 +82,8 @@ public class CharacterSelectState extends GameState{
                 return;
             }
             if(input == YES){
-                isTyping = true;
-                typedText = "";
                 nextStep();
             } else if(input == NO){
-                selectedClass = "";
-                initInputHandlerCharClass();
                 setStep(SELECT_CLASS);
             }
         } else if(step == NAME_CHARACTER){
@@ -110,39 +92,78 @@ public class CharacterSelectState extends GameState{
                 isTyping = false;
             }
             // Wait for the user to press ENTER, which disables typing
-            if(!isTyping){
-                // Add the new Character to the PlayerTeam
-                PlayerTeam playerTeam = game.getGameData().getPlayerTeamObj();
-                if(selectedClass.equals("Knight")){
-                    playerTeam.addCharacter(new Knight(typedText));
-                } else if(selectedClass.equals("Archer")){
-                    playerTeam.addCharacter(new Archer(typedText));
-                } else{
-                    playerTeam.addCharacter(new Wizard(typedText));
-                }
-                createdCharacters++;
-                dialogManager.clear();
-                dialogManager.add("Congratulations! " + typedText + " was added to your team.");
+            if(!isTyping){             
                 nextStep();
             }
         } else if(step == CREATION_SUCCESS){
             // Reuse dialogManager to display congratulations message
-            if(dialogManager.getIsActive()){
-                if(keyCode == KeyEvent.VK_ENTER){
-                    dialogManager.nextLine();
-                    if(!dialogManager.getIsActive()){
-                        if(createdCharacters == allowedCharacters){
-                            dayManager.nextPhase();
-                        } else{
-                            initInputHandlerCharClass();
-                            setStep(SELECT_CLASS);
-                        }
-                    }
+            int exitStatus = runDialog(keyCode, false);
+            if(exitStatus == 0){
+                if(createdCharacters == allowedCharacters){
+                    dayManager.nextPhase();
+                } else{
+                    setStep(SELECT_CLASS);
                 }
             }
         }
     }
 
+    // Calls once when a new step is first loaded
+    protected void onEnterStep(int step){
+        if(step == SCREEN_INFO){
+            // Figure out how many new Characters can be made
+            GameData data = game.getGameData();
+            allowedCharacters = data.getPlayerBattleCapacity() - data.getPlayerTeamArr().size();
+            if(allowedCharacters > 1){
+                dialogManager.add("You may add " + allowedCharacters + " new Characters to your team!");
+            } else{
+                dialogManager.add("You may add 1 new Character to your team!");
+            }
+        }
+        else if(step == SELECT_CLASS){
+            // Initialize the buttons used to select a character class
+            initInputHandlerCharClass();
+            selectedClass = "";
+        } else if(step == CONFIRM_CLASS){
+            // Initialize the buttons used to select YES or NO
+            initInputHandlerConfirmation();
+        } else if(step == NAME_CHARACTER){
+            // Reset typing vars
+            isTyping = true;
+            typedText = "";
+        }
+    }
+
+    // Calls once when the previous step exits
+    protected void onExitStep(int step){
+        if(step == SELECT_CLASS){
+            // Determine the selectedImage
+            if(selectedClass.equals("Knight")){
+                selectedImage = knight;
+            } else if(selectedClass.equals("Archer")){
+                selectedImage = archer;
+            } else{
+                selectedImage = wizard;
+            }
+        } else if(step == NAME_CHARACTER){
+            // Add the new Character to the PlayerTeam
+            PlayerTeam playerTeam = game.getGameData().getPlayerTeamObj();
+            if(selectedClass.equals("Knight")){
+                playerTeam.addCharacter(new Knight(typedText));
+            } else if(selectedClass.equals("Archer")){
+                playerTeam.addCharacter(new Archer(typedText));
+            } else{
+                playerTeam.addCharacter(new Wizard(typedText));
+            }
+            createdCharacters++;
+            // Prepare the dialog for the next step
+            dialogManager.clear();
+            dialogManager.add("Congratulations! " + typedText + " was added to your team.");
+            typedText = "";
+        }
+    }
+
+    // Draw relevant information of a single step
     protected void drawStep(int step, Graphics graphics){
         if(step > SCREEN_INFO){
             // Inform the user how many more Characters they can make
@@ -164,6 +185,12 @@ public class CharacterSelectState extends GameState{
             // Draw inputHandler buttons
             inputHandler.spaceButtons(graphics, 40, 800, 450);
             inputHandler.draw(graphics, 40);
+            // Draw each corresponding Character class above buttons
+            int[] buttonsX = inputHandler.getButtonsX();
+            int[] buttonsY = inputHandler.getButtonsY();
+            graphics.drawImage(knight, buttonsX[KNIGHT], buttonsY[KNIGHT] - 180, null);
+            graphics.drawImage(archer, buttonsX[ARCHER], buttonsY[ARCHER] - 180, null);
+            graphics.drawImage(wizard, buttonsX[WIZARD], buttonsY[WIZARD] - 180, null);
         } else if(step == CONFIRM_CLASS){
             // Prompt the user to confirm their choice
             UIManager.setTextColor(graphics, Color.WHITE);
@@ -178,12 +205,16 @@ public class CharacterSelectState extends GameState{
             graphics.fillRect(390, 140, 720, 420);
             graphics.setColor(new Color(117, 97, 70));
             graphics.fillRect(400, 150, 700, 400);
+            // Draw the selected Character class on the left side of the screen
+            int leftX = inputHandler.getButtonsX()[0];
+            graphics.drawImage(selectedImage, leftX-40, 260, null);
         } else if(step == NAME_CHARACTER){
             // Prompt the user to create a name for their Character
             UIManager.setTextColor(graphics, Color.WHITE);
             UIManager.setFontSize(40);
             UIManager.refreshText(graphics);
             UIManager.drawCenteredStringInBox(graphics, "Provide a name for your " + selectedClass + ".", 0, 200, 1280, 100);
+            graphics.drawImage(selectedImage, 1280/2 - 80, 260, null);
             // Draw an empty dialog box, where the user will type their name
             dialogManager.drawDialogBox(graphics);
             UIManager.setTextColor(graphics, Color.WHITE);
@@ -207,6 +238,11 @@ public class CharacterSelectState extends GameState{
         panel.add(title);
         panel.repaint();
         initInputHandlerCharClass();
+        // Setup Character images
+        knight = ImageManager.loadImage("src/Images/knight.png");
+        archer = ImageManager.loadImage("src/Images/archer.png");
+        wizard = ImageManager.loadImage("src/Images/wizard.png");
+        onEnterStep(SCREEN_INFO);
     }
     // Calls once when panel is unloaded
     public void onExit(GamePanel panel){
