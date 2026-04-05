@@ -18,6 +18,9 @@ public class EnemyTeam {
   private ArrayList<EnemyCharacter> enemyTeam;
   // The EnemyTeam has one shared inventory.
   private Inventory enemyInventory;
+
+  // The spacing between Characters when displayed
+  private int charSpacing = 0;
   
   // Constructor that takes in an exisiting ArrayList and modifies its components into an enemy
   public EnemyTeam(ArrayList<EnemyCharacter> enemyTeam, Inventory enemyInventory){
@@ -38,7 +41,6 @@ public class EnemyTeam {
   // Manually keeping track of each enemy's xp and levels are too complicated.
   // Their stats and ability limits are artificially inflated based on the player team's highest level character
   public void addEnemy(EnemyCharacter c, int highestPlayerLevel, double avgPlayerLevel){
-    c.setEnemyTeam(this);
     enemyTeam.add(c);
     // Math.max prevents negative inflation of stats in the unlikely case that the highest player level is 0
     if(Math.random() < 0.5){
@@ -59,6 +61,10 @@ public class EnemyTeam {
   // Return the enemy inventory
   public Inventory getEnemyInventory(){
     return enemyInventory;
+  }
+
+  public int getCharSpacing(){
+    return charSpacing;
   }
   
   // The total of each player character's speed value
@@ -193,16 +199,30 @@ public class EnemyTeam {
   // Space all EnemyCharacters evenly to fit the width and have a top-left corner of (x, y)
   // All characters follow a 160x160 grid, so this size can be assumed
   public void spaceCharacters(int x, int y, int width){
-    if(enemyTeam.size() <= 1){
+    if(enemyTeam.size() == 1){
+      enemyTeam.get(0).setPosition(x, y-(enemyTeam.get(0).getHeight()-160));
+      return;
+    } else if(enemyTeam.size() < 1){
       return;
     }
-    int totalWidth = 160 * enemyTeam.size();
-    int totalWidthDiff = width - totalWidth;
-    int avgWidthDiff = totalWidthDiff / enemyTeam.size();
-    int currentX = x;
+    int totalWidth = 0;
     for(EnemyCharacter c : enemyTeam){
-      c.setPosition(currentX, y);
-      currentX += 160 + avgWidthDiff;
+      totalWidth += c.getWidth();
+    }
+    int totalWidthDiff = width - totalWidth;
+    int avgWidthDiff = totalWidthDiff / (enemyTeam.size()-1);
+    int currentX = x;
+    int i = 0;
+    for(EnemyCharacter c : enemyTeam){
+      c.setPosition(currentX, y-(c.getHeight()-160));
+      if(avgWidthDiff < 0){
+        // Each Character now has less available spacing
+        c.setLostSpacing(Math.abs(avgWidthDiff/2) + 5);
+      }
+      if(i+1 < enemyTeam.size()){
+        currentX += c.getWidth() + avgWidthDiff;
+      }
+      i++;
     }
   }
 }

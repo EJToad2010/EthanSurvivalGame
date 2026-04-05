@@ -1,13 +1,16 @@
 package src.Characters;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.util.ArrayList;
 
 import src.GameManagement.UI.ImageManager;
+import src.GameManagement.UI.UIManager;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
 import src.GameManagement.Mechanics.ActionResult;
+import src.GameManagement.Mechanics.Signals;
 
 // Represents a default Character with generic attributes, acting as a superclass for all character types
 // Used by both the user's characters and the enemy's characters
@@ -22,9 +25,15 @@ public class BasicCharacter {
   private String passiveAbilityName = "";
   private String passiveAbilityDescription = "";
   private Image characterImage;
+  private Image deadImage = ImageManager.loadImage("src/Images/dead.png");
   // Location on screen
   private int x = 0;
   private int y = 0;
+  // Size of character image
+  protected int width = 160;
+  protected int height = 160;
+  // The amount of space the Character loses when displayed on screen
+  private int lostSpacing = 0;
 
   // Names and descriptions that allow for a Character to have multiple basic abilities
   private ArrayList<String> basicAbilityNames = new ArrayList<String>();
@@ -47,11 +56,6 @@ public class BasicCharacter {
   // Acts as a bridge between the Character's associated messages and the UI
   // (Replaces System.out.println from being a console game)
   private ActionResult actionResult = new ActionResult();
-  
-  // Currently used ActionResult signals
-  protected final String ATTACK_PERFORMED = "ATTACK_PERFORMED";
-  protected final String DEFENSE_RECEIVED = "DEFENSE_RECEIVED";
-  protected final String DEFENSE_PERFORMED = "DEFENSE_PERFORMED";
   
   // Core parameters related to essential interactions in battle
   private double maxHP;
@@ -247,6 +251,14 @@ public class BasicCharacter {
     return y;
   }
 
+  public int getWidth(){
+    return width;
+  }
+
+  public int getHeight(){
+    return height;
+  }
+
   // Setter methods
   // Battle-related double values work with both increasing and decreasing
   
@@ -315,6 +327,15 @@ public class BasicCharacter {
     this.x = x;
     this.y = y;
   }
+
+  public void setSize(int width, int height){
+    this.width = width;
+    this.height = height;
+  }
+
+  public void setLostSpacing(int lostSpacing){
+    this.lostSpacing = lostSpacing;
+  }
   
   // Decrease each special attack's cooldown timer by one whenever a new turn happens
   public void decreaseSpecialAbilityCooldowns(){
@@ -373,7 +394,7 @@ public class BasicCharacter {
   // but it is still usable in case specific situations happen
   public void attack(BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     System.out.println(name + " attacked " + target.getName() + " for " + attackStrength + " HP!");
-    actionResult.add(name + " attacked " + target.getName() + " for " + attackStrength + " HP!",ATTACK_PERFORMED);
+    actionResult.add(name + " attacked " + target.getName() + " for " + attackStrength + " HP!",Signals.ATTACK_PERFORMED);
     handleEnemyDefense(target, attackStrength, playerTeam, enemyTeam);
     System.out.println(target.getSimpleOutput());
   }
@@ -417,7 +438,7 @@ public class BasicCharacter {
     if(playerTeam.getIndexOfProtectedCharacter(target) != -1){
       int index = playerTeam.getIndexOfProtectedCharacter(target);
       System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
-      actionResult.add(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!",DEFENSE_RECEIVED);
+      actionResult.add(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!",Signals.DEFENSE_RECEIVED);
       actualDamage -= playerTeam.getProtectedCharacterAmounts().get(index);
     }
     return Math.max(actualDamage, 0);
@@ -429,13 +450,13 @@ public class BasicCharacter {
   public void defend(BasicCharacter target, double actualDamage){
     if(actualDamage == 0){
       System.out.println(name + " fully defended against " + target.getName() + "!");
-      actionResult.add(name + " fully defended against " + target.getName() + "!",DEFENSE_PERFORMED);
+      actionResult.add(name + " fully defended against " + target.getName() + "!",Signals.DEFENSE_PERFORMED);
     }else if(isDefending){
       System.out.println(name + " defended against " + target.getName() + " for " + defenseStrength * 2 + " HP!");
-      actionResult.add(name + " defended against " + target.getName() + " for " + defenseStrength * 2 + " HP!",DEFENSE_PERFORMED);
+      actionResult.add(name + " defended against " + target.getName() + " for " + defenseStrength * 2 + " HP!",Signals.DEFENSE_PERFORMED);
     } else{
       System.out.println(name + " lightly defended against " + target.getName() + " for " + defenseStrength + " HP!");
-      actionResult.add(name + " lightly defended against " + target.getName() + " for " + defenseStrength + " HP!",DEFENSE_PERFORMED);
+      actionResult.add(name + " lightly defended against " + target.getName() + " for " + defenseStrength + " HP!",Signals.DEFENSE_PERFORMED);
     }
   }
   
@@ -463,7 +484,31 @@ public class BasicCharacter {
 
   // Draw the given Character sprite at top left corner (x, y)
   public void drawCharacter(Graphics graphics){
-    graphics.drawImage(characterImage, x, y, null);
+    if(getIsDead()){
+      graphics.drawImage(deadImage, x, y, null);
+    } else{
+      graphics.drawImage(characterImage, x, y, null);
+    }
+    drawHPBar(graphics);
+    // Draw Character's HP points left above the text
+    UIManager.findMaxFontSize(currentHP + "/" + maxHP, graphics, (width-lostSpacing*2) / 2, 12, true, true);
+    int hpFontSize = UIManager.getFont().getSize();
+    UIManager.setTextColor(graphics, Color.WHITE);
+    UIManager.drawCenteredStringInBox(graphics, currentHP + "/" + maxHP, x+lostSpacing, y-12, (width-lostSpacing*2), 12);
+    // Draw Character's name
+    UIManager.findMaxFontSize(name, graphics, width-(lostSpacing*2), 20, true, true);
+    UIManager.drawCenteredStringInBox(graphics, name, x+lostSpacing, y-20-hpFontSize, (width-lostSpacing*2), 20);
+  }
+
+  // Draw the HP bar of the Character
+  // Positioned 10 pixels above the Character, spanning the exact width of the Character
+  public void drawHPBar(Graphics graphics){
+    double hpRatio = currentHP / maxHP;
+    int hpSize = (int)(width-(lostSpacing*2) * hpRatio);
+    graphics.setColor(Color.BLACK);
+    graphics.fillRect(x+lostSpacing, y-10, width-(lostSpacing*2), 10);
+    graphics.setColor(Color.GREEN);
+    graphics.fillRect(x+lostSpacing, y-10, hpSize, 10);
   }
 }
 

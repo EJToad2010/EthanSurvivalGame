@@ -27,18 +27,27 @@ public class UIManager {
     public static void refreshText(Graphics graphics){
         graphics.setFont(font);
     }
+    // Draw a piece of text, centered around an invisible rectangle with defined bounds
     public static void drawCenteredStringInBox(Graphics graphics, String text, int x, int y, int width, int height){
         ArrayList<String> lines = wrapText(text, graphics, width);
-        for(int i = 0; i < lines.size(); i++){
-            FontMetrics fontMetrics = graphics.getFontMetrics(font);
-            int textWidth = fontMetrics.stringWidth(lines.get(i));
-            int textHeight = fontMetrics.getHeight();
+        int startY = y;
 
+        // Setup fontmetrics
+        FontMetrics fontMetrics = graphics.getFontMetrics(font);
+        int textHeight = fontMetrics.getHeight();
+
+        // Offset if lines exceed height provided
+        if(textHeight * lines.size() > height){
+            startY -= textHeight * (lines.size() - 1);
+        }
+        for(int i = 0; i < lines.size(); i++){
+            int textWidth = fontMetrics.stringWidth(lines.get(i));
             int drawX = x + (width-textWidth) / 2;
-            int drawY = y + (height - textHeight) / 2;
+            int drawY = startY + (height - textHeight) / 2;
             graphics.drawString(lines.get(i), drawX, drawY+i*textHeight);
         }
     }
+    // Draw several lines of text, centered around an invisible rectangle with defined bounds
     public static void drawCeneterdStringInBoxSeparateLines(Graphics graphics, String[] text, int x, int y, int width, int height){
         for(String line : text){
             ArrayList<String> lines = wrapText(line, graphics, width);
@@ -53,7 +62,7 @@ public class UIManager {
             }
         }
     }
-    // Wrap text so it doesn't overflow
+    // Wrap text around lines so it doesn't overflow
     public static ArrayList<String> wrapText(String text, Graphics graphics, int width){
         FontMetrics fontMetrics = graphics.getFontMetrics(font);
         ArrayList<String> lines = new ArrayList<String>();
@@ -83,6 +92,52 @@ public class UIManager {
             lines.add(currentLine);
         }
         return lines;
+    }
+    // Find the maximum font size that fits entirely within a defined width
+    // If setAuto is true, automatically set the UIManager font to the size calculated
+    // If false, revert back to the original size
+    // If wrapLines is true, attempt to wrap each individual word on a new line to further maximize font size
+    public static int findMaxFontSize(String text, Graphics graphics, int width, int height, boolean setAuto, boolean wrapLines){
+        String change;
+        int originalSize = font.getSize();
+        // If the original size already fits, do nothing
+        FontMetrics fm = graphics.getFontMetrics(font);
+        String[] words;
+        if(wrapLines && text.indexOf(" ") != -1){
+            words = text.split(" ");
+        } else{
+            words = new String[0];
+        }
+        int checkSize = 1;
+        while(checkSize > 0){
+            setFontSize(checkSize);
+            refreshText(graphics);
+            fm = graphics.getFontMetrics(font);
+            if(wrapLines && words.length > 0){
+                boolean hasExceeded = false;
+                for(String word : words){
+                    if(fm.stringWidth(word) >= width || fm.getHeight() > height){
+                        hasExceeded = true;
+                        break;
+                    }
+                }
+                if(hasExceeded){
+                    checkSize -=1;
+                    break;
+                }
+            } else{
+                if(fm.stringWidth(text) >= width || fm.getHeight() > height){
+                        checkSize -=1;
+                        break;
+                }
+            }
+            checkSize++;
+        }
+        if(!setAuto){
+            setFontSize(originalSize);
+            refreshText(graphics);
+        }
+        return checkSize;
     }
 
     // Methods that use JLabels

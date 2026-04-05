@@ -18,10 +18,6 @@ public class PlayerCharacter extends BasicCharacter {
   private int xp = 0;
   private int level = 1;
   private int xpToNextLevel;
-
-  // Stores an instance of the PlayerTeam
-  // Set manually through the setPlayerTeam() method
-  protected PlayerTeam playerTeam = null;
   // The instance of Game is obtained alongside the playerTeam
   protected Game game;
   
@@ -76,12 +72,6 @@ public class PlayerCharacter extends BasicCharacter {
     }
     return index;
   }
-
-  // Set to the game's instance of PlayerTeam
-  public void setPlayerTeam(PlayerTeam playerTeam){
-    this.playerTeam = playerTeam;
-  }
-  
   public void updateXPToNextLevel() {
     // 50, 150, 300, 500, etc.
     // +50, +100, +150, +200

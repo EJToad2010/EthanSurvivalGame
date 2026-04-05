@@ -25,9 +25,34 @@ public class ActionResult {
         return signals;
     }
 
+    public String getMessage(int index){
+        if(index < 0 || index >= messages.size()){
+            return "";
+        }
+        return messages.get(index);
+    }
+
+    public String getSignal(int index){
+        if(index < 0 || index >= signals.size()){
+            return "";
+        }
+        return signals.get(index);
+    }
+
     // Add a new value to both ArrayLists
     public void add(String message, String signal){
         messages.add(message);
         signals.add(signal);
+    }
+
+    // Add a regular message and a blank signal
+    public void add(String message){
+        messages.add(message);
+        signals.add("");
+    }
+
+    public void clear(){
+        messages.clear();
+        signals.clear();
     }
 }

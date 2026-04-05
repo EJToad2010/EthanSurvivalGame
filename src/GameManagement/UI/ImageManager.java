@@ -14,7 +14,7 @@ public class ImageManager {
             BufferedImage output = ImageIO.read(new File(path));
             return output;
         } catch(IOException e){
-            System.out.println("The image failed to load.");
+            System.out.println("The image " + path + " failed to load.");
             try{
                 return ImageIO.read(new File("src/Images/null.png"));
             } catch(IOException ex){

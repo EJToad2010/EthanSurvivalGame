@@ -27,6 +27,7 @@ public class Goblin extends EnemyCharacter{
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{3, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{3, 3});
+    setCharacterImage("src/Images/goblin.png");
   }
   
   // Overrided getType method

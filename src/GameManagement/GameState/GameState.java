@@ -22,6 +22,8 @@ public class GameState {
     protected DayManager dayManager;
     // Store a DialogManager object that can be used by subclasses
     protected DialogManager dialogManager = new DialogManager();
+    // Store a boolean that catches if the dialog is throwing out a signal or not
+    protected boolean isHandlingSignal = false;
     // Store an InputHandler object that can be used by subclasses
     protected InputHandler inputHandler = new InputHandler();
 
@@ -130,6 +132,9 @@ public class GameState {
     protected void handleStep(int step, int keyCode){}
     // Draw relevant information of a single step
     protected void drawStep(int step, Graphics graphics){}
+    // Used when a GameState makes use of dialog that contains interaction
+    // (Remember to set isHandlingSignal to FALSE when done handling)
+    protected void handleSignal(String signal){}
     // Calls once when a new step is first loaded
     protected void onEnterStep(int step){}
     // Calls once when the previous step exits
@@ -154,7 +159,8 @@ public class GameState {
             return;
         }
         // Only allow letters, numbers, or SPACE
-        if(Character.isLetterOrDigit(c) || c == ' '){
+        // Character limit of 20
+        if((Character.isLetterOrDigit(c) || c == ' ') && typedText.length() <20){
             typedText += c;
         }
         // Backspace removes the last letter
@@ -170,18 +176,29 @@ public class GameState {
     // Return 0 if end was reached, -1 if not
     // (Call inside handleStep to access keyCode)
     public int runDialog(int keyCode, boolean moveOn){
-        if(dialogManager.getIsActive()){
-            if(keyCode == KeyEvent.VK_ENTER){
-                dialogManager.nextLine();
-                if(!dialogManager.getIsActive()){
-                    if(moveOn){
-                        nextStep();
-                    }
-                    return 0;
-                }
-            }
+        if(!dialogManager.getIsActive()){
+            return -1;
         }
-        return -1;
+        if(!(keyCode == KeyEvent.VK_ENTER)){
+            return -1;
+        }
+        if(isHandlingSignal){
+            return -1;
+        }
+        dialogManager.nextLine();
+        if(!dialogManager.getSignal().equals("")){
+            System.out.println("Handling signal " +dialogManager.getSignal());
+            isHandlingSignal = true;
+            handleSignal(dialogManager.getSignal());
+        }
+        if(dialogManager.getIsActive()){
+            return -1;
+        }
+        // Dialog finished
+        if(moveOn){
+            nextStep();
+        }
+        return 0;
     }
 
     // Automatically create an InputHandler containing the given labels for each Button

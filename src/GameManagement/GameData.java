@@ -24,6 +24,7 @@ public class GameData {
   private String[] earlyGameEnemyItems = new String[]{"HealthPotion", "HealthPotion", "HealthPool"};
   // Used in random name generation
   private String[] adjectives;
+  private String[] nouns;
   
   // Attributes needed for Player and Enemy classes outside of battle
   private int playerBattleCapacity = 2;
@@ -44,6 +45,7 @@ public class GameData {
     this.playerTeam = new PlayerTeam();
     this.enemyTeam = new EnemyTeam();
     fillAdjectives();
+    fillNouns();
   }
 
   // Getters
@@ -82,7 +84,11 @@ public class GameData {
   public String[] getAdjectives(){
     return adjectives;
   }
-
+  
+  public String[] getNouns(){
+    return nouns;
+  }
+  
   public String[] getEarlyGameEnemies(){
     return earlyGameEnemies;
   }
@@ -117,11 +123,30 @@ public class GameData {
       System.out.println("adjectives.txt failed to load.");
       return;
     }
+    ArrayList<String> lines = readLines(s);
+    adjectives = lines.toArray(new String[0]);
+    s.close();
+  }
+
+  // Read .txt file of nouns
+  private void fillNouns(){
+    Scanner s;
+    try{
+      s = new Scanner(new File("src/Misc/nouns.txt"));
+    } catch(FileNotFoundException e){
+      System.out.println("nouns.txt failed to load.");
+      return;
+    }
+    ArrayList<String> lines = readLines(s);
+    nouns = lines.toArray(new String[0]);
+    s.close();
+  }
+
+  private ArrayList<String> readLines(Scanner s){
     ArrayList<String> lines = new ArrayList<String>();
     while(s.hasNextLine()){
       lines.add(s.nextLine());
     }
-    adjectives = lines.toArray(new String[0]);
-    s.close();
+    return lines;
   }
 }

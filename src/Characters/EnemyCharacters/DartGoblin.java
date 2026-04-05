@@ -27,6 +27,7 @@ public class DartGoblin extends EnemyCharacter{
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
+    setCharacterImage("src/Images/goblin.png");
   }
   
   // Overrided getType method

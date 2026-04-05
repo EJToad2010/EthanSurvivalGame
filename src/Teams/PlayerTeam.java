@@ -40,7 +40,6 @@ public class PlayerTeam {
   // Add a player
   // Convert the isEnemyCharacter automatically to false to prevent confusion
   public void addCharacter(PlayerCharacter c){
-    c.setPlayerTeam(this);
     playerTeam.add(c);
     convertAllToPlayer();
   }
@@ -277,18 +276,31 @@ public class PlayerTeam {
   }
 
   // Space all PlayerCharacters evenly to fit the width and have a top-left corner of (x, y)
-  // All characters follow a 160x160 grid, so this size can be assumed
   public void spaceCharacters(int x, int y, int width){
-    if(playerTeam.size() <= 1){
+    if(playerTeam.size() == 1){
+      playerTeam.get(0).setPosition(x, y-(playerTeam.get(0).getHeight()-160));
+      return;
+    } else if(playerTeam.size() < 1){
       return;
     }
-    int totalWidth = 160 * playerTeam.size();
-    int totalWidthDiff = width - totalWidth;
-    int avgWidthDiff = totalWidthDiff / playerTeam.size();
-    int currentX = x;
+    int totalWidth = 0;
     for(PlayerCharacter c : playerTeam){
-      c.setPosition(currentX, y);
-      currentX += 160 + avgWidthDiff;
+      totalWidth += c.getWidth();
+    }
+    int totalWidthDiff = width - totalWidth;
+    int avgWidthDiff = totalWidthDiff / (playerTeam.size()-1);
+    int currentX = x;
+    int i = 0;
+    for(PlayerCharacter c : playerTeam){
+      c.setPosition(currentX, y-(c.getHeight()-160));
+      if(avgWidthDiff < 0){
+        // Each Character now has less available spacing
+        c.setLostSpacing(Math.abs(avgWidthDiff/2)+5);
+      }
+      if(i + 1 < playerTeam.size()){
+        currentX += c.getWidth() + avgWidthDiff;
+      }
+      i++;
     }
   }
 }
