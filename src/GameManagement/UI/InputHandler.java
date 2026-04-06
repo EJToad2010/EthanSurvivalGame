@@ -10,6 +10,11 @@ public class InputHandler {
     private ArrayList<Button> buttons = new ArrayList<>();
     private int selectedIndex = 0;
 
+    // Return the ArrayList of buttons
+    public ArrayList<Button> getButtons(){
+        return buttons;
+    }
+
     public void addButton(Button b){
         buttons.add(b);
     }

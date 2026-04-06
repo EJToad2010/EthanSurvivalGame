@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import src.Characters.BasicCharacter;
 import src.Characters.EnemyCharacter;
 import src.Characters.PlayerCharacter;
 import src.Characters.EnemyCharacters.DartGoblin;
@@ -11,7 +12,6 @@ import src.Characters.EnemyCharacters.Goblin;
 import src.GameManagement.Game;
 import src.GameManagement.GameData;
 import src.GameManagement.Mechanics.DayManager;
-import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.UI.GamePanel;
 import src.GameManagement.UI.UIManager;
 import src.ItemManager.Items.HealthPool;
@@ -73,20 +73,31 @@ public class BattleState extends GameState{
 
   // Logic used for each step
   protected void handleStep(int step, int keyCode){
+    // Handle any dialog that exists
     int exitCode = runDialog(keyCode, false);
-    if(exitCode == 0){
-      // Dialog ended
-      if(step == INTRO_ANIM){
-        System.out.println("Dialog ended INTRO_ANIM");
-        // After INTRO_ANIM, trigger the event that starts either the enemy or player's turn
-        if(turnOwner.equals("Player")){
-          System.out.println("Dialog ended INTRO_ANIM Player path");
-          initializePlayerTurn();
-          setStep(SELECT_CHARACTER);
-        } else{
-          initializeEnemyTurn();
-          setStep(ENEMY_TURN);
-        }
+    // Dialog ended
+    if(step == INTRO_ANIM){
+      System.out.println("Dialog ended INTRO_ANIM");
+      // After INTRO_ANIM, trigger the event that starts either the enemy or player's turn
+      if(turnOwner.equals("Player")){
+        System.out.println("Dialog ended INTRO_ANIM Player path");
+        initializePlayerTurn();
+        setStep(SELECT_CHARACTER);
+      } else{
+        initializeEnemyTurn();
+        setStep(ENEMY_TURN);
+      }
+    }
+
+    // Handle any inputHandler actions that exist
+    if(inputHandler.getButtons().size() > 0 && !dialogManager.getIsActive() && exitCode == -1){
+      int input = inputHandler.keyPressed(keyCode);
+      if(input == -1){
+        return;
+      }
+      if(step == SELECT_CHARACTER){
+        selectedCharacter = playerTeam.getPlayerTeam().get(input);
+        nextStep();
       }
     }
   }
@@ -99,6 +110,10 @@ public class BattleState extends GameState{
     } else{
       enemyTeam.drawEnemyTeam(graphics, 680, 100, 500);
       playerTeam.drawPlayerTeam(graphics, 100, 100, 500);
+    }
+    if(step == SELECT_CHARACTER){
+      inputHandler.spaceButtons(graphics, 40, 900, 500);
+      inputHandler.draw(graphics, 40);
     }
   }
 
@@ -134,7 +149,13 @@ public class BattleState extends GameState{
   }
 
   // Calls once when a new step is first loaded
-  protected void onEnterStep(int step){}
+  protected void onEnterStep(int step){
+    if(step == SELECT_CHARACTER){
+      inputHandler = createCharacterOptions(playerTeam.getPlayerTeam(), new ArrayList<BasicCharacter>());
+    } else if(step == SELECT_ACTION){
+      
+    }
+  }
   // Calls once when the previous step exits
   protected void onExitStep(int step){
     // Between steps, check if a victory condition has been reached

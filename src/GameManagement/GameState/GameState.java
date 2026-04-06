@@ -239,8 +239,19 @@ public class GameState {
     }
 
     // Automatically create an InputHandler containing an option for each Character in a given team
+    public InputHandler createCharacterOptions(ArrayList<? extends BasicCharacter> team){
+        InputHandler output = new InputHandler();
+        for(int i = 0; i < team.size(); i++){
+            BasicCharacter character = team.get(i);
+            Button characterButton = new Button(character.getName(), 0, 0, i);
+            output.addButton(characterButton);
+        }
+        return output;
+    }
+
+    // Automatically create an InputHandler containing an option for each Character in a given team
     // Keep in mind that some Characters cannot be selected due to various reasons
-    public InputHandler createCharacterOptions(ArrayList<BasicCharacter> team, ArrayList<BasicCharacter> unavailableCharacters){
+    public InputHandler createCharacterOptions(ArrayList<? extends BasicCharacter> team, ArrayList<? extends BasicCharacter> unavailableCharacters){
         InputHandler output = new InputHandler();
         for(int i = 0; i < team.size(); i++){
             BasicCharacter character = team.get(i);
