@@ -93,9 +93,7 @@ public class BattleState extends GameState{
 
   // Graphics drawn for each step
   protected void drawStep(int step, Graphics graphics){
-    if(dialogManager.getIsActive()){
-      dialogManager.draw(graphics);
-    }
+    dialogManager.draw(graphics);
     if(step == INTRO_ANIM){
       drawScene(scene, graphics);
     } else{
@@ -131,7 +129,6 @@ public class BattleState extends GameState{
       } else{
         enemyTeam.drawEnemyTeam(graphics, 680, 100, 500);
         playerTeam.drawPlayerTeam(graphics, 100, 100, 500);
-        dialogManager.draw(graphics);
       }
     }
   }
@@ -142,6 +139,15 @@ public class BattleState extends GameState{
   protected void onExitStep(int step){
     // Between steps, check if a victory condition has been reached
     // Exit the battle if so
+  }
+
+  // Calls once when a new frame is first loaded
+  protected void onEnterFrame(int scene, int frame){}
+  // Calls once when the previous frame is unloaded
+  protected void onExitFrame(int scene, int frame){
+    if(scene == 0 && frame == 2){
+      decideTurnPriority();
+    }
   }
 
   // Calls once when panel is first loaded

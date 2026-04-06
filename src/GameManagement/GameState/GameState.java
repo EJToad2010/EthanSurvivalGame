@@ -88,26 +88,34 @@ public class GameState {
     // Increment the frame number
     protected void nextFrame(){
         if(isAnimating){
+            onExitFrame(scene, frame);
             frame++;
+            onEnterFrame(scene, frame);
             resetTick();
         }
     }
 
     // Set frame to 0
     protected void resetFrame(){
+        onExitFrame(scene, frame);
         frame = 0;
+        onEnterFrame(scene, 0);
         resetTick();
     }
 
     // Set frame to a given number
     protected void setFrame(int frame){
+        onExitFrame(scene, this.frame);
         this.frame = frame;
+        onEnterFrame(scene, this.frame);
     }
 
     // Increment the animation scene
     protected void nextScene(){
         if(isAnimating){
+            onExitScene(scene);
             scene++;
+            onEnterScene(scene);
             resetFrame();
             resetTick();
         }
@@ -115,7 +123,9 @@ public class GameState {
 
     // Set scene to 0
     protected void resetScene(){
+        onExitScene(scene);
         scene = 0;
+        onEnterScene(scene);
         resetFrame();
         resetTick();
     }
@@ -139,6 +149,14 @@ public class GameState {
     protected void onEnterStep(int step){}
     // Calls once when the previous step exits
     protected void onExitStep(int step){}
+    // Calls once when a new scene is first loaded
+    protected void onEnterScene(int scene){}
+    // Calls once when the previous scene is unloaded
+    protected void onExitScene(int scene){}
+    // Calls once when a new frame is first loaded
+    protected void onEnterFrame(int scene, int frame){}
+    // Calls once when the previous frame is unloaded
+    protected void onExitFrame(int scene, int frame){}
     // Calls once when panel is first loaded
     public void onEnter(GamePanel panel){}
     // Calls once when panel is unloaded
