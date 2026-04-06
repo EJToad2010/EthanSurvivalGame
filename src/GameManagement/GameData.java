@@ -81,6 +81,10 @@ public class GameData {
     return turnNum;
   }
 
+  public int getPlayerActionPoints(){
+    return playerActionPoints;
+  }
+
   public String[] getAdjectives(){
     return adjectives;
   }

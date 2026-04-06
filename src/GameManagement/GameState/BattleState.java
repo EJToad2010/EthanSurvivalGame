@@ -48,6 +48,7 @@ public class BattleState extends GameState{
       super(g, dayManager);
       playerTeam = g.getGameData().getPlayerTeamObj();
       enemyTeam = g.getGameData().getEnemyTeamObj();
+      playerActionPoints = g.getGameData().getPlayerActionPoints();
   }
 
   // Handle tick when applicable
@@ -72,17 +73,35 @@ public class BattleState extends GameState{
 
   // Logic used for each step
   protected void handleStep(int step, int keyCode){
-    runDialog(keyCode, false);
+    int exitCode = runDialog(keyCode, false);
+    if(exitCode == 0){
+      // Dialog ended
+      if(step == INTRO_ANIM){
+        System.out.println("Dialog ended INTRO_ANIM");
+        // After INTRO_ANIM, trigger the event that starts either the enemy or player's turn
+        if(turnOwner.equals("Player")){
+          System.out.println("Dialog ended INTRO_ANIM Player path");
+          initializePlayerTurn();
+          setStep(SELECT_CHARACTER);
+        } else{
+          initializeEnemyTurn();
+          setStep(ENEMY_TURN);
+        }
+      }
+    }
   }
 
   // Graphics drawn for each step
   protected void drawStep(int step, Graphics graphics){
-      if(step == INTRO_ANIM){
-        drawScene(scene, graphics);
-      } else{
-        enemyTeam.drawEnemyTeam(graphics, 680, 100, 500);
-        playerTeam.drawPlayerTeam(graphics, 100, 100, 500);
-      }
+    if(dialogManager.getIsActive()){
+      dialogManager.draw(graphics);
+    }
+    if(step == INTRO_ANIM){
+      drawScene(scene, graphics);
+    } else{
+      enemyTeam.drawEnemyTeam(graphics, 680, 100, 500);
+      playerTeam.drawPlayerTeam(graphics, 100, 100, 500);
+    }
   }
 
   // Call in drawStep if a panel wants to make use of animations
@@ -132,7 +151,6 @@ public class BattleState extends GameState{
       turnNum = 1;
       turnHalf = 0;
       initializeEnemy();
-      decideTurnPriority();
       resetScene();
       currentStep = INTRO_ANIM;
       panel.repaint();
@@ -144,11 +162,28 @@ public class BattleState extends GameState{
 
   // Based on the combined speed of the player's team and the enemy's team, decide who will go first
   private void decideTurnPriority(){
+    dialogManager.clear();
     if(playerTeam.getTotalSpeed() >= enemyTeam.getTotalSpeed()){
       dialogManager.add("The player's team has the higher combined speed and will go first!");
+      turnOwner = "Player";
     } else{
       dialogManager.add("The enemy's team has the higher combined speed and will go first!");
+      turnOwner = "Enemy";
     }
+  }
+
+  // Reset the Player's action points and announce that the Player's turn has been reached
+  private void initializePlayerTurn(){
+    actionPointsLeft = playerActionPoints;
+    dialogManager.clear();
+    dialogManager.add("It is your turn!");
+    dialogManager.add("You may perform " + actionPointsLeft + " actions during your turn.");
+  }
+
+  // Reset the Enemy's action points and announce that the Enemy's turn has been reached
+  private void initializeEnemyTurn(){
+    dialogManager.clear();
+    dialogManager.add("It is the enemy's turn!");
   }
 
   // Create a new set of EnemyCharacters equal to enemyBattleCapacity
