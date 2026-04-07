@@ -1,4 +1,4 @@
-package src;
+
 import java.io.IOException;
 
 import src.GameManagement.GameManager;

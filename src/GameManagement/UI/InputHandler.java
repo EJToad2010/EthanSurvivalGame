@@ -44,7 +44,7 @@ public class InputHandler {
     // Use the arrow keys to navigate between options,
     // press ENTER to send an option
     public int keyPressed(int keyCode){
-        if(keyCode == KeyEvent.VK_LEFT){
+        if(keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_A){
             selectedIndex--;
             if(selectedIndex < 0){
                 selectedIndex = buttons.size() - 1;
@@ -56,7 +56,7 @@ public class InputHandler {
                 }
             }
         }
-        if(keyCode == KeyEvent.VK_RIGHT){
+        if(keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_D){
             selectedIndex++;
             if(selectedIndex >= buttons.size()){
                 selectedIndex = 0;
