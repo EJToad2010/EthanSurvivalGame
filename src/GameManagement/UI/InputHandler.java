@@ -74,16 +74,16 @@ public class InputHandler {
         return -1;
     }
 
-    public void draw(Graphics g, int fontSize){
+    public void draw(Graphics g){
         for(int i = 0; i < buttons.size(); i++){
-            buttons.get(i).draw(g, i==selectedIndex, fontSize);
+            buttons.get(i).draw(g, i==selectedIndex);
         }
     }
 
     // Space all buttons evenly on the same vertical axis.
     // Calculated by obtaining the bounds of all buttons
     public void spaceButtons(Graphics g, int fontSize, int width, int y){
-        if(buttons.size() <= 1){
+        if(buttons.size() < 1){
             return;
         }
         // Obtain total width of all buttons
@@ -98,6 +98,7 @@ public class InputHandler {
         int startX = (1280 - totalWidth) / 2;
         for(Button button : buttons){
             button.setPosition(startX, y);
+            button.setTextSize(fontSize);
             startX += button.getBounds(g, fontSize)[0] + spacing;
         }
     }

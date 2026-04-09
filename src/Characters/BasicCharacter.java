@@ -26,6 +26,7 @@ public class BasicCharacter {
   private String passiveAbilityDescription = "";
   private Image characterImage;
   private Image deadImage = ImageManager.loadImage("src/Images/dead.png");
+  private boolean isSelected = false;
   // Location on screen
   private int x = 0;
   private int y = 0;
@@ -336,6 +337,10 @@ public class BasicCharacter {
   public void setLostSpacing(int lostSpacing){
     this.lostSpacing = lostSpacing;
   }
+
+  public void setIsSelected(boolean isSelected){
+    this.isSelected = isSelected;
+  }
   
   // Decrease each special attack's cooldown timer by one whenever a new turn happens
   public void decreaseSpecialAbilityCooldowns(){
@@ -384,6 +389,15 @@ public class BasicCharacter {
   // Allow subclasses to seamlessly use ActionResult without adding a getter method first
   protected void addActionResult(String message, String signal){
     actionResult.add(message, signal);
+  }
+  
+  // Convert an ArrayList<String> of a Character to a String[] to be used in other class methods
+  public String[] convertArrToList(ArrayList<String> charArr){
+    String[] output = new String[charArr.size()];
+    for(int i = 0; i < charArr.size(); i++){
+      output[i] = charArr.get(i);
+    }
+    return output;
   }
   
   // Specialized methods to interact with battle
@@ -484,6 +498,10 @@ public class BasicCharacter {
 
   // Draw the given Character sprite at top left corner (x, y)
   public void drawCharacter(Graphics graphics){
+    if(isSelected){
+      graphics.setColor(Color.YELLOW);
+      graphics.fillRect(x, y, width, height);
+    }
     if(getIsDead()){
       graphics.drawImage(deadImage, x, y, null);
     } else{

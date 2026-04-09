@@ -184,7 +184,7 @@ public class CharacterSelectState extends GameState{
             UIManager.drawCenteredStringInBox(graphics, "Select a Character class.", 0, 650, 1280, 100);
             // Draw inputHandler buttons
             inputHandler.spaceButtons(graphics, 40, 800, 450);
-            inputHandler.draw(graphics, 40);
+            inputHandler.draw(graphics);
             // Draw each corresponding Character class above buttons
             int[] buttonsX = inputHandler.getButtonsX();
             int[] buttonsY = inputHandler.getButtonsY();
@@ -199,7 +199,7 @@ public class CharacterSelectState extends GameState{
             UIManager.drawCenteredStringInBox(graphics, "Are you sure you want to select " + selectedClass + "?", 0, 650, 1280, 100);
             // Draw inputHandler buttons
             inputHandler.spaceButtons(graphics, 40, 800, 575);
-            inputHandler.draw(graphics, 40);
+            inputHandler.draw(graphics);
             // Draw a box containing relevant info for the Character class
             graphics.setColor(new Color(60, 60, 60));
             graphics.fillRect(390, 140, 720, 420);

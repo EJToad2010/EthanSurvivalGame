@@ -44,6 +44,9 @@ public class BattleState extends GameState{
   private PlayerTeam playerTeam;
   private EnemyTeam enemyTeam;
 
+  // Variables used to track UI
+  private int buttonFontSize = 40;
+
   public BattleState(Game g, DayManager dayManager){
       super(g, dayManager);
       playerTeam = g.getGameData().getPlayerTeamObj();
@@ -98,6 +101,13 @@ public class BattleState extends GameState{
       if(step == SELECT_CHARACTER){
         selectedCharacter = playerTeam.getPlayerTeam().get(input);
         nextStep();
+      } else if(step == SELECT_ACTION){
+        selectedActionType = inputHandler.getButtons().get(input).getText();
+        if(selectedActionType.equals("Basic ability") || selectedActionType.equals("Special ability")){
+          nextStep();
+        } else{
+          System.out.println("THIS FEATURE ISN'T OUT YET");
+        }
       }
     }
   }
@@ -111,9 +121,35 @@ public class BattleState extends GameState{
       enemyTeam.drawEnemyTeam(graphics, 680, 100, 500);
       playerTeam.drawPlayerTeam(graphics, 100, 100, 500);
     }
-    if(step == SELECT_CHARACTER){
-      inputHandler.spaceButtons(graphics, 40, 900, 500);
-      inputHandler.draw(graphics, 40);
+    if(step == SELECT_CHARACTER && !dialogManager.getIsActive()){
+      dialogManager.drawDialogBox(graphics);
+      inputHandler.spaceButtons(graphics, buttonFontSize, 900, 550);
+      // Prompt the user to select a Character from their team
+        UIManager.setTextColor(graphics, Color.WHITE);
+        UIManager.setFontSize(40);
+        UIManager.refreshText(graphics);
+        UIManager.drawCenteredStringInBox(graphics, "Select a Character to use.", 0, 650, 1280, 100);
+    }
+    if(step == SELECT_ACTION){
+      dialogManager.drawDialogBox(graphics);
+      inputHandler.spaceButtons(graphics, buttonFontSize, 1100, 550);
+      // Prompt the user to select an action for their Character
+      UIManager.setTextColor(graphics, Color.WHITE);
+      UIManager.setFontSize(40);
+      UIManager.refreshText(graphics);
+      UIManager.drawCenteredStringInBox(graphics, "Select an action to perform.", 0, 650, 1280, 100);
+    }
+    if(step == SELECT_ABILITY){
+      dialogManager.drawDialogBox(graphics);
+      inputHandler.spaceButtons(graphics, buttonFontSize, 1100, 550);
+      // Prompt the user to select an action for their Character
+      UIManager.setTextColor(graphics, Color.WHITE);
+      UIManager.setFontSize(40);
+      UIManager.refreshText(graphics);
+      UIManager.drawCenteredStringInBox(graphics, "Select an ability to perform.", 0, 650, 1280, 100);
+    }
+    if(inputHandler.getButtons().size() > 0 && !dialogManager.getIsActive()){
+      inputHandler.draw(graphics);
     }
   }
 
@@ -151,15 +187,27 @@ public class BattleState extends GameState{
   // Calls once when a new step is first loaded
   protected void onEnterStep(int step){
     if(step == SELECT_CHARACTER){
+      buttonFontSize = 30;
       inputHandler = createCharacterOptions(playerTeam.getPlayerTeam(), new ArrayList<BasicCharacter>());
     } else if(step == SELECT_ACTION){
-      
+      buttonFontSize = 25;
+      inputHandler = createOptions(new String[]{"Basic ability", "Special ability", "Use item", "Defend", "HELP"});
+    } else if(step == SELECT_ABILITY){
+      buttonFontSize = 25;
+      if(selectedActionType.equals("Basic ability")){
+        inputHandler = createOptions(playerTeam.getUnlockedBasicAbilityNames(selectedCharacter));
+      } else{
+        inputHandler = createOptions(playerTeam.getUnlockedBasicAbilityNames(selectedCharacter));
+      }
     }
   }
   // Calls once when the previous step exits
   protected void onExitStep(int step){
     // Between steps, check if a victory condition has been reached
     // Exit the battle if so
+    if(step == SELECT_CHARACTER){
+      playerTeam.setSelectedCharacter(selectedCharacter);
+    }
   }
 
   // Calls once when a new frame is first loaded

@@ -22,6 +22,9 @@ public class PlayerTeam {
   
   // How many coins the player's team currently has
   private int coinBalance = 0;
+
+  // The index of the Character that is currently selected
+  private PlayerCharacter selectedCharacter = null;
   
   // Constructor that takes in an exisiting ArrayList and modifies its components into a player
   public PlayerTeam(ArrayList<PlayerCharacter> playerTeam, Inventory playerInventory){
@@ -30,11 +33,13 @@ public class PlayerTeam {
       convertAllToPlayer();
     }
     this.playerInventory = playerInventory;
+    resetSelectedCharacter();
   }
   
   // Constructor that creates an empty team
   public PlayerTeam(){
     this(new ArrayList<PlayerCharacter>(), new Inventory());
+    resetSelectedCharacter();
   }
   
   // Add a player
@@ -154,7 +159,7 @@ public class PlayerTeam {
   public String getBasicAbilityNamesNumFormat(PlayerCharacter p, boolean includeLockedAbilities){
     int limit;
     if(includeLockedAbilities){
-      limit = p.getSpecialAbilityNames().size();
+      limit = p.getBasicAbilityNames().size();
     } else{
       limit = p.getHighestIndexBasic() + 1;
     }
@@ -162,6 +167,26 @@ public class PlayerTeam {
     for(int i = 1; i <= limit; i++){
       output += i + ": " + p.getBasicAbilityNames().get(i-1);
       output += "\n";
+    }
+    return output;
+  }
+
+  // Return a String[] of a PlayerCharacter's available basic abilities
+  public String[] getUnlockedBasicAbilityNames(PlayerCharacter p){
+    int limit = p.getHighestIndexBasic() + 1;
+    String[] output = new String[limit];
+    for(int i = 0; i < limit; i++){
+      output[i] = p.getBasicAbilityNames().get(i);
+    }
+    return output;
+  }
+
+  // Return a String[] of a PlayerCharacter's available special abilities
+  public String[] getUnlockedSpecialAbilityNames(PlayerCharacter p){
+    int limit = p.getHighestIndexSpecial() + 1;
+    String[] output = new String[limit];
+    for(int i = 0; i < limit; i++){
+      output[i] = p.getSpecialAbilityNames().get(i);
     }
     return output;
   }
@@ -254,6 +279,22 @@ public class PlayerTeam {
       }
     }
     return alive;
+  }
+
+  // Set the selected character to null
+  public void resetSelectedCharacter(){
+    if(!(selectedCharacter == null)){
+      selectedCharacter.setIsSelected(false);
+    }
+    selectedCharacter = null;
+  }
+
+  public void setSelectedCharacter(PlayerCharacter selectedCharacter){
+    if(!(selectedCharacter == null)){
+      selectedCharacter.setIsSelected(false);
+    }
+    this.selectedCharacter = selectedCharacter;
+    this.selectedCharacter.setIsSelected(true);
   }
   
   // To String method prints all character objects the user controls

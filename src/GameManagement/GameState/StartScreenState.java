@@ -34,7 +34,7 @@ public class StartScreenState extends GameState{
 
     protected void drawStep(int step, Graphics graphics){
         inputHandler.spaceButtons(graphics, 50, 800, 400);
-        inputHandler.draw(graphics, 50);
+        inputHandler.draw(graphics);
         graphics.drawImage(castle, (1280 - castle.getWidth(null))/2 - 40, 100, null);
         if(step == -1){
             UIManager.setTextColor(graphics, Color.GRAY);

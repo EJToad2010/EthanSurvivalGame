@@ -7,6 +7,7 @@ import src.GameManagement.UI.UIManager;
 public class Button {
     // Attributes
     private String text;
+    private int textSize = 32;
     private int x;
     private int y;
     private int id;
@@ -41,6 +42,10 @@ public class Button {
         return y;
     }
 
+    public String getText(){
+        return text;
+    }
+
     public int getHorizontalGap(){
         return HORIZONTAL_GAP;
     }
@@ -53,15 +58,19 @@ public class Button {
         return isSelectable;
     }
 
+    public void setTextSize(int textSize){
+        this.textSize = textSize;
+    }
+
     public void setPosition(int x, int y){
         this.x = x;
         this.y = y;
     }
 
     // If selected, button has a yellow background instead of white
-    public void draw(Graphics graphics, boolean selected, int fontSize){
+    public void draw(Graphics graphics, boolean selected){
         // Get FontMetrics
-        UIManager.setFontSize(fontSize);
+        UIManager.setFontSize(textSize);
         UIManager.refreshText(graphics);
         FontMetrics fontMetrics = graphics.getFontMetrics(UIManager.getFont());
         // Draw the box around the button
@@ -75,13 +84,14 @@ public class Button {
             bgColor = Color.GRAY;
         }
         graphics.setColor(bgColor);
-        int[] cornerCoords = getCornerCoords(graphics, fontSize);
-        graphics.fillRoundRect(cornerCoords[0], cornerCoords[1], cornerCoords[2], cornerCoords[3], fontSize, fontSize);
+        int[] cornerCoords = getCornerCoords(graphics, textSize);
+        graphics.fillRoundRect(cornerCoords[0], cornerCoords[1], cornerCoords[2], cornerCoords[3], textSize, textSize);
 
         // Draw the text
         UIManager.setTextColor(graphics, Color.BLACK);
+        UIManager.setFontSize(textSize);
         UIManager.refreshText(graphics);
-        int[] bounds = getBounds(graphics, fontSize);
+        int[] bounds = getBounds(graphics, textSize);
         UIManager.drawCenteredStringInBox(graphics, text, x, y+fontMetrics.getAscent(), bounds[0], bounds[1]);
     }
 
