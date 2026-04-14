@@ -32,6 +32,12 @@ public class DialogManager {
         return dialogSequence.getSignal(dialogIndex);
     }
 
+    // Return the amount of the current dialogIndex
+    // Return 0 if none found
+    public Double getAmount(){
+        return dialogSequence.getAmount(dialogIndex);
+    }
+
     // Manipulating elements
     public void add(String line){
         dialogSequence.add(line);
@@ -51,6 +57,7 @@ public class DialogManager {
         for(int i = 0; i < messages.size(); i++){
             dialogSequence.add(messages.get(i), signals.get(i));
         }
+        isActive = true;
     }
 
     public void clear(){
@@ -88,11 +95,9 @@ public class DialogManager {
         UIManager.refreshText(graphics);
         UIManager.drawCenteredStringInBox(graphics, dialogSequence.getMessage(dialogIndex), 0, 500, 1280, 220);
         // Display Press ENTER to continue
-        if(dialogIndex == 0){
-            UIManager.setTextColor(graphics, Color.GRAY);
-            UIManager.setFontSize(25);
-            UIManager.refreshText(graphics);
-            UIManager.drawCenteredStringInBox(graphics, "(Press ENTER to continue)", 0, 680, 1280, 20);
-        }
+        UIManager.setTextColor(graphics, Color.GRAY);
+        UIManager.setFontSize(25);
+        UIManager.refreshText(graphics);
+        UIManager.drawCenteredStringInBox(graphics, "(Press ENTER to continue)", 0, 680, 1280, 20);
     }
 }

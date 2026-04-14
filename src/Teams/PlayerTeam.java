@@ -174,20 +174,23 @@ public class PlayerTeam {
   // Return a String[] of a PlayerCharacter's available basic abilities
   public String[] getUnlockedBasicAbilityNames(PlayerCharacter p){
     int limit = p.getHighestIndexBasic() + 1;
-    String[] output = new String[limit];
+    String[] output = new String[limit+1];
     for(int i = 0; i < limit; i++){
       output[i] = p.getBasicAbilityNames().get(i);
     }
+    output[limit] = "Cancel";
     return output;
   }
 
   // Return a String[] of a PlayerCharacter's available special abilities
   public String[] getUnlockedSpecialAbilityNames(PlayerCharacter p){
     int limit = p.getHighestIndexSpecial() + 1;
-    String[] output = new String[limit];
+    String[] output = new String[limit+1];
     for(int i = 0; i < limit; i++){
       output[i] = p.getSpecialAbilityNames().get(i);
+      output[i] += " (CD " + p.getCurrentSpecialAbilityCooldowns().get(i) + ")";
     }
+    output[limit] = "Cancel";
     return output;
   }
   

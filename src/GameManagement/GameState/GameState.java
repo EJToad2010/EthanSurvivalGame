@@ -201,6 +201,8 @@ public class GameState {
             return -1;
         }
         if(isHandlingSignal){
+            isHandlingSignal = true;
+            handleSignal(dialogManager.getSignal());
             return -1;
         }
         dialogManager.nextLine();

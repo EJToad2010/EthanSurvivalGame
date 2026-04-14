@@ -83,23 +83,51 @@ public class InputHandler {
     // Space all buttons evenly on the same vertical axis.
     // Calculated by obtaining the bounds of all buttons
     public void spaceButtons(Graphics g, int fontSize, int width, int y){
-        if(buttons.size() < 1){
+        if(buttons.isEmpty()){
             return;
         }
+        String combinedButtonText = "";
+        for(Button button : buttons){
+            combinedButtonText += button.getText();
+        }
+
+        // Find ideal text size to fit width
+        // If entered text size > width, decrease text size until all buttons fit
+        int finalFontSize = fontSize;
+        while(true){
+            if(finalFontSize < 1){
+                break;
+            }
+            FontMetrics fm = g.getFontMetrics(UIManager.getFont(finalFontSize));
+            int candidateTextWidth = fm.stringWidth(combinedButtonText);
+            if(candidateTextWidth > width * 0.75){
+                finalFontSize--;
+            } else{
+                break;
+            }
+        }
+
         // Obtain total width of all buttons
         int totalButtonWidth = 0;
         for(Button button : buttons){
-            int[] bounds = button.getBounds(g, fontSize);
+            button.setTextSize(finalFontSize);
+            int[] bounds = button.getBounds(g, finalFontSize);
             totalButtonWidth += bounds[0];
         }
-        int spacing = (width - totalButtonWidth) / (buttons.size() - 1);
+        int spacing;
+        if(buttons.size() == 1){
+            spacing = 0;
+        }else{
+            spacing = (width - totalButtonWidth) / (buttons.size() - 1);
+        }
         int totalSpacing = spacing * (buttons.size() - 1);
         int totalWidth = totalButtonWidth + totalSpacing;
         int startX = (1280 - totalWidth) / 2;
+
         for(Button button : buttons){
             button.setPosition(startX, y);
-            button.setTextSize(fontSize);
-            startX += button.getBounds(g, fontSize)[0] + spacing;
+            button.setTextSize(finalFontSize);
+            startX += button.getBounds(g, finalFontSize)[0] + spacing;
         }
     }
 }
