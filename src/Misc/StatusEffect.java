@@ -19,7 +19,7 @@ public class StatusEffect {
   public StatusEffect(){}
   
   // Add a status effect for a specific character for the specified amount of turns
-  public static void addStatusEffect (BasicCharacter c, String type, int totalTurns) throws InterruptedException {
+  public static void addStatusEffect (BasicCharacter c, String type, int totalTurns){
     if(hasStatusEffect(c, type)){
       // Avoiding stacking multiple of the same status effect.
       // If this happens, only update the turns left to the new value
@@ -43,7 +43,6 @@ public class StatusEffect {
     }
     // Message to confirm addition of StatusEffect
     System.out.println(c.getName() + " has gained [" + type.toUpperCase() + "] for " + totalTurns + " turns!");
-    Thread.sleep(1000);
     if(indexOfType(type) == -1){
       // System.out.println("DEBUG: " + type + " was not found in effectTypes.");
       return;
@@ -122,7 +121,7 @@ public class StatusEffect {
   }
   
   // Runs once every turn
-  private static void applyPassiveEffect(BasicCharacter c, String type) throws InterruptedException{
+  private static void applyPassiveEffect(BasicCharacter c, String type){
     if(type.equals("Poison")){
       System.out.println(c.getName() + " lost 5 HP from poison!");
       c.changeCurrentHP(-5);
@@ -133,7 +132,6 @@ public class StatusEffect {
       System.out.println(c.getName() + " lost 5 HP from burning!");
       c.changeCurrentHP(-5);
     }
-    Thread.sleep(1000);
   }
   
   // Return a formatted list of all of a Character's status effects.
@@ -170,7 +168,7 @@ public class StatusEffect {
   }
   
   // Runs every time the turn switches from player to enemy and the other way around
-  public static void handleStatusTurn() throws InterruptedException{
+  public static void handleStatusTurn(){
     for(int i = 0; i < affectedCharacters.size(); i++){
       // This method is called twice per turn. Decrease by -0.5 to offset this difference.
       affectedTurnsLeft.set(i, affectedTurnsLeft.get(i) - 0.5);

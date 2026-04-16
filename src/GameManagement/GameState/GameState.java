@@ -24,6 +24,8 @@ public class GameState {
     protected DialogManager dialogManager = new DialogManager();
     // Store a boolean that catches if the dialog is throwing out a signal or not
     protected boolean isHandlingSignal = false;
+    // Each dialog message can only throw a signal once
+    protected boolean isOnSignalCooldown = false;
     // Store an InputHandler object that can be used by subclasses
     protected InputHandler inputHandler = new InputHandler();
 
@@ -57,6 +59,10 @@ public class GameState {
         return inputHandler;
     }
 
+    public boolean getIsHandlingSignal(){
+        return isHandlingSignal;
+    }
+
     // Both of these methods should call once per frame but they handle different tasks
     // Handles all logic of a panel
     public void update(){}
@@ -64,6 +70,9 @@ public class GameState {
     // Redirect to drawStep()
     public void draw(Graphics graphics){
         drawStep(currentStep, graphics);
+        if(isHandlingSignal){
+            drawSignal(dialogManager.getSignal(),graphics);
+        }
     }
 
     // Move to the next stpe
@@ -144,7 +153,10 @@ public class GameState {
     protected void drawStep(int step, Graphics graphics){}
     // Used when a GameState makes use of dialog that contains interaction
     // (Remember to set isHandlingSignal to FALSE when done handling)
-    protected void handleSignal(String signal){}
+    protected void handleSignal(String signal, double amount){}
+    // Graphical content of a GameState's signal
+    // (Remember to set isHandlingSignal to FALSE when done handling)
+    protected void drawSignal(String signal, Graphics graphics){}
     // Calls once when a new step is first loaded
     protected void onEnterStep(int step){}
     // Calls once when the previous step exits
@@ -189,6 +201,41 @@ public class GameState {
         }
     }
 
+    public void runDialogSignalChecks(){
+        if(!dialogManager.getIsActive()){
+            return;
+        }
+        if(isHandlingSignal){
+            handleSignal(dialogManager.getSignal(), dialogManager.getAmount());
+            return;
+        }
+        if(!dialogManager.getSignal().equals("") && !isHandlingSignal && !isOnSignalCooldown){
+            System.out.println("Handling signal " +dialogManager.getSignal());
+            isHandlingSignal = true;
+            handleSignal(dialogManager.getSignal(), dialogManager.getAmount());
+        }
+    }
+
+    public int runEmptyDialogCheck(){
+        if(!dialogManager.getIsActive()){
+            return -1;
+        }
+        if(isHandlingSignal){
+            return -1;
+        }
+        if(dialogManager.getMessage().equals("")){
+            System.out.println("Empty dialog skipped");
+            dialogManager.nextLine();
+            isOnSignalCooldown = false;
+        }
+        if(!dialogManager.getIsActive()){
+            System.out.println("Dialog concluded");
+            isHandlingSignal = false;
+            return 0;
+        }
+        return -1;
+    }
+
     // Automatically process every dialog line, moving on every time the user presses ENTER
     // If the end of the dialog is reached, moveOn dictates whether or not it should move to the next step
     // Return 0 if end was reached, -1 if not
@@ -197,20 +244,11 @@ public class GameState {
         if(!dialogManager.getIsActive()){
             return -1;
         }
-        if(!(keyCode == KeyEvent.VK_ENTER)){
-            return -1;
-        }
-        if(isHandlingSignal){
-            isHandlingSignal = true;
-            handleSignal(dialogManager.getSignal());
+        if(!(keyCode == KeyEvent.VK_ENTER) && !dialogManager.getMessage().equals("")){
             return -1;
         }
         dialogManager.nextLine();
-        if(!dialogManager.getSignal().equals("")){
-            System.out.println("Handling signal " +dialogManager.getSignal());
-            isHandlingSignal = true;
-            handleSignal(dialogManager.getSignal());
-        }
+        isOnSignalCooldown = false;
         if(dialogManager.getIsActive()){
             return -1;
         }
@@ -218,6 +256,8 @@ public class GameState {
         if(moveOn){
             nextStep();
         }
+        System.out.println("Dialog concluded");
+        isHandlingSignal = false;
         return 0;
     }
 

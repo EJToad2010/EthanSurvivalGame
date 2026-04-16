@@ -1,5 +1,4 @@
 package src.Characters.PlayerCharacters;
-import java.awt.Desktop.Action;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -7,6 +6,7 @@ import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
 import src.GameManagement.Mechanics.ActionResult;
+import src.GameManagement.Mechanics.Signals;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
@@ -40,55 +40,70 @@ public class Archer extends PlayerCharacter {
   }
   
   // Overrided battle methods
-  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     if(basicAbilityIndex == 0){
       // Softening Arrow
-      System.out.println(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
-      if((int)(Math.random() * 100) < 33 && wasEnemyHit){
+      //System.out.println(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
+      output.add(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
+      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      output.add(defenseResult);
+      if((int)(Math.random() * 100) < 33 && enemyHPChange > 0){
         StatusEffect.addStatusEffect(target, "Soft", 2);
       }
-      System.out.println(target.getSimpleOutput());
+      //System.out.println(target.getSimpleOutput());
     } else if(basicAbilityIndex == 1){
       // Double Shot
-      System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + (getAttackStrength() - 3) + " HP!");
-      handleEnemyDefense(target, getAttackStrength() - 3, playerTeam, enemyTeam);
-      System.out.println(target.getSimpleOutput());
+      //System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + (getAttackStrength() - 3) + " HP!");
+      output.add(getName() + " fired an arrow at " + target.getName() + " for " + (getAttackStrength() - 3) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()-3);
+      output.add(handleEnemyDefense(target, getAttackStrength() - 3, playerTeam, enemyTeam));
+      //System.out.println(target.getSimpleOutput());
     }
-    return getActionResult();
+    return output;
   }
   
   // Archer has two special attacks to choose from
-  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     if(specialAbilityIndex == 0){
       // Volley
-      System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
-      if((int)(Math.random() * 100) < 10 && wasEnemyHit){
+      //System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
+      output.add(getName() + " fired an arrow at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
+      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      output.add(defenseResult);
+      if((int)(Math.random() * 100) < 10 && enemyHPChange > 0){
         StatusEffect.addStatusEffect(target, "Burn", 1);
       }
     } else if(specialAbilityIndex == 1){
       // Crippling Arrow
       // 50% chance of receiving PIERCE status effect regardless of if they received any damage
-      System.out.println(getName() + " fired an armor piercing arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!");
-      handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam);
+      //System.out.println(getName() + " fired an armor piercing arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!");
+      output.add(getName() + " fired an armor piercing arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()+5);
+      output.add(handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam));
       if((int)(Math.random() * 100) < 50){
         StatusEffect.addStatusEffect(target, "Pierce", 2);
       }
     }
-    System.out.println(target.getSimpleOutput());
-    return getActionResult();
+    //System.out.println(target.getSimpleOutput());
+    return output;
   }
   
   // Defense function which is called when an enemy targets the Archer
-  public void defend(BasicCharacter target, double actualDamage){
+  public ActionResult defend(BasicCharacter target, double actualDamage){
+    ActionResult output = new ActionResult();
     if(actualDamage == 0){
-      System.out.println(getName() + " evaded " + target.getName() + "'s attack!");
+      //System.out.println(getName() + " evaded " + target.getName() + "'s attack!");
+      output.add(getName() + " evaded " + target.getName() + "'s attack!",Signals.DEFENSE_PERFORMED, 999.0);
     }else if(getIsDefending()){
-      System.out.println(getName() + " partially dodged " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
+      //System.out.println(getName() + " partially dodged " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
+      output.add(getName() + " partially dodged " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
     } else{
-      System.out.println(getName() + " lightly dodged " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
+      //System.out.println(getName() + " lightly dodged " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
+      output.add(getName() + " lightly dodged " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength());
     }
+    return output;
   }
 
   // A precision minigame that is not implemented yet

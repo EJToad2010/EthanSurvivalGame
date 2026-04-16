@@ -26,6 +26,20 @@ public class DialogManager {
         return isActive;
     }
 
+    public ActionResult getDialogSequence(){
+        return dialogSequence;
+    }
+
+    public int getDialogIndex(){
+        return dialogIndex;
+    }
+
+    // Return the message of the current dialogIndex
+    // Return blank if none found
+    public String getMessage(){
+        return dialogSequence.getMessage(dialogIndex);
+    }
+
     // Return the signal of the current dialogIndex
     // Return blank if none found
     public String getSignal(){
@@ -34,7 +48,7 @@ public class DialogManager {
 
     // Return the amount of the current dialogIndex
     // Return 0 if none found
-    public Double getAmount(){
+    public double getAmount(){
         return dialogSequence.getAmount(dialogIndex);
     }
 
@@ -52,10 +66,11 @@ public class DialogManager {
     // Since an ActionResult can contain multiple messages and signals, add each one
     // Messages and signals must have the same length to work
     public void add(ActionResult actionResult){
-        ArrayList<String> messages = actionResult.getMessages();
-        ArrayList<String> signals = actionResult.getSignals();
-        for(int i = 0; i < messages.size(); i++){
-            dialogSequence.add(messages.get(i), signals.get(i));
+        ArrayList<String> amessages = actionResult.getMessages();
+        ArrayList<String> asignals = actionResult.getSignals();
+        ArrayList<Double> aamounts = actionResult.getAmounts();
+        for(int i = 0; i < amessages.size(); i++){
+            dialogSequence.add(amessages.get(i), asignals.get(i), aamounts.get(i));
         }
         isActive = true;
     }

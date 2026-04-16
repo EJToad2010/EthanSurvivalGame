@@ -13,7 +13,9 @@ import src.GameManagement.Game;
 import src.GameManagement.GameData;
 import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.Mechanics.DayManager;
+import src.GameManagement.Mechanics.Signals;
 import src.GameManagement.UI.GamePanel;
+import src.GameManagement.UI.InputHandler;
 import src.GameManagement.UI.UIManager;
 import src.ItemManager.Items.HealthPool;
 import src.ItemManager.Items.HealthPotion;
@@ -31,8 +33,17 @@ public class BattleState extends GameState{
   private final int SELECT_TARGET = 4;
   private final int PERFORM_ABILITY = 5;
   private final int ENEMY_TURN = 6;
+  private final int ENEMY_PERFORM_ABILITY = 7;
+  private final int SELECT_ITEM = 8;
+  private final int SELECT_ITEM_TARGET = 9;
+  private final int SELECT_DEFENSE_TARGET = 10;
+  private final int HELP = 11;
+  private final int PLAYER_VICTORY = 12;
+  private final int ENEMY_VICTORY = 13;
+  private final int ENEMY_REWARDS = 14;
 
   // Variables stored between steps
+  // Use for reference only
   private PlayerCharacter selectedCharacter;
   private String selectedActionType;
   private int selectedAbilityIndex;
@@ -40,6 +51,7 @@ public class BattleState extends GameState{
   private int targetAmount;
   private ArrayList<EnemyCharacter> targets = new ArrayList<EnemyCharacter>();
   private int targetIndex;
+  private EnemyCharacter currentTarget;
 
   // Variables tracked during a battle
   private int turnNum;
@@ -49,8 +61,7 @@ public class BattleState extends GameState{
   private int actionPointsLeft;
   // The list of every enemy that can perform an action in enemyTeam
   private ArrayList<EnemyCharacter> actionableEnemies = new ArrayList<EnemyCharacter>();
-  // The enemy character that is currently performing their turn
-  private ArrayList<EnemyCharacter> currentActionEnemy;
+  private int actionableEnemyIndex;
   private PlayerTeam playerTeam;
   private EnemyTeam enemyTeam;
 
@@ -66,6 +77,12 @@ public class BattleState extends GameState{
 
   // Handle tick when applicable
   public void update(){
+    runDialogSignalChecks();
+    int exitCode = runEmptyDialogCheck();
+    if(exitCode == 0){
+      handleDialogEndedLogic(currentStep);
+    }
+    checkWinConditions();
     if(currentStep == INTRO_ANIM){
           nextTick();
           if(frame == 0){
@@ -87,31 +104,21 @@ public class BattleState extends GameState{
   // Logic used for each step
   protected void handleStep(int step, int keyCode){
     // Handle any misc logic that exists
-    if(step == SELECT_CHARACTER){
+    /*if(step == SELECT_CHARACTER){
       if(actionPointsLeft < 1){
         initializeEnemyTurn();
+        nextTurnHalf();
         setStep(ENEMY_TURN);
+        return;
       }
-    } else if(step == ENEMY_TURN){
-      if(actionableEnemies.isEmpty()){
-        initializePlayerTurn();
-        setStep(SELECT_CHARACTER);
-      }
-    }
+    }*/
 
     // Handle any dialog that exists
     int exitCode = runDialog(keyCode, false);
-    // Dialog ended
-    if(step == INTRO_ANIM){
-      // After INTRO_ANIM, trigger the event that starts either the enemy or player's turn
-      if(turnOwner.equals("Player")){
-        initializePlayerTurn();
-        setStep(SELECT_CHARACTER);
-      } else{
-        initializeEnemyTurn();
-        setStep(ENEMY_TURN);
-      }
+    if(exitCode == -1 && dialogManager.getIsActive()){
+      return;
     }
+    handleDialogEndedLogic(step);
 
     // Handle any inputHandler actions that exist
     if(inputHandler.getButtons().size() > 0 && !dialogManager.getIsActive() && exitCode == -1){
@@ -121,6 +128,7 @@ public class BattleState extends GameState{
       }
       if(step == SELECT_CHARACTER){
         selectedCharacter = playerTeam.getPlayerTeam().get(input);
+        playerTeam.setSelectedCharacterIndex(input);
         nextStep();
       } else if(step == SELECT_ACTION){
         selectedActionType = inputHandler.getButtons().get(input).getText();
@@ -142,12 +150,12 @@ public class BattleState extends GameState{
           } else{
             targetAmount = selectedCharacter.getSpecialAbilityEnemyCount(selectedAbilityIndex);
           }
-          targetIndex =0;
           nextStep();
         }
       } else if(step == SELECT_TARGET){
         targetIndex = input;
         targets.add(enemyTeam.getEnemyTeam().get(targetIndex));
+        currentTarget = enemyTeam.getEnemyTeam().get(targetIndex);
         setStep(PERFORM_ABILITY);
       } else if(step == PERFORM_ABILITY){
 
@@ -157,10 +165,82 @@ public class BattleState extends GameState{
     }
   }
 
+  private void handleDialogEndedLogic(int step){
+    // Dialog ended
+    if(step == INTRO_ANIM){
+      // After INTRO_ANIM, trigger the event that starts either the enemy or player's turn
+      if(turnOwner.equals("Player")){
+        initializePlayerTurn();
+        setStep(SELECT_CHARACTER);
+      } else{
+        initializeEnemyTurn();
+        setStep(ENEMY_TURN);
+      }
+    } else if(step == PERFORM_ABILITY){
+      if(targets.size() < targetAmount){
+        dialogManager.clear();
+        dialogManager.add("You may select " + (targetAmount-targets.size()) + " more targets.");
+        setStep(SELECT_TARGET);
+        System.out.println("Next target");
+      } else if(actionPointsLeft > 1){
+        actionPointsLeft--;
+        playerTeam.resetSelectedCharacterIndex();
+        dialogManager.clear();
+        dialogManager.add("You have " + actionPointsLeft + " actions left this turn.");
+        System.out.println("Next action");
+        setStep(SELECT_CHARACTER);
+      } else{
+        System.out.println("Player turn over");
+        nextTurnHalf();
+        initializeEnemyTurn();
+        setStep(ENEMY_TURN);
+      }
+    } else if(step == ENEMY_TURN){
+      setStep(ENEMY_PERFORM_ABILITY);
+    } else if(step == ENEMY_PERFORM_ABILITY){
+      actionableEnemyIndex++;
+      if(actionableEnemyIndex == -1 || actionableEnemyIndex >= actionableEnemies.size()){
+        System.out.println("Enemy turn over");
+        initializePlayerTurn();
+        nextTurnHalf();
+        setStep(SELECT_CHARACTER);
+      }else{
+        setStep(ENEMY_TURN);
+      }
+    } else if(step == PLAYER_VICTORY){
+      setStep(ENEMY_REWARDS);
+    }
+  }
+
   // Used when a GameState makes use of dialog that contains interaction
   // (Remember to set isHandlingSignal to FALSE when done handling)
-  protected void handleSignal(String signal){
-    isHandlingSignal = false;
+  protected void handleSignal(String signal, double amount){
+    System.out.println(signal+ " " + calculateCurrentTurnOwner());
+    // Signals that take one tick to perform
+    if((calculateCurrentTurnOwner().equals("Player") && signal.equals(Signals.HEALTH_GAINED))||(calculateCurrentTurnOwner().equals("Enemy") && signal.equals(Signals.TARGET_HEALTH_GAINED))){
+      System.out.println("Player health gained");
+      playerTeam.getSelectedCharacter().changeCurrentHP(amount);
+      isHandlingSignal = false;
+    } else if((calculateCurrentTurnOwner().equals("Player") && signal.equals(Signals.HEALTH_LOST))||(calculateCurrentTurnOwner().equals("Enemy") && signal.equals(Signals.TARGET_HEALTH_LOST))){
+      System.out.println("Player health lost");
+      playerTeam.getSelectedCharacter().changeCurrentHP(-amount);
+      isHandlingSignal = false;
+    } else if((calculateCurrentTurnOwner().equals("Player") && signal.equals(Signals.TARGET_HEALTH_GAINED))||(calculateCurrentTurnOwner().equals("Enemy") && signal.equals(Signals.HEALTH_GAINED))){
+      System.out.println("Target health gained");
+      currentTarget.changeCurrentHP(amount);
+      isHandlingSignal = false;
+    } else if((calculateCurrentTurnOwner().equals("Player") && signal.equals(Signals.TARGET_HEALTH_LOST))||(calculateCurrentTurnOwner().equals("Enemy") && signal.equals(Signals.HEALTH_LOST))){
+      System.out.println("Target health lost");
+      currentTarget.changeCurrentHP(-amount);
+      isHandlingSignal = false;
+    } else{
+      System.out.println("No valid signal handler found.");
+      isHandlingSignal = false;
+    }
+    if(!isHandlingSignal){
+      System.out.println("Signal concluded");
+      isOnSignalCooldown = true;
+    }
   }
 
   // Graphics drawn for each step
@@ -208,7 +288,8 @@ public class BattleState extends GameState{
       UIManager.setTextColor(graphics, Color.GRAY);
       UIManager.setFontSize(20);
       UIManager.refreshText(graphics);
-      UIManager.drawCenteredStringInBox(graphics, "(" + (targets.size() - targetAmount) + ") targets left", 0, 680, 1280, 40);
+      UIManager.drawCenteredStringInBox(graphics, "(" + (targetAmount - targets.size()) + " targets left)", 0, 700, 1280, 20);
+    } else if(step == PERFORM_ABILITY){
     }
     dialogManager.draw(graphics);
     if(inputHandler.getButtons().size() > 0 && !dialogManager.getIsActive()){
@@ -249,6 +330,7 @@ public class BattleState extends GameState{
 
   // Calls once when a new step is first loaded
   protected void onEnterStep(int step){
+    System.out.println("Enter step " + step);
     if(step == SELECT_CHARACTER){
       inputHandler = createCharacterOptions(playerTeam.getPlayerTeam(), new ArrayList<BasicCharacter>());
     } else if(step == SELECT_ACTION){
@@ -262,33 +344,41 @@ public class BattleState extends GameState{
     } else if(step == SELECT_TARGET){
       refreshAvailableTargets();
     } else if(step == PERFORM_ABILITY){
+      inputHandler = new InputHandler();
       // Get the ActionResult of the Character's ability function
-      dialogManager.clear();
       ActionResult output;
-      if(selectedActionType.equals("Basic abiltiy")){
-        try{
-          output = selectedCharacter.basicAbility(selectedAbilityIndex, targets.get(targetAmount), playerTeam, enemyTeam);
-        } catch(Exception e){
-          output = new ActionResult();
-        }
+      dialogManager.clear();
+      if(selectedActionType.equals("Basic ability")){
+        output = selectedCharacter.basicAbility(selectedAbilityIndex, currentTarget, playerTeam, enemyTeam);
       } else{
-        try{
-          output = selectedCharacter.specialAbility(selectedAbilityIndex, targets.get(targetAmount), playerTeam, enemyTeam);
-        } catch(Exception e){
-          output = new ActionResult();
-        }
+        output = selectedCharacter.specialAbility(selectedAbilityIndex, currentTarget, playerTeam, enemyTeam);
       }
       dialogManager.add(output);
+    } else if(step== ENEMY_PERFORM_ABILITY){
+      inputHandler = new InputHandler();
+      // Get the ActionResult of the Enemy's ability function
+      ActionResult output;
+      dialogManager.clear();
+      output = actionableEnemies.get(actionableEnemyIndex).takeTurn(playerTeam, enemyTeam);
+      dialogManager.add(output);
+    } else if(step == PLAYER_VICTORY){
+      dialogManager.clear();
+      dialogManager.add("Congratulations! All enemies have been defeated.");
+    } else if(step == ENEMY_VICTORY){
+      dialogManager.clear();
+      dialogManager.add("Oh no! All your characters have died.");
     }
   }
   // Calls once when the previous step exits
   protected void onExitStep(int step){
+    System.out.println("Exit step " + step);
     // Between steps, check if a victory condition has been reached
     // Exit the battle if so
     if(step == SELECT_CHARACTER){
-      playerTeam.setSelectedCharacter(selectedCharacter);
+      
     } else if(step == SELECT_ABILITY){
       targets.clear();
+    } else if(step == ENEMY_PERFORM_ABILITY){
     }
   }
 
@@ -324,7 +414,6 @@ public class BattleState extends GameState{
 
   // Based on the combined speed of the player's team and the enemy's team, decide who will go first
   private void decideTurnPriority(){
-    dialogManager.clear();
     if(playerTeam.getTotalSpeed() >= enemyTeam.getTotalSpeed()){
       dialogManager.add("The player's team has the higher combined speed and will go first!");
       turnOwner = "Player";
@@ -337,20 +426,81 @@ public class BattleState extends GameState{
   // Reset the Player's action points and announce that the Player's turn has been reached
   private void initializePlayerTurn(){
     actionPointsLeft = playerActionPoints;
-    dialogManager.clear();
     dialogManager.add("It is your turn!");
     dialogManager.add("You may perform " + actionPointsLeft + " actions during your turn.");
   }
 
   // Find every Enemy able to perform an action and announce that the Enemy's turn has been reached
   private void initializeEnemyTurn(){
-    dialogManager.clear();
     dialogManager.add("It is the enemy's turn!");
     actionableEnemies.clear();
     for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
       if(!e.getIsDead() && !StatusEffect.hasStatusEffect(e, "Stun")){
         actionableEnemies.add(e);
       }
+    }
+    if(actionableEnemies.isEmpty()){
+      actionableEnemyIndex = -1;
+    } else{
+      actionableEnemyIndex = 0;
+    }
+  }
+
+  // Increment turn half
+  // If turnOwner returned to original, increment turnNum
+  private void nextTurnHalf(){
+    turnHalf++;
+    if(turnHalf > 1){
+      turnHalf = 0;
+      turnNum++;
+    }
+  }
+
+  // Calculate who's turn it currently is based on turnHalf and turnOwner
+  private String calculateCurrentTurnOwner(){
+    if(turnOwner.equals("Player")){
+      if(turnHalf == 0){
+        return "Player";
+      } else{
+        return "Enemy";
+      }
+    } else{
+      if(turnHalf == 0){
+        return "Enemy";
+      } else{
+        return "Player";
+      }
+    }
+  }
+
+  // Check for win/lose conditions during battle
+  // If either all of the player all of the enemy's characters die
+  private boolean hasPlayerWon(){
+    for(EnemyCharacter c : enemyTeam.getEnemyTeam()){
+      if(!c.getIsDead()){
+        return false;
+      }
+    }
+    return true;
+  }
+  private boolean hasEnemyWon(){
+    for(PlayerCharacter c : playerTeam.getPlayerTeam()){
+      if(!c.getIsDead()){
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Use conditional methods to automatically redirect the battle to the victory step
+  private void checkWinConditions(){
+    if(currentStep == PLAYER_VICTORY || currentStep == ENEMY_VICTORY || currentStep == ENEMY_REWARDS){
+      return;
+    }
+    if(hasPlayerWon()){
+      setStep(PLAYER_VICTORY);
+    } else if(hasEnemyWon()){
+      setStep(ENEMY_VICTORY);
     }
   }
 

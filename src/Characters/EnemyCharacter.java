@@ -2,6 +2,7 @@ package src.Characters;
 import java.util.ArrayList;
 
 import src.GameManagement.Game;
+import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.UI.DialogManager;
 import src.ItemManager.Inventory;
 import src.ItemManager.Items.HealthPool;
@@ -88,7 +89,8 @@ public class EnemyCharacter extends BasicCharacter{
   }
   
   // Main function helping one enemy decide what action to perform in one turn
-  public void takeTurn(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult takeTurn(PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     hasTakenTurn = false;
     // Prioritize using an item
     itemAI(playerTeam, enemyTeam);
@@ -104,15 +106,16 @@ public class EnemyCharacter extends BasicCharacter{
     // Use different behavior patterns for an enemy's defense and basic abilities
     if(!hasTakenTurn){
       if(behaviorType.equals("AGGRESSIVE")){
-        aggressive(playerTeam, enemyTeam);
+        output.add(aggressive(playerTeam, enemyTeam));
       } else if(behaviorType.equals("DEFENSIVE")){
-        defensive(playerTeam, enemyTeam);
+        output.add(defensive(playerTeam, enemyTeam));
       } else if(behaviorType.equals("RANDOM")){
-        random(playerTeam, enemyTeam);
+        output.add(random(playerTeam, enemyTeam));
       } else{
         System.out.println("Invalid behavior type.");
       }
     }
+    return output;
   }
   
   // Check the EnemyCharacter's shared inventory for situational items
@@ -140,11 +143,11 @@ public class EnemyCharacter extends BasicCharacter{
   }
   
   // Intended to be overridden by subclasses since each class has unique basic / special abilities
-  public void basicAbilityAI(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{}
+  public ActionResult basicAbilityAI(PlayerTeam playerTeam, EnemyTeam enemyTeam){return null;}
   // Perform decision-making, provided a target is clearly defined
-  public void basicAbilityAI(BasicCharacter preferredCharacter, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{}
+  public ActionResult basicAbilityAI(BasicCharacter preferredCharacter, PlayerTeam playerTeam, EnemyTeam enemyTeam) {return null;}
   // Perform decision-making on special abilities
-  public void specialAbilityAI(ArrayList<Integer> availableSpecialAbilityIndices, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{}
+  public ActionResult specialAbilityAI(ArrayList<Integer> availableSpecialAbilityIndices, PlayerTeam playerTeam, EnemyTeam enemyTeam) {return null;}
   
   // Helper class that returns an ArrayList of special abilities that can be used in the current turn (cooldown of 0)
   private ArrayList<Integer> getAvailableSpecialAbilityIndices(){
@@ -159,7 +162,7 @@ public class EnemyCharacter extends BasicCharacter{
   
   // Prioritizes killing weaker units.
   // Uses maximal aggression and no defense
-  private void aggressive(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException {
+  private ActionResult aggressive(PlayerTeam playerTeam, EnemyTeam enemyTeam)  {
     // Fetch alive Characters from playerTeam
     ArrayList<PlayerCharacter> aliveCharacters = playerTeam.getAliveCharacters();
     // Attack the member of playerTeam with the lowest health
@@ -171,30 +174,32 @@ public class EnemyCharacter extends BasicCharacter{
         lowestHealth = pc.getCurrentHP();
       }
     }
-    basicAbilityAI(lowestPlayer, playerTeam, enemyTeam);
+    return basicAbilityAI(lowestPlayer, playerTeam, enemyTeam);
   }
   
   // Prioritize staying alive and safe over offensive abilities
-  private void defensive(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  private ActionResult defensive(PlayerTeam playerTeam, EnemyTeam enemyTeam) {
     // Focus on staying defended / healing
     if((int)(Math.random() * 100) < 20){
       // Attack a random player
-      basicAbilityAI(playerTeam, enemyTeam);
+      return basicAbilityAI(playerTeam, enemyTeam);
     } else{
       if((int)(Math.random() * 100) < 60){
         setIsDefending(true);
+        return new ActionResult();
       } else{
-        basicAbilityAI(playerTeam, enemyTeam);
+        return basicAbilityAI(playerTeam, enemyTeam);
       }
     }
   }
   
   // Randomly attack or defend with no "smart" decision-making
-  private void random(PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  private ActionResult random(PlayerTeam playerTeam, EnemyTeam enemyTeam) {
     if((int)(Math.random() * 100) < 60){
-      basicAbilityAI(playerTeam, enemyTeam);
+      return basicAbilityAI(playerTeam, enemyTeam);
     } else{
       setIsDefending(true);
+      return new ActionResult();
     }
   }
 }

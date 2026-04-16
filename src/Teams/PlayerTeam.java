@@ -24,7 +24,7 @@ public class PlayerTeam {
   private int coinBalance = 0;
 
   // The index of the Character that is currently selected
-  private PlayerCharacter selectedCharacter = null;
+  private int selectedCharacterIndex = 0;
   
   // Constructor that takes in an exisiting ArrayList and modifies its components into a player
   public PlayerTeam(ArrayList<PlayerCharacter> playerTeam, Inventory playerInventory){
@@ -33,13 +33,13 @@ public class PlayerTeam {
       convertAllToPlayer();
     }
     this.playerInventory = playerInventory;
-    resetSelectedCharacter();
+    resetSelectedCharacterIndex();
   }
   
   // Constructor that creates an empty team
   public PlayerTeam(){
     this(new ArrayList<PlayerCharacter>(), new Inventory());
-    resetSelectedCharacter();
+    resetSelectedCharacterIndex();
   }
   
   // Add a player
@@ -284,20 +284,28 @@ public class PlayerTeam {
     return alive;
   }
 
-  // Set the selected character to null
-  public void resetSelectedCharacter(){
-    if(!(selectedCharacter == null)){
-      selectedCharacter.setIsSelected(false);
-    }
-    selectedCharacter = null;
+  public int getSelectedCharacterIndex(){
+    return selectedCharacterIndex;
   }
 
-  public void setSelectedCharacter(PlayerCharacter selectedCharacter){
-    if(!(selectedCharacter == null)){
-      selectedCharacter.setIsSelected(false);
+  public PlayerCharacter getSelectedCharacter(){
+    return playerTeam.get(selectedCharacterIndex);
+  }
+
+  // Set the selected character to null
+  public void resetSelectedCharacterIndex(){
+    if(selectedCharacterIndex < playerTeam.size() && selectedCharacterIndex != -1){
+      playerTeam.get(selectedCharacterIndex).setIsSelected(false);
     }
-    this.selectedCharacter = selectedCharacter;
-    this.selectedCharacter.setIsSelected(true);
+    selectedCharacterIndex = -1;
+  }
+
+  public void setSelectedCharacterIndex(int selectedCharacterIndex){
+    if(this.selectedCharacterIndex < playerTeam.size() && this.selectedCharacterIndex != -1){
+      playerTeam.get(this.selectedCharacterIndex).setIsSelected(false);
+    }
+    this.selectedCharacterIndex = selectedCharacterIndex;
+    playerTeam.get(this.selectedCharacterIndex).setIsSelected(true);
   }
   
   // To String method prints all character objects the user controls

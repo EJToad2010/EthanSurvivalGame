@@ -35,6 +35,9 @@ public class BasicCharacter {
   protected int height = 160;
   // The amount of space the Character loses when displayed on screen
   private int lostSpacing = 0;
+  // Integer value used to uniquely identify a Character
+  // (Used within signals)
+  private int id;
 
   // Names and descriptions that allow for a Character to have multiple basic abilities
   private ArrayList<String> basicAbilityNames = new ArrayList<String>();
@@ -53,10 +56,6 @@ public class BasicCharacter {
   private ArrayList<Integer> specialAbilityCooldowns = new ArrayList<Integer>();
   private ArrayList<Integer> currentSpecialAbilityCooldowns = new ArrayList<Integer>();
   private ArrayList<String> specialAbilityTypes = new ArrayList<String>();
-
-  // Acts as a bridge between the Character's associated messages and the UI
-  // (Replaces System.out.println from being a console game)
-  private ActionResult actionResult = new ActionResult();
   
   // Core parameters related to essential interactions in battle
   private double maxHP;
@@ -84,6 +83,8 @@ public class BasicCharacter {
     this.attackStrength = attackStrength;
     this.defenseStrength = defenseStrength;
     this.speed = speed;
+    // Create an id from 20 randomly generated numbers
+    id = generateRandomNum(20);
   }
   
   // If only the maxHP is provided, default values will be given for battle-related stats
@@ -100,8 +101,21 @@ public class BasicCharacter {
   public BasicCharacter(String name){
     this(name, 100.0, 25.0, 5.0, 5.0);
   }
+
+  // Create n numbers in sequence randomly
+  private int generateRandomNum(int n){
+    String strOutput = "";
+    for(int i = 0; i < n; i++){
+      strOutput += (int)(Math.random() * 10);
+    }
+    return Integer.parseInt(strOutput);
+  }
   
   // Getter methods
+
+  public int getID(){
+    return id;
+  }
   
   public String getName(){
     return name;
@@ -238,10 +252,6 @@ public class BasicCharacter {
   
   public ArrayList<String> getSpecialAbilityTypes(){
     return specialAbilityTypes;
-  }
-
-  public ActionResult getActionResult(){
-    return actionResult;
   }
 
   public int getX(){
@@ -385,11 +395,6 @@ public class BasicCharacter {
       arrayList.add(i);
     }
   }
-
-  // Allow subclasses to seamlessly use ActionResult without adding a getter method first
-  protected void addActionResult(String message, String signal){
-    actionResult.add(message, signal);
-  }
   
   // Convert an ArrayList<String> of a Character to a String[] to be used in other class methods
   public String[] convertArrToList(ArrayList<String> charArr){
@@ -407,33 +412,28 @@ public class BasicCharacter {
   // This function is almost completely overriden by the basicAbility and specialAbility functions,
   // but it is still usable in case specific situations happen
   public void attack(BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+    ActionResult output = new ActionResult();
     System.out.println(name + " attacked " + target.getName() + " for " + attackStrength + " HP!");
-    actionResult.add(name + " attacked " + target.getName() + " for " + attackStrength + " HP!",Signals.ATTACK_PERFORMED);
+    output.add(name + " attacked " + target.getName() + " for " + attackStrength + " HP!",Signals.ATTACK_PERFORMED);
     handleEnemyDefense(target, attackStrength, playerTeam, enemyTeam);
     System.out.println(target.getSimpleOutput());
   }
   
   // Calls the enemy target's defend function against the attacker
   // Reduce enemy HP by the appropriate amount
-  // Boolean returns true if the enemy received any damage, false if not
-  protected boolean handleEnemyDefense(BasicCharacter target, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
-    Thread.sleep(1000);
+  protected ActionResult handleEnemyDefense(BasicCharacter target, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     double actualDamage;
     if(StatusEffect.hasStatusEffect(target, "Nimble")){
       System.out.println("Attack was reduced by 25% from " + target.getName() + " being NIMBLE!");
-      actionResult.add("Attack was reduced by 25% from " + target.getName() + " being NIMBLE!","");
-      Thread.sleep(1000);
+      output.add("Attack was reduced by 25% from " + target.getName() + " being NIMBLE!");
       actualDamage = calculateActualDamage(target, attack*0.75, playerTeam, enemyTeam);
     } else{
       actualDamage = calculateActualDamage(target, attack, playerTeam, enemyTeam);
     } 
-    target.defend(this, actualDamage);
-    Thread.sleep(1000);
-    target.changeCurrentHP(-actualDamage);
-    if(actualDamage > 0){
-      return true;
-    }
-    return false;
+    output.add(target.defend(this, actualDamage));
+    output.add(Signals.TARGET_HEALTH_LOST, actualDamage);
+    return output;
   }
   
   // If a character did not actively defend, their normal defenseStrength is applied
@@ -452,7 +452,6 @@ public class BasicCharacter {
     if(playerTeam.getIndexOfProtectedCharacter(target) != -1){
       int index = playerTeam.getIndexOfProtectedCharacter(target);
       System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
-      actionResult.add(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!",Signals.DEFENSE_RECEIVED);
       actualDamage -= playerTeam.getProtectedCharacterAmounts().get(index);
     }
     return Math.max(actualDamage, 0);
@@ -461,31 +460,33 @@ public class BasicCharacter {
   // Handle the print statements shown when a character defends.
   // Damage calculations and accessing enemy functions are managed by helper functions
   // to make subclass overloading easier.
-  public void defend(BasicCharacter target, double actualDamage){
+  public ActionResult defend(BasicCharacter target, double actualDamage){
+    ActionResult output = new ActionResult();
     if(actualDamage == 0){
       System.out.println(name + " fully defended against " + target.getName() + "!");
-      actionResult.add(name + " fully defended against " + target.getName() + "!",Signals.DEFENSE_PERFORMED);
+      output.add(name + " fully defended against " + target.getName() + "!",Signals.DEFENSE_PERFORMED, defenseStrength);
     }else if(isDefending){
       System.out.println(name + " defended against " + target.getName() + " for " + defenseStrength * 2 + " HP!");
-      actionResult.add(name + " defended against " + target.getName() + " for " + defenseStrength * 2 + " HP!",Signals.DEFENSE_PERFORMED);
+      output.add(name + " defended against " + target.getName() + " for " + defenseStrength * 2 + " HP!",Signals.DEFENSE_PERFORMED, defenseStrength*2);
     } else{
       System.out.println(name + " lightly defended against " + target.getName() + " for " + defenseStrength + " HP!");
-      actionResult.add(name + " lightly defended against " + target.getName() + " for " + defenseStrength + " HP!",Signals.DEFENSE_PERFORMED);
+      output.add(name + " lightly defended against " + target.getName() + " for " + defenseStrength + " HP!",Signals.DEFENSE_PERFORMED, defenseStrength);
     }
+    return output;
   }
   
   // These methods are intended to be overriden by superclasses
   // basicAttacks and specialAttacks are directly correlated to the user
   // Inside these, subclasses may call the helper functions such as attack() or handleEnemyDefense()
   // Return an ActionResult, which tells the dialog system how to react to the Character's ability
-  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     System.out.println("This character does not have a basicAbility function implemented.");
-    return actionResult;
+    return new ActionResult();
   }
   
-  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     System.out.println("This character does not have a specialAbility function implemented.");
-    return actionResult;
+    return new ActionResult();
   }
   
   // Overrided toString method
@@ -522,7 +523,7 @@ public class BasicCharacter {
   // Positioned 10 pixels above the Character, spanning the exact width of the Character
   public void drawHPBar(Graphics graphics){
     double hpRatio = currentHP / maxHP;
-    int hpSize = (int)(width-(lostSpacing*2) * hpRatio);
+    int hpSize = (int)((double)(width-(lostSpacing*2)) * hpRatio);
     graphics.setColor(Color.BLACK);
     graphics.fillRect(x+lostSpacing, y-10, width-(lostSpacing*2), 10);
     graphics.setColor(Color.GREEN);

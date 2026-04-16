@@ -5,6 +5,7 @@ import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
 import src.GameManagement.Mechanics.ActionResult;
+import src.GameManagement.Mechanics.Signals;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
@@ -38,31 +39,42 @@ public class Wizard extends PlayerCharacter {
   }
   
   // Overrided battle methods
-  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     if(basicAbilityIndex == 0){
       // Magic Zap
-      System.out.println(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()) + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, (getAttackStrength()), playerTeam, enemyTeam);
-      if((int)(Math.random() * 100) < 10 && wasEnemyHit){
+      //System.out.println(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()) + " HP!");
+      output.add(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
+      // Check for how much damage the attack did to the enemy
+      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      output.add(defenseResult);
+      if((int)(Math.random() * 100) < 10 && enemyHPChange > 0){
         StatusEffect.addStatusEffect(target, "Stun", 1);
       }
-      System.out.println(target.getSimpleOutput());
+      //System.out.println(target.getSimpleOutput());
     } else if(basicAbilityIndex == 1){
       // Electro Spirit
-      System.out.println(getName() + "'s Electro Spirit zapped " + target.getName() + " for " + (getAttackStrength() - 15) + " HP!");
-      handleEnemyDefense(target, getAttackStrength() - 15, playerTeam, enemyTeam);
-      System.out.println(target.getSimpleOutput());
+      //System.out.println(getName() + "'s Electro Spirit zapped " + target.getName() + " for " + (getAttackStrength() - 15) + " HP!");
+      output.add(getName() + "'s Electro Spirit zapped " + target.getName() + " for " + (getAttackStrength() - 15) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()-15);
+      output.add(handleEnemyDefense(target, getAttackStrength() - 15, playerTeam, enemyTeam));
+      //System.out.println(target.getSimpleOutput());
     }
-    return getActionResult();
+    return output;
   }
   
   // Wizard has two special attacks to choose from
-  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     if(specialAbilityIndex == 0){
       // Fireball
-      System.out.println(getName() + " launched a fireball at " + target.getName() + " for " + getAttackStrength()+5 + " HP!");
-      boolean wasEnemyHit = handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam);
-      if((int)(Math.random() * 100) < 25 && wasEnemyHit){
+      //System.out.println(getName() + " launched a fireball at " + target.getName() + " for " + getAttackStrength()+5 + " HP!");
+      output.add(getName() + " launched a fireball at " + target.getName() + " for " + getAttackStrength()+5 + " HP!",Signals.ATTACK_PERFORMED, getAttackStrength()+5);
+      // Check for how much damage the attack did to the enemy
+      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      output.add(defenseResult);
+      if((int)(Math.random() * 100) < 25 && enemyHPChange > 0){
         StatusEffect.addStatusEffect(target, "Burn", 2);
       }
     } else if(specialAbilityIndex == 1){
@@ -70,29 +82,32 @@ public class Wizard extends PlayerCharacter {
       int correctDigits = promptMemorizationCode(7);
       if(correctDigits == 7){
         System.out.println("The spirits have answered your call!");
-        Thread.sleep(1000);
         System.out.println(getName() + " casted the ancient spell at " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!");
-        handleEnemyDefense(target, (getAttackStrength() * 2), playerTeam, enemyTeam);
+        output.add(handleEnemyDefense(target, (getAttackStrength() * 2), playerTeam, enemyTeam));
       } else{
         System.out.println("The spirits have rejected your call.");
-        Thread.sleep(1000);
         System.out.println(getName() + " casted a weak spell at " + target.getName() + " for " + (getAttackStrength() * 0.75) + " HP.");
-        handleEnemyDefense(target, (getAttackStrength() * 0.75), playerTeam, enemyTeam);
+        output.add(handleEnemyDefense(target, (getAttackStrength() * 0.75), playerTeam, enemyTeam));
       }
     }
-    System.out.println(target.getSimpleOutput());
-    return getActionResult();
+    //System.out.println(target.getSimpleOutput());
+    return output;
   }
   
   // Defense function which is called when an enemy targets the Wizard
-  public void defend(BasicCharacter target, double actualDamage){
+  public ActionResult defend(BasicCharacter target, double actualDamage){
+    ActionResult output = new ActionResult();
     if(actualDamage == 0){
-      System.out.println(getName() + " cancelled " + target.getName() + "'s attack!");
+      //System.out.println(getName() + " cancelled " + target.getName() + "'s attack!");
+      output.add(getName() + " cancelled " + target.getName() + "'s attack!",Signals.DEFENSE_PERFORMED, 999.0);
     }else if(getIsDefending()){
-      System.out.println(getName() + " partially cancelled " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
+      //System.out.println(getName() + " partially cancelled " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
+      output.add(getName() + " partially cancelled " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
     } else{
-      System.out.println(getName() + " lightly cancelled " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
+      //System.out.println(getName() + " lightly cancelled " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
+      output.add(getName() + " lightly cancelled " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength());
     }
+    return output;
   }
 
   // Generate a random numerical code with length digits.

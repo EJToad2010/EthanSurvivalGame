@@ -44,25 +44,51 @@ public class ActionResult {
         return signals.get(index);
     }
 
-    public Double getAmount(int index){
+    public double getAmount(int index){
         if(index < 0 || index >= amounts.size()){
             return 0.0;
         }
         return amounts.get(index);
     }
 
+    // Get the amount corresponding to the first occurrence of a specific signal
+    public Double getAmount(String signal){
+        int foundIndex = 0;
+        for(int i =0; i < messages.size(); i++){
+            if(signals.get(i).equals(signal)){
+                foundIndex = i;
+                break;
+            }
+        }
+        return amounts.get(foundIndex);
+    }
+
+    // Add the values of another ActionResult object to this one
+    public void add(ActionResult actionResult){
+        for(int i = 0; i < actionResult.getMessages().size(); i++){
+            messages.add(actionResult.getMessage(i));
+            signals.add(actionResult.getSignal(i));
+            amounts.add(actionResult.getAmount(i));
+        }
+    }
+
     // Add a new value to all ArrayLists
-    public void add(String message, String signal, Double amount){
+    public void add(String message, String signal, double amount){
+        messages.add(message);
+        signals.add(signal);
+        amounts.add(amount);
+    }
+
+    public void add(String message, String signal){
         messages.add(message);
         signals.add(signal);
         amounts.add(0.0);
     }
 
-    // Add a new value to both ArrayLists
-    public void add(String message, String signal){
-        messages.add(message);
+    public void add(String signal, Double amount){
+        messages.add("");
         signals.add(signal);
-        amounts.add(0.0);
+        amounts.add(amount);
     }
 
     // Add a regular message and a blank signal
@@ -76,5 +102,17 @@ public class ActionResult {
         messages.clear();
         signals.clear();
         amounts.clear();
+    }
+
+    // use for debugging
+    public String toString(){
+        String output = "";
+        for(int i = 0; i < messages.size(); i++){
+            output += messages.get(i);
+            output += " " + signals.get(i);
+            output += " " + amounts.get(i);
+            output += "\n";
+        }
+        return output;
     }
 }

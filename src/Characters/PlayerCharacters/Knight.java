@@ -4,7 +4,7 @@ import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
 import src.GameManagement.Mechanics.ActionResult;
-import src.GameManagement.UI.DialogManager;
+import src.GameManagement.Mechanics.Signals;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
 
@@ -37,63 +37,77 @@ public class Knight extends PlayerCharacter {
   }
   
   // Overrided battle methods
-  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     if(basicAbilityIndex == 0){
       // Sword Swing
-      System.out.println(getName() + " swung their sword at " + target.getName() + " for " + getAttackStrength() + " HP!");
-      handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
-      System.out.println(target.getSimpleOutput());
+      //System.out.println(getName() + " swung their sword at " + target.getName() + " for " + getAttackStrength() + " HP!");
+      output.add(getName() + " swung their sword at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
+      output.add(handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam));
+      //System.out.println(target.getSimpleOutput());
       
       if(!target.getIsDead()){
         int counterAttackDamage = (int)(Math.random() * 3) + 5;
-        Thread.sleep(1000);
-        System.out.println(target.getName() + " counterattacked for " + (double) counterAttackDamage + " HP!");
-        changeCurrentHP(-(double) counterAttackDamage);
-        Thread.sleep(1000);
-        System.out.println(getSimpleOutput());
+        //Thread.sleep(1000);
+        //System.out.println(target.getName() + " counterattacked for " + (double) counterAttackDamage + " HP!");
+        output.add(target.getName() + " counterattacked for " + (double) counterAttackDamage + " HP!", Signals.HEALTH_LOST, (double)counterAttackDamage);
+        //changeCurrentHP(-(double) counterAttackDamage);
+        //Thread.sleep(1000);
+        //System.out.println(getSimpleOutput());
       }
     } else if(basicAbilityIndex == 1){
       // Cautious Attack
-      System.out.println(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 8) + " HP!");
-      handleEnemyDefense(target, getAttackStrength() - 8, playerTeam, enemyTeam);
-      System.out.println(target.getSimpleOutput());
+      //System.out.println(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 8) + " HP!");
+      output.add(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 8) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength() - 8);
+      output.add(handleEnemyDefense(target, getAttackStrength() - 8, playerTeam, enemyTeam));
+      //System.out.println(target.getSimpleOutput());
     }
-    return getActionResult();
+    return output;
   }
   
   // Knight has two special attacks to choose from
-  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
+  public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     if(specialAbilityIndex == 0){
       // Last Push
       if(target.getCurrentHP() / target.getMaxHP() < 0.5){
-        System.out.println(getName() + " had a last push against " + target.getName() + " for " + (getAttackStrength() + 10) * 1.5 + " HP!");
-        handleEnemyDefense(target, (getAttackStrength() + 10) * 1.5, playerTeam, enemyTeam);
+        //System.out.println(getName() + " had a last push against " + target.getName() + " for " + (getAttackStrength() + 10) * 1.5 + " HP!");
+        output.add(getName() + " had a last push against " + target.getName() + " for " + (getAttackStrength() + 10) * 1.5 + " HP!", Signals.ATTACK_PERFORMED, (getAttackStrength() + 10)*1.5);
+        output.add(handleEnemyDefense(target, (getAttackStrength() + 10) * 1.5, playerTeam, enemyTeam));
       } else{
-        System.out.println(getName() + " pushed against " + target.getName() + " for " + (getAttackStrength() + 10) + " HP!");
-        handleEnemyDefense(target, getAttackStrength() + 10, playerTeam, enemyTeam);
+        //System.out.println(getName() + " pushed against " + target.getName() + " for " + (getAttackStrength() + 10) + " HP!");
+        output.add(getName() + " pushed against " + target.getName() + " for " + (getAttackStrength() + 10) + " HP!", Signals.ATTACK_PERFORMED, (getAttackStrength() + 10));
+        output.add(handleEnemyDefense(target, getAttackStrength() + 10, playerTeam, enemyTeam));
       }
       
     } else if(specialAbilityIndex == 1){
       // Rage Strike
-      System.out.println(getName() + " furiously attacked " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!");
-      handleEnemyDefense(target, (getAttackStrength() * 2), playerTeam, enemyTeam);
-      System.out.println(getName() + "'s rage made them lose " + (getAttackStrength() * 0.5) + " HP!");
-      changeCurrentHP(-(getAttackStrength() * 0.5));
-      System.out.println(getSimpleOutput());
+      //System.out.println(getName() + " furiously attacked " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!");
+      output.add(getName() + " furiously attacked " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()*2);
+      output.add(handleEnemyDefense(target, (getAttackStrength() * 2), playerTeam, enemyTeam));
+      //System.out.println(getName() + "'s rage made them lose " + (getAttackStrength() * 0.5) + " HP!");
+      output.add(getName() + "'s rage made them lose " + (getAttackStrength() * 0.5) + " HP!", Signals.HEALTH_LOST, getAttackStrength()*0.5);
+      //changeCurrentHP(-(getAttackStrength() * 0.5));
+      //System.out.println(getSimpleOutput());
     }
-    System.out.println(target.getSimpleOutput());
-    return getActionResult();
+    //System.out.println(target.getSimpleOutput());
+    return output;
   }
   
   // Defense function which is called when an enemy targets the Knight
-  public void defend(BasicCharacter target, double actualDamage){
+  public ActionResult defend(BasicCharacter target, double actualDamage){
+    ActionResult output = new ActionResult();
     if(actualDamage == 0){
       System.out.println(getName() + " fully countered " + target.getName() + " with their shield!");
+      output.add(getName() + " fully countered " + target.getName() + " with their shield!",Signals.DEFENSE_PERFORMED, 999.0);
     }else if(getIsDefending()){
       System.out.println(getName() + " partially blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() * 2 + " HP!");
+      output.add(getName() + " defended against " + target.getName() + " for " + getDefenseStrength() * 2 + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
     } else{
       System.out.println(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() + " HP!");
+      output.add(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength());
     }
+    return output;
   }
 
   // The Trial of Strength minigame that appears in the Tournament
