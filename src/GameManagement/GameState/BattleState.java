@@ -43,7 +43,6 @@ public class BattleState extends GameState{
   private final int ENEMY_REWARDS = 14;
 
   // Variables stored between steps
-  // Use for reference only
   private PlayerCharacter selectedCharacter;
   private String selectedActionType;
   private int selectedAbilityIndex;
@@ -52,6 +51,8 @@ public class BattleState extends GameState{
   private ArrayList<EnemyCharacter> targets = new ArrayList<EnemyCharacter>();
   private int targetIndex;
   private EnemyCharacter currentTarget;
+
+  private int enemyRewardIndex;
 
   // Variables tracked during a battle
   private int turnNum;
@@ -104,14 +105,6 @@ public class BattleState extends GameState{
   // Logic used for each step
   protected void handleStep(int step, int keyCode){
     // Handle any misc logic that exists
-    /*if(step == SELECT_CHARACTER){
-      if(actionPointsLeft < 1){
-        initializeEnemyTurn();
-        nextTurnHalf();
-        setStep(ENEMY_TURN);
-        return;
-      }
-    }*/
 
     // Handle any dialog that exists
     int exitCode = runDialog(keyCode, false);
@@ -219,11 +212,11 @@ public class BattleState extends GameState{
     // Signals that take one tick to perform
     if((calculateCurrentTurnOwner().equals("Player") && signal.equals(Signals.HEALTH_GAINED))||(calculateCurrentTurnOwner().equals("Enemy") && signal.equals(Signals.TARGET_HEALTH_GAINED))){
       System.out.println("Player health gained");
-      playerTeam.getSelectedCharacter().changeCurrentHP(amount);
+      selectedCharacter.changeCurrentHP(amount);
       isHandlingSignal = false;
     } else if((calculateCurrentTurnOwner().equals("Player") && signal.equals(Signals.HEALTH_LOST))||(calculateCurrentTurnOwner().equals("Enemy") && signal.equals(Signals.TARGET_HEALTH_LOST))){
       System.out.println("Player health lost");
-      playerTeam.getSelectedCharacter().changeCurrentHP(-amount);
+      selectedCharacter.changeCurrentHP(-amount);
       isHandlingSignal = false;
     } else if((calculateCurrentTurnOwner().equals("Player") && signal.equals(Signals.TARGET_HEALTH_GAINED))||(calculateCurrentTurnOwner().equals("Enemy") && signal.equals(Signals.HEALTH_GAINED))){
       System.out.println("Target health gained");
@@ -233,6 +226,17 @@ public class BattleState extends GameState{
       System.out.println("Target health lost");
       currentTarget.changeCurrentHP(-amount);
       isHandlingSignal = false;
+    } else if((calculateCurrentTurnOwner().equals("Enemy")) && signal.equals(Signals.TARGET_OBJECT)){
+      System.out.println("Target E object");
+      selectedCharacter = playerTeam.findCharWithID((int)amount);
+      playerTeam.setSelectedCharacterIndex(0);
+      isHandlingSignal = false;
+    } else if((calculateCurrentTurnOwner().equals("Player")) && signal.equals(Signals.TARGET_OBJECT)){
+      currentTarget = enemyTeam.findCharWithID((int)amount);
+      isHandlingSignal = false;
+    }else if(signal.equals(Signals.COINS_GAINED)){
+      System.out.println("Coins gained");
+      playerTeam.increaseCoinBalance((int)amount);
     } else{
       System.out.println("No valid signal handler found.");
       isHandlingSignal = false;
@@ -289,7 +293,12 @@ public class BattleState extends GameState{
       UIManager.setFontSize(20);
       UIManager.refreshText(graphics);
       UIManager.drawCenteredStringInBox(graphics, "(" + (targetAmount - targets.size()) + " targets left)", 0, 700, 1280, 20);
-    } else if(step == PERFORM_ABILITY){
+    } else if(step == ENEMY_REWARDS){
+      enemyRewardIndex++;
+      if(enemyRewardIndex >= enemyTeam.getEnemyTeam().size()){
+        dayManager.nextPhase();
+      }
+      addDialogForEnemyReward();
     }
     dialogManager.draw(graphics);
     if(inputHandler.getButtons().size() > 0 && !dialogManager.getIsActive()){
@@ -367,6 +376,11 @@ public class BattleState extends GameState{
     } else if(step == ENEMY_VICTORY){
       dialogManager.clear();
       dialogManager.add("Oh no! All your characters have died.");
+    } else if(step == ENEMY_REWARDS){
+      playerTeam.setIsDrawingXP(true);
+      dialogManager.clear();
+      enemyRewardIndex = 0;
+      addDialogForEnemyReward();
     }
   }
   // Calls once when the previous step exits
@@ -398,6 +412,7 @@ public class BattleState extends GameState{
       turnNum = 1;
       turnHalf = 0;
       initializeEnemy();
+      playerTeam.setIsDrawingXP(false);
       resetScene();
       currentStep = INTRO_ANIM;
       panel.repaint();
@@ -410,6 +425,15 @@ public class BattleState extends GameState{
   // Update the inputHandler to select all available enemy characters
   private void refreshAvailableTargets(){
     inputHandler = createCharacterOptions(enemyTeam.getEnemyTeam(), targets);
+  }
+
+  // Add the proper messages and signals for DialogManager within Enemy loot
+  private void addDialogForEnemyReward(){
+    EnemyCharacter currentRewardEnemy = enemyTeam.getEnemyTeam().get(enemyRewardIndex);
+    dialogManager.add(currentRewardEnemy.getName() + " dropped " + currentRewardEnemy.getCoinReward() + "g!", Signals.COINS_GAINED, currentRewardEnemy.getCoinReward());
+    for(PlayerCharacter p : playerTeam.getPlayerTeam()){
+      dialogManager.add(p.increaseXP(currentRewardEnemy.getXPReward()));
+    }
   }
 
   // Based on the combined speed of the player's team and the enemy's team, decide who will go first
@@ -428,6 +452,9 @@ public class BattleState extends GameState{
     actionPointsLeft = playerActionPoints;
     dialogManager.add("It is your turn!");
     dialogManager.add("You may perform " + actionPointsLeft + " actions during your turn.");
+    if(turnNum > 1){
+      playerTeam.decreasePlayerCooldowns();
+    }
   }
 
   // Find every Enemy able to perform an action and announce that the Enemy's turn has been reached
@@ -443,6 +470,9 @@ public class BattleState extends GameState{
       actionableEnemyIndex = -1;
     } else{
       actionableEnemyIndex = 0;
+    }
+    if(turnNum > 1){
+      enemyTeam.decreaseEnemyCooldowns();
     }
   }
 

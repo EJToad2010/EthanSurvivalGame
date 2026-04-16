@@ -100,6 +100,17 @@ public class EnemyTeam {
     }
     return output;
   }
+
+  // Given an ID, look for a EnemyCharacter in this team with that ID
+  // return null if none found
+  public EnemyCharacter findCharWithID(int id){
+    for(EnemyCharacter e : enemyTeam){
+      if(e.getID() == id){
+        return e;
+      }
+    }
+    return null;
+  }
   
   // Used in battle messages
   // Has a blacklist of enemies in case they are already selected or they cannot be targeteds

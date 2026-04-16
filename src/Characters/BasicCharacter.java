@@ -83,8 +83,8 @@ public class BasicCharacter {
     this.attackStrength = attackStrength;
     this.defenseStrength = defenseStrength;
     this.speed = speed;
-    // Create an id from 20 randomly generated numbers
-    id = generateRandomNum(20);
+    // Create an id from 9 randomly generated numbers
+    id = generateRandomNum(9);
   }
   
   // If only the maxHP is provided, default values will be given for battle-related stats
@@ -268,6 +268,10 @@ public class BasicCharacter {
 
   public int getHeight(){
     return height;
+  }
+
+  public int getLostSpacing(){
+    return lostSpacing;
   }
 
   // Setter methods
@@ -509,6 +513,11 @@ public class BasicCharacter {
       graphics.drawImage(characterImage, x, y, null);
     }
     drawHPBar(graphics);
+    if(this instanceof PlayerCharacter){
+      if(((PlayerCharacter) this).getIsDrawingXP()){
+        ((PlayerCharacter) this).drawXPBar(graphics);
+      }
+    }
     // Draw Character's HP points left above the text
     UIManager.findMaxFontSize(currentHP + "/" + maxHP, graphics, (width-lostSpacing*2) / 2, 12, true, true);
     int hpFontSize = UIManager.getFont().getSize();

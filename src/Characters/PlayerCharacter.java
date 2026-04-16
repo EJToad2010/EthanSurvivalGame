@@ -1,7 +1,11 @@
 package src.Characters;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.ArrayList;
 
 import src.GameManagement.Game;
+import src.GameManagement.Mechanics.ActionResult;
+import src.GameManagement.Mechanics.Signals;
 import src.GameManagement.UI.DialogManager;
 import src.Teams.PlayerTeam;
 // PlayerCharacters have unique attributes such as a shared inventory, xp, and levels
@@ -20,6 +24,9 @@ public class PlayerCharacter extends BasicCharacter {
   private int xpToNextLevel;
   // The instance of Game is obtained alongside the playerTeam
   protected Game game;
+
+  // Synced with PlayerTeam
+  private boolean isDrawingXP;
   
   // Constructor that requires all attributes
   public PlayerCharacter(String name, double maxHP, double attackStrength, double defenseStrength, double speed){
@@ -41,6 +48,14 @@ public class PlayerCharacter extends BasicCharacter {
   
   public int getLevel(){
     return level;
+  }
+
+  public boolean getIsDrawingXP(){
+    return isDrawingXP;
+  }
+
+  public void setIsDrawingXP(boolean isDrawingXP){
+    this.isDrawingXP = isDrawingXP;
   }
   
   public ArrayList<Integer> getBasicAbilityUnlockLevels(){
@@ -80,8 +95,10 @@ public class PlayerCharacter extends BasicCharacter {
   
   // Increase the Character's total xp by the specified amount
   // Handle detection for levelling up and its logic
-  public void increaseXP(int amount) throws InterruptedException {
-    System.out.println(getName() + " gained " + amount + " XP!");
+  public ActionResult increaseXP(int amount){
+    ActionResult output = new ActionResult();
+    //System.out.println(getName() + " gained " + amount + " XP!");
+    output.add(getName() + " gained " + amount + " XP!", Signals.XP_GAINED, amount);
     updateXPToNextLevel();
     xp += amount;
     while (xp >= xpToNextLevel) {
@@ -89,50 +106,65 @@ public class PlayerCharacter extends BasicCharacter {
       int prevSpecial = getHighestIndexSpecial();
       level++;
       updateXPToNextLevel();
-      Thread.sleep(1000);
-      System.out.println(getName() + " leveled up to level " + level + "!");
-      Thread.sleep(1000);
-      updatePlayerStats();
-      Thread.sleep(1000);
-      checkUnlockedAbilities(prevBasic, prevSpecial);
+      // System.out.println(getName() + " leveled up to level " + level + "!");
+      output.add(getName() + " leveled up to level " + level + "!", Signals.LEVEL_UP, 1);
+      output.add(updatePlayerStats());
+      output.add(checkUnlockedAbilities(prevBasic, prevSpecial));
     }
-	  System.out.println(getName() + "'s XP to next level: " + (xpToNextLevel - xp) + "\n");
+	  //System.out.println(getName() + "'s XP to next level: " + (xpToNextLevel - xp) + "\n");
+    //output.add(getName() + "'s XP to next level: " + (xpToNextLevel - xp));
+    return output;
   }
   
   //Attributes that upgrade every time a PlayerCharacter levels up
-  private void updatePlayerStats(){
-    System.out.println("+5 MAX HP");
+  private ActionResult updatePlayerStats(){
+    ActionResult output = new ActionResult();
+    output.add("+5 MAX HP, +2 ATK, +2 DEF, +2 SPD");
+    //System.out.println("+5 MAX HP");
     changeMaxHP(5);
-    System.out.println("+2 ATK");
+    //System.out.println("+2 ATK");
     changeAttackStrength(2);
-    System.out.println("+2 DEF");
+    //System.out.println("+2 DEF");
     changeDefenseStrength(2);
-    System.out.println("+2 SPD");
+    //System.out.println("+2 SPD");
     changeSpeed(2);
+    return output;
   }
   
   // Check if a new basic or special ability was unlocked after levelling up
-  private void checkUnlockedAbilities(int prevBasic, int prevSpecial) throws InterruptedException{
+  private ActionResult checkUnlockedAbilities(int prevBasic, int prevSpecial){
+    ActionResult output = new ActionResult();
     for(int i = prevBasic + 1; i < basicAbilityUnlockLevels.size(); i++){
       if(basicAbilityUnlockLevels.get(i) <= level){
-        System.out.println("New basic ability unlocked!");
-        Thread.sleep(1000);
-        System.out.print(getBasicAbilityNames().get(i) + ": ");
-        System.out.println(getBasicAbilityDescriptions().get(i));
-        System.out.println("");
-        Thread.sleep(2000);
+        //System.out.println("New basic ability unlocked!");
+        output.add("New basic ability unlocked! " + getBasicAbilityNames().get(i));
+        //System.out.print(getBasicAbilityNames().get(i) + ": ");
+        //System.out.println(getBasicAbilityDescriptions().get(i));
+        output.add(getBasicAbilityDescriptions().get(i));
+        //System.out.println("");
       }
     }
     
     for(int i = prevSpecial + 1; i < specialAbilityUnlockLevels.size(); i++){
       if(specialAbilityUnlockLevels.get(i) == level){
-        System.out.println("New special ability unlocked!");
-        Thread.sleep(1000);
-        System.out.print(getSpecialAbilityNames().get(i) + ": ");
-        System.out.println(getSpecialAbilityDescriptions().get(i));
-        System.out.println("");
-        Thread.sleep(2000);
+        //System.out.println("New special ability unlocked!");
+        output.add("New special ability unlocked! " + getSpecialAbilityNames().get(i));
+        //System.out.print(getSpecialAbilityNames().get(i) + ": ");
+        //System.out.println(getSpecialAbilityDescriptions().get(i));
+        output.add(getSpecialAbilityDescriptions().get(i));
+        //System.out.println("");
       }
     }
+    return output;
+  }
+
+  public void drawXPBar(Graphics graphics){
+    updateXPToNextLevel();
+    double xpRatio = xp / xpToNextLevel;
+    int xpSize = (int)((double)(width-(getLostSpacing()*2)) * xpRatio);
+    graphics.setColor(Color.BLACK);
+    graphics.fillRect(getX()+getLostSpacing(), getY()+getHeight()+10, width-(getLostSpacing()*2), 10);
+    graphics.setColor(Color.CYAN);
+    graphics.fillRect(getX()+getLostSpacing(), getY()+getHeight()+10, xpSize, 10);
   }
 }

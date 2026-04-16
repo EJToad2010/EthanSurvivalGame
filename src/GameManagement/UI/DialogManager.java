@@ -63,6 +63,11 @@ public class DialogManager {
         isActive = true;
     }
 
+    public void add(String line, String signal, double amount){
+        dialogSequence.add(line, signal, amount);
+        isActive = true;
+    }
+
     // Since an ActionResult can contain multiple messages and signals, add each one
     // Messages and signals must have the same length to work
     public void add(ActionResult actionResult){

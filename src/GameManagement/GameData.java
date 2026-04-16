@@ -19,7 +19,8 @@ public class GameData {
   private String[] earlyGameEnemies = new String[]{"Goblin", "Goblin", "DartGoblin"};
   // Enemy behaviors change as the game progresses, adding more complex roles.
   // This simulates the AI getting smarter.
-  private String[] earlyGameEnemyBehaviors = new String[]{"RANDOM", "RANDOM", "RANDOM", "AGGRESSIVE", "DEFENSIVE"};
+  //private String[] earlyGameEnemyBehaviors = new String[]{"RANDOM", "RANDOM", "RANDOM", "AGGRESSIVE", "DEFENSIVE"};
+  private String[] earlyGameEnemyBehaviors = new String[]{"AGGRESSIVE"};
   // Enemy items are basic early on
   private String[] earlyGameEnemyItems = new String[]{"HealthPotion", "HealthPotion", "HealthPool"};
   // Used in random name generation

@@ -25,6 +25,9 @@ public class PlayerTeam {
 
   // The index of the Character that is currently selected
   private int selectedCharacterIndex = 0;
+
+  // Control the way in which Characters are drawn
+  private boolean isDrawingXP = false;
   
   // Constructor that takes in an exisiting ArrayList and modifies its components into a player
   public PlayerTeam(ArrayList<PlayerCharacter> playerTeam, Inventory playerInventory){
@@ -67,6 +70,14 @@ public class PlayerTeam {
   // Return the ArrayList of the defensive strength each protected Character is receiving that turn
   public ArrayList<Double> getProtectedCharacterAmounts(){
     return protectedCharacterAmounts;
+  }
+
+  public boolean getIsDrawingXP(){
+    return isDrawingXP;
+  }
+
+  public void setIsDrawingXP(boolean isDrawingXP){
+    this.isDrawingXP = isDrawingXP;
   }
 
   // Return the index of a Character in protectedCharacters
@@ -136,6 +147,17 @@ public class PlayerTeam {
       sum += p.getLevel();
     }
     return (double)(sum)/(double)(playerTeam.size());
+  }
+
+  // Given an ID, look for a PlayerCharacter in this team with that ID
+  // return null if none found
+  public PlayerCharacter findCharWithID(int id){
+    for(PlayerCharacter p : playerTeam){
+      if(p.getID() == id){
+        return p;
+      }
+    }
+    return null;
   }
   
   // Used in battle messages
@@ -323,6 +345,7 @@ public class PlayerTeam {
   public void drawPlayerTeam(Graphics graphics, int x, int y, int width){
     spaceCharacters(x, y, width);
     for(PlayerCharacter c : playerTeam){
+      c.setIsDrawingXP(isDrawingXP);
       c.drawCharacter(graphics);
     }
   }
