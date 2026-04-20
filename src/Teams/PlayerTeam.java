@@ -159,6 +159,17 @@ public class PlayerTeam {
     }
     return null;
   }
+
+  // Given an ID, look for a PlayerCharacter in this team with that ID
+  // return the index, or -1 if not found
+  public int findIndexWithID(int id){
+    for(int i = 0; i < playerTeam.size(); i++){
+      if(playerTeam.get(i).getID() == id){
+        return i;
+      }
+    }
+    return -1;
+  }
   
   // Used in battle messages
   public String getPlayerTeamNumFormat(){

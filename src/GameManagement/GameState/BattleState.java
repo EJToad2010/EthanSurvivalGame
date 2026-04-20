@@ -83,7 +83,9 @@ public class BattleState extends GameState{
     if(exitCode == 0){
       handleDialogEndedLogic(currentStep);
     }
-    checkWinConditions();
+    if(currentStep > 0){
+      checkWinConditions();
+    }
     if(currentStep == INTRO_ANIM){
           nextTick();
           if(frame == 0){
@@ -108,7 +110,7 @@ public class BattleState extends GameState{
 
     // Handle any dialog that exists
     int exitCode = runDialog(keyCode, false);
-    if(exitCode == -1 && dialogManager.getIsActive()){
+    if(exitCode == -1 && (dialogManager.getIsActive() || dialogManager.size() == 0)){
       return;
     }
     handleDialogEndedLogic(step);
@@ -163,9 +165,11 @@ public class BattleState extends GameState{
     if(step == INTRO_ANIM){
       // After INTRO_ANIM, trigger the event that starts either the enemy or player's turn
       if(turnOwner.equals("Player")){
+        playerTeam.resetSelectedCharacterIndex();
         initializePlayerTurn();
         setStep(SELECT_CHARACTER);
       } else{
+        playerTeam.resetSelectedCharacterIndex();
         initializeEnemyTurn();
         setStep(ENEMY_TURN);
       }
@@ -208,7 +212,7 @@ public class BattleState extends GameState{
   // Used when a GameState makes use of dialog that contains interaction
   // (Remember to set isHandlingSignal to FALSE when done handling)
   protected void handleSignal(String signal, double amount){
-    System.out.println(signal+ " " + calculateCurrentTurnOwner());
+    //System.out.println(signal+ " " + calculateCurrentTurnOwner());
     // Signals that take one tick to perform
     if((calculateCurrentTurnOwner().equals("Player") && signal.equals(Signals.HEALTH_GAINED))||(calculateCurrentTurnOwner().equals("Enemy") && signal.equals(Signals.TARGET_HEALTH_GAINED))){
       System.out.println("Player health gained");
@@ -227,9 +231,7 @@ public class BattleState extends GameState{
       currentTarget.changeCurrentHP(-amount);
       isHandlingSignal = false;
     } else if((calculateCurrentTurnOwner().equals("Enemy")) && signal.equals(Signals.TARGET_OBJECT)){
-      System.out.println("Target E object");
       selectedCharacter = playerTeam.findCharWithID((int)amount);
-      playerTeam.setSelectedCharacterIndex(0);
       isHandlingSignal = false;
     } else if((calculateCurrentTurnOwner().equals("Player")) && signal.equals(Signals.TARGET_OBJECT)){
       currentTarget = enemyTeam.findCharWithID((int)amount);
@@ -314,6 +316,9 @@ public class BattleState extends GameState{
   }
   // Call in drawScene to make use of individual frames
   protected void drawFrame(int scene, int frame, Graphics graphics){
+    if(currentStep != INTRO_ANIM){
+      return;
+    }
     if(scene == 0){
       if(frame == 0){
         // Intro text in black background
@@ -415,6 +420,8 @@ public class BattleState extends GameState{
       playerTeam.setIsDrawingXP(false);
       resetScene();
       currentStep = INTRO_ANIM;
+      dialogManager.clear();
+      dialogManager.setIsActive(false);
       panel.repaint();
   }
   // Calls once when panel is unloaded
@@ -429,11 +436,13 @@ public class BattleState extends GameState{
 
   // Add the proper messages and signals for DialogManager within Enemy loot
   private void addDialogForEnemyReward(){
+    System.out.println("dialog for enemy reward added");
     EnemyCharacter currentRewardEnemy = enemyTeam.getEnemyTeam().get(enemyRewardIndex);
     dialogManager.add(currentRewardEnemy.getName() + " dropped " + currentRewardEnemy.getCoinReward() + "g!", Signals.COINS_GAINED, currentRewardEnemy.getCoinReward());
     for(PlayerCharacter p : playerTeam.getPlayerTeam()){
       dialogManager.add(p.increaseXP(currentRewardEnemy.getXPReward()));
     }
+    System.out.println(dialogManager.getDialogSequence());
   }
 
   // Based on the combined speed of the player's team and the enemy's team, decide who will go first

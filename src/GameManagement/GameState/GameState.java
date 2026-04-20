@@ -241,6 +241,9 @@ public class GameState {
     // Return 0 if end was reached, -1 if not
     // (Call inside handleStep to access keyCode)
     public int runDialog(int keyCode, boolean moveOn){
+        if(dialogManager.size() < 1){
+            return -1;
+        }
         if(!dialogManager.getIsActive()){
             return -1;
         }

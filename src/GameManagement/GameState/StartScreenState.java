@@ -47,7 +47,7 @@ public class StartScreenState extends GameState{
             UIManager.setTextColor(graphics, Color.GRAY);
             UIManager.setFontSize(25);
             UIManager.refreshText(graphics);
-            UIManager.drawCenteredStringInBox(graphics, "Use the left and right arrow keys to move between options. Press ENTER to select.", 0, 600, 1280, 100);
+            UIManager.drawCenteredStringInBox(graphics, "Use arrow keys or WASD to move between options. Press ENTER to select.", 0, 600, 1280, 100);
             UIManager.setTextColor(graphics, Color.BLACK);
         }
     }

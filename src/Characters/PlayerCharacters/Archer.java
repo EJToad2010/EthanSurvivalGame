@@ -42,7 +42,7 @@ public class Archer extends PlayerCharacter {
   // Overrided battle methods
   public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Integer.toString(target.getID()), Signals.TARGET_OBJECT);
+    output.add(Signals.TARGET_OBJECT, target.getID());
     if(basicAbilityIndex == 0){
       // Softening Arrow
       //System.out.println(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -67,7 +67,7 @@ public class Archer extends PlayerCharacter {
   // Archer has two special attacks to choose from
   public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Integer.toString(target.getID()), Signals.TARGET_OBJECT);
+    output.add(Signals.TARGET_OBJECT, target.getID());
     if(specialAbilityIndex == 0){
       // Volley
       //System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");

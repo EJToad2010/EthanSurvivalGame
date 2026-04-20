@@ -39,7 +39,7 @@ public class Knight extends PlayerCharacter {
   // Overrided battle methods
   public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Integer.toString(target.getID()), Signals.TARGET_OBJECT);
+    output.add(Signals.TARGET_OBJECT, target.getID());
     if(basicAbilityIndex == 0){
       // Sword Swing
       //System.out.println(getName() + " swung their sword at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -69,7 +69,7 @@ public class Knight extends PlayerCharacter {
   // Knight has two special attacks to choose from
   public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Integer.toString(target.getID()), Signals.TARGET_OBJECT);
+    output.add(Signals.TARGET_OBJECT, target.getID());
     if(specialAbilityIndex == 0){
       // Last Push
       if(target.getCurrentHP() / target.getMaxHP() < 0.5){

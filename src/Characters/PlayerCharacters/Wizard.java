@@ -41,7 +41,7 @@ public class Wizard extends PlayerCharacter {
   // Overrided battle methods
   public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Integer.toString(target.getID()), Signals.TARGET_OBJECT);
+    output.add(Signals.TARGET_OBJECT, target.getID());
     if(basicAbilityIndex == 0){
       // Magic Zap
       //System.out.println(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()) + " HP!");
@@ -67,7 +67,7 @@ public class Wizard extends PlayerCharacter {
   // Wizard has two special attacks to choose from
   public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Integer.toString(target.getID()), Signals.TARGET_OBJECT);
+    output.add(Signals.TARGET_OBJECT, target.getID());
     if(specialAbilityIndex == 0){
       // Fireball
       //System.out.println(getName() + " launched a fireball at " + target.getName() + " for " + getAttackStrength()+5 + " HP!");

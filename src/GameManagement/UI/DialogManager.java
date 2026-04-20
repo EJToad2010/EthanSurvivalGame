@@ -34,6 +34,10 @@ public class DialogManager {
         return dialogIndex;
     }
 
+    public int size(){
+        return dialogSequence.getMessages().size();
+    }
+
     // Return the message of the current dialogIndex
     // Return blank if none found
     public String getMessage(){
@@ -50,6 +54,10 @@ public class DialogManager {
     // Return 0 if none found
     public double getAmount(){
         return dialogSequence.getAmount(dialogIndex);
+    }
+
+    public void setIsActive(boolean isActive){
+        this.isActive = isActive;
     }
 
     // Manipulating elements

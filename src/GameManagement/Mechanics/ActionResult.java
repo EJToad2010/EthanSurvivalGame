@@ -85,7 +85,7 @@ public class ActionResult {
         amounts.add(0.0);
     }
 
-    public void add(String signal, Double amount){
+    public void add(String signal, double amount){
         messages.add("");
         signals.add(signal);
         amounts.add(amount);

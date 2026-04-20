@@ -2,6 +2,7 @@ package src.GameManagement.Mechanics;
 
 import src.GameManagement.Game;
 import src.GameManagement.GameState.CharacterSelectState;
+import src.GameManagement.GameState.DayEndState;
 import src.GameManagement.GameState.TournamentState;
 import src.GameManagement.GameState.BattleState;
 
@@ -69,6 +70,7 @@ public class DayManager {
             nextPhase();
         } else if(currentPhase == DAY_END){
             // Not implemented yet
+            game.setCurrentGameState(new DayEndState(game, this));
             nextPhase();
         }
     }
