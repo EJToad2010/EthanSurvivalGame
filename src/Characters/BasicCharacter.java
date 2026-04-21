@@ -327,11 +327,14 @@ public class BasicCharacter {
     isEnemyCharacter = newValue;
   }
   
-  public void setIsDefending(boolean newValue){
+  public ActionResult setIsDefending(boolean newValue){
+    ActionResult output = new ActionResult();
     isDefending = newValue;
     if(isDefending){
-      System.out.println(name + " will defend against opponent attacks for one turn.");
+      //System.out.println(name + " will defend against opponent attacks for one turn.");
+      output.add(name + " will defend against opponent attacks for one turn.");
     }
+    return output;
   }
 
   public void setCharacterImage(String path){
@@ -521,7 +524,7 @@ public class BasicCharacter {
     // Draw Character's HP points left above the text
     UIManager.findMaxFontSize(currentHP + "/" + maxHP, graphics, (width-lostSpacing*2) / 2, 12, true, true);
     int hpFontSize = UIManager.getFont().getSize();
-    UIManager.setTextColor(graphics, Color.WHITE);
+    UIManager.setTextColor(graphics, Color.BLACK);
     UIManager.drawCenteredStringInBox(graphics, currentHP + "/" + maxHP, x+lostSpacing, y-12, (width-lostSpacing*2), 12);
     // Draw Character's name
     UIManager.findMaxFontSize(name, graphics, width-(lostSpacing*2), 20, true, true);

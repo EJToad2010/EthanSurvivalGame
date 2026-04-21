@@ -2,6 +2,7 @@ package src.GameManagement.GameState;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import src.Characters.BasicCharacter;
@@ -15,6 +16,7 @@ import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.Mechanics.DayManager;
 import src.GameManagement.Mechanics.Signals;
 import src.GameManagement.UI.GamePanel;
+import src.GameManagement.UI.ImageManager;
 import src.GameManagement.UI.InputHandler;
 import src.GameManagement.UI.UIManager;
 import src.ItemManager.Items.HealthPool;
@@ -68,6 +70,10 @@ public class BattleState extends GameState{
 
   // Variables used to track UI
   private int buttonFontSize = 40;
+
+  // Graphics variables
+  private BufferedImage sky;
+  private BufferedImage ground;
 
   public BattleState(Game g, DayManager dayManager){
       super(g, dayManager);
@@ -206,6 +212,8 @@ public class BattleState extends GameState{
       }
     } else if(step == PLAYER_VICTORY){
       setStep(ENEMY_REWARDS);
+    } else if(step == ENEMY_REWARDS){
+      dayManager.nextPhase();
     }
   }
 
@@ -251,6 +259,8 @@ public class BattleState extends GameState{
 
   // Graphics drawn for each step
   protected void drawStep(int step, Graphics graphics){
+    graphics.drawImage(sky, 0, 0, null);
+    graphics.drawImage(ground, 0, 360, null);
     if(step == INTRO_ANIM){
       drawScene(scene, graphics);
     } else{
@@ -296,11 +306,10 @@ public class BattleState extends GameState{
       UIManager.refreshText(graphics);
       UIManager.drawCenteredStringInBox(graphics, "(" + (targetAmount - targets.size()) + " targets left)", 0, 700, 1280, 20);
     } else if(step == ENEMY_REWARDS){
-      enemyRewardIndex++;
-      if(enemyRewardIndex >= enemyTeam.getEnemyTeam().size()){
-        dayManager.nextPhase();
+      if(enemyRewardIndex < enemyTeam.getEnemyTeam().size()){
+        enemyRewardIndex++;
+        addDialogForEnemyReward();
       }
-      addDialogForEnemyReward();
     }
     dialogManager.draw(graphics);
     if(inputHandler.getButtons().size() > 0 && !dialogManager.getIsActive()){
@@ -384,8 +393,7 @@ public class BattleState extends GameState{
     } else if(step == ENEMY_REWARDS){
       playerTeam.setIsDrawingXP(true);
       dialogManager.clear();
-      enemyRewardIndex = 0;
-      addDialogForEnemyReward();
+      enemyRewardIndex = -1;
     }
   }
   // Calls once when the previous step exits
@@ -422,6 +430,8 @@ public class BattleState extends GameState{
       currentStep = INTRO_ANIM;
       dialogManager.clear();
       dialogManager.setIsActive(false);
+      sky = ImageManager.loadImage("src/Images/sky.png");
+      ground = ImageManager.loadImage("src/Images/ground.png");
       panel.repaint();
   }
   // Calls once when panel is unloaded
@@ -437,6 +447,9 @@ public class BattleState extends GameState{
   // Add the proper messages and signals for DialogManager within Enemy loot
   private void addDialogForEnemyReward(){
     System.out.println("dialog for enemy reward added");
+    if(enemyRewardIndex >= enemyTeam.getEnemyTeam().size()){
+      return;
+    }
     EnemyCharacter currentRewardEnemy = enemyTeam.getEnemyTeam().get(enemyRewardIndex);
     dialogManager.add(currentRewardEnemy.getName() + " dropped " + currentRewardEnemy.getCoinReward() + "g!", Signals.COINS_GAINED, currentRewardEnemy.getCoinReward());
     for(PlayerCharacter p : playerTeam.getPlayerTeam()){

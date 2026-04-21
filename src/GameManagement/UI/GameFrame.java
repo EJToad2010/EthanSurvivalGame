@@ -17,6 +17,7 @@ public class GameFrame {
         // Java Swing methods I learned to use
         frame.add(panel);
         frame.pack();
+        frame.setIconImage(ImageManager.loadImage("src/Images/icon.png"));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);

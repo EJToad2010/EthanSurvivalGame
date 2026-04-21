@@ -51,7 +51,7 @@ public class Archer extends PlayerCharacter {
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
       if((int)(Math.random() * 100) < 33 && enemyHPChange > 0){
-        StatusEffect.addStatusEffect(target, "Soft", 2);
+        output.add(StatusEffect.addStatusEffect(target, "Soft", 2));
       }
       //System.out.println(target.getSimpleOutput());
     } else if(basicAbilityIndex == 1){
@@ -76,7 +76,7 @@ public class Archer extends PlayerCharacter {
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
       if((int)(Math.random() * 100) < 10 && enemyHPChange > 0){
-        StatusEffect.addStatusEffect(target, "Burn", 1);
+        output.add(StatusEffect.addStatusEffect(target, "Burn", 1));
       }
     } else if(specialAbilityIndex == 1){
       // Crippling Arrow
@@ -85,7 +85,7 @@ public class Archer extends PlayerCharacter {
       output.add(getName() + " fired an armor piercing arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()+5);
       output.add(handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam));
       if((int)(Math.random() * 100) < 50){
-        StatusEffect.addStatusEffect(target, "Pierce", 2);
+        output.add(StatusEffect.addStatusEffect(target, "Pierce", 2));
       }
     }
     //System.out.println(target.getSimpleOutput());

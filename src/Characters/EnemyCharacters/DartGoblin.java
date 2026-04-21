@@ -99,7 +99,7 @@ public class DartGoblin extends EnemyCharacter{
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
       if((int)(Math.random() * 100) < 25 && enemyHPChange > 0){
-        StatusEffect.addStatusEffect(target, "Poison", 2);
+        output.add(StatusEffect.addStatusEffect(target, "Poison", 2));
       }
       //System.out.println(target.getSimpleOutput());
     } else if(basicAbilityIndex == 1){
@@ -122,7 +122,7 @@ public class DartGoblin extends EnemyCharacter{
       //Thread.sleep(1000);
       // 33% chance of Poison for 2 turns
       if((int)(Math.random() * 100) < 33){
-        StatusEffect.addStatusEffect(target, "Poison", 2);
+        output.add(StatusEffect.addStatusEffect(target, "Poison", 2));
       }
     } else if(specialAbilityIndex == 1){
       // Poison Mark
@@ -132,7 +132,7 @@ public class DartGoblin extends EnemyCharacter{
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
       if((int)(Math.random() * 100) < 75 && enemyHPChange > 0){
-        StatusEffect.addStatusEffect(target, "Poison", 3);
+        output.add(StatusEffect.addStatusEffect(target, "Poison", 3));
       }
     }
     //System.out.println(target.getSimpleOutput());

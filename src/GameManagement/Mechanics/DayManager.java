@@ -44,6 +44,7 @@ public class DayManager {
             currentPhase++;
         }
         if(currentPhase > DAY_END){
+            System.out.println("Next day");
             game.getGameData().nextDay();
             currentPhase = NEW_DAY;
         }
@@ -71,7 +72,6 @@ public class DayManager {
         } else if(currentPhase == DAY_END){
             // Not implemented yet
             game.setCurrentGameState(new DayEndState(game, this));
-            nextPhase();
         }
     }
 }

@@ -7,6 +7,7 @@ import src.GameManagement.Game;
 import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.Mechanics.Signals;
 import src.GameManagement.UI.DialogManager;
+import src.GameManagement.UI.UIManager;
 import src.Teams.PlayerTeam;
 // PlayerCharacters have unique attributes such as a shared inventory, xp, and levels
 // This object should never be created on its own. Only its subclasses will ever be used.
@@ -29,8 +30,8 @@ public class PlayerCharacter extends BasicCharacter {
   private boolean isDrawingXP;
   
   // Constructor that requires all attributes
-  public PlayerCharacter(String name, double maxHP, double attackStrength, double defenseStrength, double speed){
-    super(name, maxHP, attackStrength, defenseStrength, speed);
+  public PlayerCharacter(String name, double xpToNextLevel, double attackStrength, double defenseStrength, double speed){
+    super(name, xpToNextLevel, attackStrength, defenseStrength, speed);
     setDescription("A basic player character.");
   }
   
@@ -166,5 +167,9 @@ public class PlayerCharacter extends BasicCharacter {
     graphics.fillRect(getX()+getLostSpacing(), getY()+getHeight()+10, width-(getLostSpacing()*2), 10);
     graphics.setColor(Color.CYAN);
     graphics.fillRect(getX()+getLostSpacing(), getY()+getHeight()+10, xpSize, 10);
+    // Draw Character's XP point ratio below the bar
+    UIManager.findMaxFontSize(xp + "/" + xpToNextLevel, graphics, (width-getLostSpacing()*2) / 2, 12, true, true);
+    UIManager.setTextColor(graphics, Color.BLACK);
+    UIManager.drawCenteredStringInBox(graphics, xp + "/" + xpToNextLevel, getX()+getLostSpacing(), getY()+getHeight()+22, (width-getLostSpacing()*2), 12);
   }
 }

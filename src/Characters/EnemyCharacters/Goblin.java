@@ -118,7 +118,7 @@ public class Goblin extends EnemyCharacter{
       output.add(defenseResult);
       //System.out.println(target.getSimpleOutput());
       if((int)(Math.random() * 100) < 10 && enemyHPChange > 0){
-        StatusEffect.addStatusEffect(target, "Bleed", 2);
+        output.add(StatusEffect.addStatusEffect(target, "Bleed", 2));
       }
     } else if(basicAbilityIndex == 1){
       // Nimble Dodge (shared with Goblin class since they are both speedy Goblin types)

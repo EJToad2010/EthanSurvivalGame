@@ -22,4 +22,7 @@ public class ImageManager {
             }
         }
     }
+    public static ImageIcon loadIcon(String path){
+        return new ImageIcon(ImageManager.loadImage(path));
+    }
 }

@@ -2,6 +2,7 @@ package src.Misc;
 import java.util.ArrayList;
 
 import src.Characters.BasicCharacter;
+import src.GameManagement.Mechanics.ActionResult;
 // Handles all status effects that both players and enemies experience
 // Static class that can be used flexibly across all other classes
 public class StatusEffect {
@@ -19,7 +20,8 @@ public class StatusEffect {
   public StatusEffect(){}
   
   // Add a status effect for a specific character for the specified amount of turns
-  public static void addStatusEffect (BasicCharacter c, String type, int totalTurns){
+  public static ActionResult addStatusEffect (BasicCharacter c, String type, int totalTurns){
+    ActionResult output = new ActionResult();
     if(hasStatusEffect(c, type)){
       // Avoiding stacking multiple of the same status effect.
       // If this happens, only update the turns left to the new value
@@ -42,24 +44,24 @@ public class StatusEffect {
       affectedRandomStats.add(0.0);
     }
     // Message to confirm addition of StatusEffect
-    System.out.println(c.getName() + " has gained [" + type.toUpperCase() + "] for " + totalTurns + " turns!");
-    if(indexOfType(type) == -1){
-      // System.out.println("DEBUG: " + type + " was not found in effectTypes.");
-      return;
-    }
+    //System.out.println(c.getName() + " has gained [" + type.toUpperCase() + "] for " + totalTurns + " turns!");
+    output.add(c.getName() + " has gained [" + type.toUpperCase() + "] for " + totalTurns + " turns!");
     // One-time effect apply immediately after a StatusEffect is added
     if(applyTypes[indexOfType(type)].equalsIgnoreCase("One-time")){
       applyOneTimeEffect(c, type);
     }
+    return output;
   }
 
   // Search for an exact combination of Character and type in the ArrayLists
   // If found, remove them
   // If not found, do nothing
-  public static void removeStatusEffect(BasicCharacter c, String type){
+  public static ActionResult removeStatusEffect(BasicCharacter c, String type){
+    ActionResult output = new ActionResult();
     for(int i = 0; i < affectedCharacters.size(); i++){
       if(affectedCharacters.get(i) == c && affectedTypes.get(i).equals(type)){
-        System.out.println(affectedCharacters.get(i).getName() + " lost the [" + affectedTypes.get(i).toUpperCase() + "] effect!");
+        //System.out.println(affectedCharacters.get(i).getName() + " lost the [" + affectedTypes.get(i).toUpperCase() + "] effect!");
+        output.add(affectedCharacters.get(i).getName() + " lost the [" + affectedTypes.get(i).toUpperCase() + "] effect!");
         if(applyTypes[indexOfType(affectedTypes.get(i))].equals("One-time")){
           reverseOneTimeEffect(affectedCharacters.get(i), affectedTypes.get(i));
         }
@@ -71,6 +73,7 @@ public class StatusEffect {
         break;
       }
     }
+    return output;
   }
   
   // Remove a character's status effect
@@ -121,17 +124,22 @@ public class StatusEffect {
   }
   
   // Runs once every turn
-  private static void applyPassiveEffect(BasicCharacter c, String type){
+  private static ActionResult applyPassiveEffect(BasicCharacter c, String type){
+    ActionResult output = new ActionResult();
     if(type.equals("Poison")){
-      System.out.println(c.getName() + " lost 5 HP from poison!");
+      //System.out.println(c.getName() + " lost 5 HP from poison!");
+      output.add(c.getName() + " lost 5 HP from poison!");
       c.changeCurrentHP(-5);
     } else if (type.equals("Bleed")){
-      System.out.println(c.getName() + " lost 5 HP from bleeding!");
+      //System.out.println(c.getName() + " lost 5 HP from bleeding!");
+      output.add(c.getName() + " lost 5 HP from bleeding!");
       c.changeCurrentHP(-5);
     } else if(type.equals("Burn")){
-      System.out.println(c.getName() + " lost 5 HP from burning!");
+      //System.out.println(c.getName() + " lost 5 HP from burning!");
+      output.add(c.getName() + " lost 5 HP from burning!");
       c.changeCurrentHP(-5);
     }
+    return output;
   }
   
   // Return a formatted list of all of a Character's status effects.
@@ -168,13 +176,14 @@ public class StatusEffect {
   }
   
   // Runs every time the turn switches from player to enemy and the other way around
-  public static void handleStatusTurn(){
+  public static ActionResult handleStatusTurn(){
+    ActionResult output = new ActionResult();
     for(int i = 0; i < affectedCharacters.size(); i++){
       // This method is called twice per turn. Decrease by -0.5 to offset this difference.
       affectedTurnsLeft.set(i, affectedTurnsLeft.get(i) - 0.5);
       // Make sure a passive effect is only applied once per turn
       if(applyTypes[indexOfType(affectedTypes.get(i))].equals("Passive") && affectedTurnsLeft.get(i) % 1 == 0){
-          applyPassiveEffect(affectedCharacters.get(i), affectedTypes.get(i));
+          output.add(applyPassiveEffect(affectedCharacters.get(i), affectedTypes.get(i)));
       }
 
       // Remove a status effect if a Character is dead
@@ -189,16 +198,19 @@ public class StatusEffect {
 
       // Remove a status effect if its turn timer runs out
       if(affectedTurnsLeft.get(i) <= 0){
-        System.out.println(affectedCharacters.get(i).getName() + " lost the [" + affectedTypes.get(i).toUpperCase() + "] effect!");
+        output.add(removeStatusEffect(affectedCharacters.get(i), affectedTypes.get(i)));
+        //System.out.println(affectedCharacters.get(i).getName() + " lost the [" + affectedTypes.get(i).toUpperCase() + "] effect!");
+        /*output.add(affectedCharacters.get(i).getName() + " lost the [" + affectedTypes.get(i).toUpperCase() + "] effect!");
         if(applyTypes[indexOfType(affectedTypes.get(i))].equals("One-time")){
           reverseOneTimeEffect(affectedCharacters.get(i), affectedTypes.get(i));
         }
         affectedCharacters.remove(i);
         affectedTypes.remove(i);
         affectedTurnsLeft.remove(i);
-        affectedRandomStats.remove(i);
+        affectedRandomStats.remove(i);*/
         i--;
       }
     }
+    return output;
   }
 }
