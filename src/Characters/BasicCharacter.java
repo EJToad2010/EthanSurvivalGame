@@ -48,6 +48,7 @@ public class BasicCharacter {
   private ArrayList<Integer> basicAbilityEnemyCounts = new ArrayList<Integer>();
   // The type of basic ability (EX: offensive, defensive)
   private ArrayList<String> basicAbilityTypes = new ArrayList<String>();
+  private ArrayList<Integer> basicAbilityAnimationLengths = new ArrayList<Integer>();
   // Names and descriptions that allow for a Character to have multiple special abilities
   private ArrayList<String> specialAbilityNames = new ArrayList<String>();
   private ArrayList<String> specialAbilityDescriptions = new ArrayList<String>();
@@ -58,6 +59,7 @@ public class BasicCharacter {
   private ArrayList<Integer> specialAbilityCooldowns = new ArrayList<Integer>();
   private ArrayList<Integer> currentSpecialAbilityCooldowns = new ArrayList<Integer>();
   private ArrayList<String> specialAbilityTypes = new ArrayList<String>();
+  private ArrayList<Integer> specialAbilityAnimationLengths = new ArrayList<Integer>();
   
   // Core parameters related to essential interactions in battle
   private double maxHP;
@@ -227,6 +229,10 @@ public class BasicCharacter {
   public ArrayList<String> getBasicAbilityTypes(){
     return basicAbilityTypes;
   }
+
+  public ArrayList<Integer> getBasicAbilityAnimationLengths(){
+    return basicAbilityAnimationLengths;
+  }
   
   public ArrayList<String> getSpecialAbilityNames(){
     return specialAbilityNames;
@@ -254,6 +260,10 @@ public class BasicCharacter {
   
   public ArrayList<String> getSpecialAbilityTypes(){
     return specialAbilityTypes;
+  }
+
+  public ArrayList<Integer> getSpecialAbilityAnimationLengths(){
+    return specialAbilityAnimationLengths;
   }
 
   public int getX(){
@@ -305,7 +315,7 @@ public class BasicCharacter {
     currentHP += amount;
     if(currentHP < 0.0){
       currentHP = 0.0;
-      System.out.println(name + " was knocked out in battle!");
+      // System.out.println(name + " was knocked out in battle!");
     }
     if(currentHP > maxHP){
       currentHP = maxHP;
@@ -521,7 +531,7 @@ public class BasicCharacter {
 
   // Animation methods to override
   // Called every time the Character conducts an offensive attack
-  public void drawAttackAnimation(Graphics graphics, int tick){}
+  public void drawAttackAnimation(String abilityType, int abilityIndex, Graphics graphics, int tick){}
 
   // Draw the given Character sprite at top left corner (x, y)
   public void drawCharacter(Graphics graphics){

@@ -354,7 +354,7 @@ public class BattleState extends GameState{
         isHandlingSignal = false;
         selectedCharacter.setIsAnimating(false);
       } else{
-        selectedCharacter.drawAttackAnimation(graphics, tick);
+        selectedCharacter.drawAttackAnimation(selectedActionType, selectedAbilityIndex, graphics, tick);
       }
     }
   }

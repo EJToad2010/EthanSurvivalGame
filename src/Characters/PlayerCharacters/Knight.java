@@ -103,20 +103,20 @@ public class Knight extends PlayerCharacter {
   public ActionResult defend(BasicCharacter target, double actualDamage){
     ActionResult output = new ActionResult();
     if(actualDamage == 0){
-      System.out.println(getName() + " fully countered " + target.getName() + " with their shield!");
+      //System.out.println(getName() + " fully countered " + target.getName() + " with their shield!");
       output.add(getName() + " fully countered " + target.getName() + " with their shield!",Signals.DEFENSE_PERFORMED, 999.0);
     }else if(getIsDefending()){
-      System.out.println(getName() + " partially blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() * 2 + " HP!");
+      //System.out.println(getName() + " partially blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() * 2 + " HP!");
       output.add(getName() + " defended against " + target.getName() + " for " + getDefenseStrength() * 2 + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
     } else{
-      System.out.println(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() + " HP!");
+      //System.out.println(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() + " HP!");
       output.add(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength());
     }
     return output;
   }
 
   // Called every time the Character conducts an offensive attack
-  public void drawAttackAnimation(Graphics graphics, int tick){
+  public void drawAttackAnimation(String abilityType, int abilityIndex, Graphics graphics, int tick){
     // Move right for 10 ticks, move left back to start for 10 ticks
     int localX = getX() + 75 - 15 * Math.abs(tick - 10);
     drawCharImage(graphics, localX, getY());
