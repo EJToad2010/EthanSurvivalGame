@@ -521,6 +521,7 @@ public class BasicCharacter {
         ((PlayerCharacter) this).drawXPBar(graphics);
       }
     }
+    StatusEffect.drawStatusEffects(graphics, this);
     // Draw Character's HP points left above the text
     UIManager.findMaxFontSize(currentHP + "/" + maxHP, graphics, (width-lostSpacing*2) / 2, 12, true, true);
     int hpFontSize = UIManager.getFont().getSize();

@@ -1,8 +1,12 @@
 package src.Misc;
 import java.util.ArrayList;
 
+import java.awt.Color;
+import java.awt.Graphics;
+
 import src.Characters.BasicCharacter;
 import src.GameManagement.Mechanics.ActionResult;
+import src.GameManagement.UI.UIManager;
 // Handles all status effects that both players and enemies experience
 // Static class that can be used flexibly across all other classes
 public class StatusEffect {
@@ -10,6 +14,10 @@ public class StatusEffect {
   private static String[] effectTypes = new String[]{"Soft", "Bleed", "Poison", "Slow", "Stun", "Nimble", "Taunt", "Burn", "Pierce"};
   // How each status effect affects a target
   private static String[] applyTypes = new String[]{"One-time", "Passive", "Passive", "One-time", "One-time", "Other", "Other", "Passive", "One-time"};
+  // The color of each status effect when displayed in-game
+  private static Color[] colorTypes = new Color[]{Color.DARK_GRAY, new Color(110, 23, 23), new Color(17, 92, 29), new Color(53, 56, 99), new Color(66, 66, 66),
+    new Color(10, 130, 20), new Color(0, 186, 16), new Color(173, 16, 16), new Color(9, 100, 128)
+  };
   
   // These three lists all have corresponding index values
   private static ArrayList<BasicCharacter> affectedCharacters = new ArrayList<BasicCharacter>();
@@ -212,5 +220,24 @@ public class StatusEffect {
       }
     }
     return output;
+  }
+  // Draw the text containing all status effects of a Character
+  public static void drawStatusEffects(Graphics graphics, BasicCharacter c){
+    ArrayList<String> statusTypesOfCharacter = statusEffectListOf(c);
+    int heightOffset = 50;
+    for(String statusType : statusTypesOfCharacter){
+      // Find corresponding color for status type
+      int statusIndex = 0;
+      for(int i = 0; i < effectTypes.length; i++){
+        if(effectTypes[i].equals(statusType)){
+          statusIndex = i;
+          break;
+        }
+      }
+      UIManager.setTextColor(graphics, colorTypes[statusIndex]);
+      UIManager.findMaxFontSize("["+statusType+"]", graphics, c.getWidth()-(c.getLostSpacing()*2), 20, true, true);
+      UIManager.drawCenteredStringInBox(graphics, "["+statusType+"]", c.getX()+c.getLostSpacing(), c.getY()-heightOffset, c.getWidth()-(c.getLostSpacing()*2), 20);
+      heightOffset -= 20;
+    }
   }
 }

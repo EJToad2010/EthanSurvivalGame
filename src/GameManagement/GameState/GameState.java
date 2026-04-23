@@ -77,6 +77,7 @@ public class GameState {
 
     // Move to the next stpe
     protected void nextStep(){
+        System.out.println("Next step called");
         onExitStep(currentStep);
         onEnterStep(currentStep+1);
         currentStep++;
@@ -141,7 +142,9 @@ public class GameState {
     
     // Set a specific step
     protected void setStep(int newStep){
+        System.out.println("Exiting step " + currentStep);
         onExitStep(currentStep);
+        System.out.println("Entering step " + newStep);
         onEnterStep(newStep);
         currentStep = newStep;
     }

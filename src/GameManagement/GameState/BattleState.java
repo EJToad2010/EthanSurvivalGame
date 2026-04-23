@@ -53,6 +53,7 @@ public class BattleState extends GameState{
   private ArrayList<EnemyCharacter> targets = new ArrayList<EnemyCharacter>();
   private int targetIndex;
   private EnemyCharacter currentTarget;
+  private boolean isTargetingAllEnemies = false;
 
   private int enemyRewardIndex;
 
@@ -119,7 +120,9 @@ public class BattleState extends GameState{
     if(exitCode == -1 && (dialogManager.getIsActive() || dialogManager.size() == 0)){
       return;
     }
-    handleDialogEndedLogic(step);
+    if(exitCode == 0){
+      handleDialogEndedLogic(step);
+    }
 
     // Handle any inputHandler actions that exist
     if(inputHandler.getButtons().size() > 0 && !dialogManager.getIsActive() && exitCode == -1){
@@ -151,7 +154,11 @@ public class BattleState extends GameState{
           } else{
             targetAmount = selectedCharacter.getSpecialAbilityEnemyCount(selectedAbilityIndex);
           }
-          nextStep();
+          if(targetAmount == 999){
+            dialogManager.add(selectedAbilityName + " will target all enemies!");
+          } else{
+            setStep(SELECT_TARGET);
+          }
         }
       } else if(step == SELECT_TARGET){
         targetIndex = input;
@@ -179,28 +186,59 @@ public class BattleState extends GameState{
         initializeEnemyTurn();
         setStep(ENEMY_TURN);
       }
-    } else if(step == PERFORM_ABILITY){
-      if(targets.size() < targetAmount){
+    } else if(step == SELECT_ABILITY){
+      if(targetAmount == 999){
+        setStep(PERFORM_ABILITY);
+      }
+    }else if(step == PERFORM_ABILITY){
+      // Return to selecting the next target if more targets are left
+      // Return to next action if no targets are left
+      // Go to enemy turn if no actions are left
+      if(targets.size() < targetAmount || (targetAmount == 999 && targetIndex < targets.size())){
         dialogManager.clear();
-        dialogManager.add("You may select " + (targetAmount-targets.size()) + " more targets.");
-        setStep(SELECT_TARGET);
-        System.out.println("Next target");
+        if(!isTargetingAllEnemies){
+          dialogManager.add("You may select " + (targetAmount-targets.size()) + " more targets.");
+        }
+        if(targetAmount != 999){
+          setStep(SELECT_TARGET);
+          System.out.println("Next target");
+        } else{
+          while(true){
+              targetIndex++;
+              if(targetIndex >= enemyTeam.getEnemyTeam().size()){
+                break;
+              }
+              if(!enemyTeam.getEnemyTeam().get(targetIndex).getIsDead()){
+                break;
+              }
+              
+          }
+          if(targetIndex >= enemyTeam.getEnemyTeam().size()){
+            if(actionPointsLeft > 1){
+              System.out.println("next action path");
+              nextAction();
+            } else{
+              System.out.println("next turn half path");
+              nextTurnHalfActions();
+            }
+          } else{
+            System.out.println("perform ability path");
+            currentTarget = enemyTeam.getEnemyTeam().get(targetIndex);
+            setStep(PERFORM_ABILITY);
+          }
+        }
+        
       } else if(actionPointsLeft > 1){
-        actionPointsLeft--;
-        playerTeam.resetSelectedCharacterIndex();
-        dialogManager.clear();
-        dialogManager.add("You have " + actionPointsLeft + " actions left this turn.");
-        System.out.println("Next action");
-        setStep(SELECT_CHARACTER);
+        nextAction();
       } else{
-        System.out.println("Player turn over");
-        nextTurnHalf();
-        initializeEnemyTurn();
-        setStep(ENEMY_TURN);
+        nextTurnHalfActions();
       }
     } else if(step == ENEMY_TURN){
+      // Move automatically to an enemy ability
       setStep(ENEMY_PERFORM_ABILITY);
     } else if(step == ENEMY_PERFORM_ABILITY){
+      // Make the next enemy perform an action
+      // Move on to player turn if no enemies are left
       actionableEnemyIndex++;
       if(actionableEnemyIndex == -1 || actionableEnemyIndex >= actionableEnemies.size()){
         System.out.println("Enemy turn over");
@@ -215,6 +253,25 @@ public class BattleState extends GameState{
     } else if(step == ENEMY_REWARDS){
       dayManager.nextPhase();
     }
+  }
+
+  // Move on to the next action
+  private void nextAction(){
+    actionPointsLeft--;
+    playerTeam.resetSelectedCharacterIndex();
+    dialogManager.clear();
+    dialogManager.add("You have " + actionPointsLeft + " actions left this turn.");
+    isTargetingAllEnemies = false;
+    System.out.println("Next action");
+    setStep(SELECT_CHARACTER);
+  }
+
+  // Move on to enemy turn after actions run out
+  private void nextTurnHalfActions(){
+    System.out.println("Player turn over");
+    nextTurnHalf();
+    initializeEnemyTurn();
+    setStep(ENEMY_TURN);
   }
 
   // Used when a GameState makes use of dialog that contains interaction
@@ -259,6 +316,7 @@ public class BattleState extends GameState{
 
   // Graphics drawn for each step
   protected void drawStep(int step, Graphics graphics){
+    // Draw the background componentsx that are always rendered
     graphics.drawImage(sky, 0, 0, null);
     graphics.drawImage(ground, 0, 360, null);
     if(step == INTRO_ANIM){
@@ -267,6 +325,7 @@ public class BattleState extends GameState{
       enemyTeam.drawEnemyTeam(graphics, 680, 200, 500);
       playerTeam.drawPlayerTeam(graphics, 100, 200, 500);
     }
+
     if(step == SELECT_CHARACTER && !dialogManager.getIsActive()){
       dialogManager.drawDialogBox(graphics);
       inputHandler.spaceButtons(graphics, buttonFontSize, 900, 550);
@@ -353,12 +412,14 @@ public class BattleState extends GameState{
 
   // Calls once when a new step is first loaded
   protected void onEnterStep(int step){
-    System.out.println("Enter step " + step);
     if(step == SELECT_CHARACTER){
+      // Init the character the player can choose from
       inputHandler = createCharacterOptions(playerTeam.getPlayerTeam(), new ArrayList<BasicCharacter>());
     } else if(step == SELECT_ACTION){
-      inputHandler = createOptions(new String[]{"Basic ability", "Special ability", "Use item", "Defend", "HELP"});
+      // Init the possible choice the player can make
+      inputHandler = createOptions(new String[]{"Basic ability", "Special ability", "Use item", "Defend"});
     } else if(step == SELECT_ABILITY){
+      // Init the possible abilities the player can pick from
       if(selectedActionType.equals("Basic ability")){
         inputHandler = createOptions(playerTeam.getUnlockedBasicAbilityNames(selectedCharacter));
       } else{
@@ -366,6 +427,12 @@ public class BattleState extends GameState{
       }
     } else if(step == SELECT_TARGET){
       refreshAvailableTargets();
+      // If an ability can target all available enemies, move on automatically without user input
+      if(targetAmount == 999){
+        System.out.println("targeting all enemies");
+        isTargetingAllEnemies = true;
+        
+      }
     } else if(step == PERFORM_ABILITY){
       inputHandler = new InputHandler();
       // Get the ActionResult of the Character's ability function
@@ -382,15 +449,24 @@ public class BattleState extends GameState{
       // Get the ActionResult of the Enemy's ability function
       ActionResult output;
       dialogManager.clear();
+      // Emergency break
+      if(actionableEnemyIndex >= actionableEnemies.size()){
+        nextTurnHalf();
+        initializePlayerTurn();
+        return;
+      }
       output = actionableEnemies.get(actionableEnemyIndex).takeTurn(playerTeam, enemyTeam);
       dialogManager.add(output);
     } else if(step == PLAYER_VICTORY){
+      // Update dialog
       dialogManager.clear();
       dialogManager.add("Congratulations! All enemies have been defeated.");
     } else if(step == ENEMY_VICTORY){
+      // Update dialog
       dialogManager.clear();
       dialogManager.add("Oh no! All your characters have died.");
     } else if(step == ENEMY_REWARDS){
+      // Init variables to track enemy rewards
       playerTeam.setIsDrawingXP(true);
       dialogManager.clear();
       enemyRewardIndex = -1;
@@ -398,11 +474,11 @@ public class BattleState extends GameState{
   }
   // Calls once when the previous step exits
   protected void onExitStep(int step){
-    System.out.println("Exit step " + step);
     // Between steps, check if a victory condition has been reached
     // Exit the battle if so
     if(step == SELECT_CHARACTER){
-      
+      targetIndex = -1;
+
     } else if(step == SELECT_ABILITY){
       targets.clear();
     } else if(step == ENEMY_PERFORM_ABILITY){
@@ -474,13 +550,12 @@ public class BattleState extends GameState{
     actionPointsLeft = playerActionPoints;
     dialogManager.add("It is your turn!");
     dialogManager.add("You may perform " + actionPointsLeft + " actions during your turn.");
-    if(turnNum > 1){
-      playerTeam.decreasePlayerCooldowns();
-    }
+    playerTeam.decreasePlayerCooldowns();
   }
 
   // Find every Enemy able to perform an action and announce that the Enemy's turn has been reached
   private void initializeEnemyTurn(){
+    System.out.println("Enemy turn initialized");
     dialogManager.add("It is the enemy's turn!");
     actionableEnemies.clear();
     for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
