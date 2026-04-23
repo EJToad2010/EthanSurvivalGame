@@ -35,6 +35,8 @@ public class BasicCharacter {
   protected int height = 160;
   // The amount of space the Character loses when displayed on screen
   private int lostSpacing = 0;
+  private boolean isAnimating = false;
+  protected int attackAnimationLength = 0;
   // Integer value used to uniquely identify a Character
   // (Used within signals)
   private int id;
@@ -274,6 +276,14 @@ public class BasicCharacter {
     return lostSpacing;
   }
 
+  public boolean getIsAnimating(){
+    return isAnimating;
+  }
+
+  public int getAttackAnimationLength(){
+    return attackAnimationLength;
+  }
+
   // Setter methods
   // Battle-related double values work with both increasing and decreasing
   
@@ -386,6 +396,10 @@ public class BasicCharacter {
   protected void setPassiveAbilityDescription(String newValue){
     passiveAbilityDescription = newValue;
   }
+
+  public void setIsAnimating(boolean isAnimating){
+    this.isAnimating = isAnimating;
+  }
   
   // Even though overloading methods like this may be discouraged, I found that Java is good at
   // distinguishing between Strings and Integers
@@ -434,9 +448,9 @@ public class BasicCharacter {
     if(StatusEffect.hasStatusEffect(target, "Nimble")){
       System.out.println("Attack was reduced by 25% from " + target.getName() + " being NIMBLE!");
       output.add("Attack was reduced by 25% from " + target.getName() + " being NIMBLE!");
-      actualDamage = calculateActualDamage(target, attack*0.75, playerTeam, enemyTeam);
+      actualDamage = calculateActualDamage(target, attack*0.75, playerTeam, enemyTeam, output);
     } else{
-      actualDamage = calculateActualDamage(target, attack, playerTeam, enemyTeam);
+      actualDamage = calculateActualDamage(target, attack, playerTeam, enemyTeam, output);
     } 
     output.add(target.defend(this, actualDamage));
     output.add(Signals.TARGET_HEALTH_LOST, actualDamage);
@@ -445,7 +459,7 @@ public class BasicCharacter {
   
   // If a character did not actively defend, their normal defenseStrength is applied
   // When a character actively defends, their defenseStrength is doubled
-  private double calculateActualDamage(BasicCharacter target, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+  private double calculateActualDamage(BasicCharacter target, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam,ActionResult output){
     double actualDamage;
     if(target.isDefending){
       actualDamage = attack - (target.defenseStrength * 2);
@@ -458,7 +472,8 @@ public class BasicCharacter {
     }
     if(playerTeam.getIndexOfProtectedCharacter(target) != -1){
       int index = playerTeam.getIndexOfProtectedCharacter(target);
-      System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
+      // System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
+      output.add(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!", Signals.DEFENSE_RECEIVED, playerTeam.getProtectedCharacterAmounts().get(index));
       actualDamage -= playerTeam.getProtectedCharacterAmounts().get(index);
     }
     return Math.max(actualDamage, 0);
@@ -504,43 +519,55 @@ public class BasicCharacter {
     return output;
   }
 
+  // Animation methods to override
+  // Called every time the Character conducts an offensive attack
+  public void drawAttackAnimation(Graphics graphics, int tick){}
+
   // Draw the given Character sprite at top left corner (x, y)
   public void drawCharacter(Graphics graphics){
     if(isSelected){
       graphics.setColor(Color.YELLOW);
       graphics.fillRect(x, y, width, height);
     }
-    if(getIsDead()){
-      graphics.drawImage(deadImage, x, y, null);
-    } else{
-      graphics.drawImage(characterImage, x, y, null);
-    }
-    drawHPBar(graphics);
+    drawCharImage(graphics, x, y);
+    drawHPBar(graphics, x, y);
     if(this instanceof PlayerCharacter){
       if(((PlayerCharacter) this).getIsDrawingXP()){
-        ((PlayerCharacter) this).drawXPBar(graphics);
+        ((PlayerCharacter) this).drawXPBar(graphics, x, y);
       }
     }
+    drawCharText(graphics, x, y);
+  }
+
+  protected void drawCharImage(Graphics graphics, int localX, int localY){
+    if(getIsDead()){
+      graphics.drawImage(deadImage, localX, localY, null);
+    } else{
+      graphics.drawImage(characterImage, localX, localY, null);
+    }
+  }
+
+  protected void drawCharText(Graphics graphics, int localX, int localY){
     StatusEffect.drawStatusEffects(graphics, this);
     // Draw Character's HP points left above the text
     UIManager.findMaxFontSize(currentHP + "/" + maxHP, graphics, (width-lostSpacing*2) / 2, 12, true, true);
     int hpFontSize = UIManager.getFont().getSize();
     UIManager.setTextColor(graphics, Color.BLACK);
-    UIManager.drawCenteredStringInBox(graphics, currentHP + "/" + maxHP, x+lostSpacing, y-12, (width-lostSpacing*2), 12);
+    UIManager.drawCenteredStringInBox(graphics, currentHP + "/" + maxHP, localX+lostSpacing, localY-12, (width-lostSpacing*2), 12);
     // Draw Character's name
     UIManager.findMaxFontSize(name, graphics, width-(lostSpacing*2), 20, true, true);
-    UIManager.drawCenteredStringInBox(graphics, name, x+lostSpacing, y-20-hpFontSize, (width-lostSpacing*2), 20);
+    UIManager.drawCenteredStringInBox(graphics, name, localX+lostSpacing, localY-20-hpFontSize, (width-lostSpacing*2), 20);
   }
 
   // Draw the HP bar of the Character
   // Positioned 10 pixels above the Character, spanning the exact width of the Character
-  public void drawHPBar(Graphics graphics){
+  protected void drawHPBar(Graphics graphics, int localX, int localY){
     double hpRatio = currentHP / maxHP;
     int hpSize = (int)((double)(width-(lostSpacing*2)) * hpRatio);
     graphics.setColor(Color.BLACK);
-    graphics.fillRect(x+lostSpacing, y-10, width-(lostSpacing*2), 10);
+    graphics.fillRect(localX+lostSpacing, localY-10, width-(lostSpacing*2), 10);
     graphics.setColor(Color.GREEN);
-    graphics.fillRect(x+lostSpacing, y-10, hpSize, 10);
+    graphics.fillRect(localX+lostSpacing, localY-10, hpSize, 10);
   }
 }
 

@@ -159,18 +159,18 @@ public class PlayerCharacter extends BasicCharacter {
     return output;
   }
 
-  public void drawXPBar(Graphics graphics){
+  public void drawXPBar(Graphics graphics, int localX, int localY){
     updateXPToNextLevel();
     double xpRatio = xp / xpToNextLevel;
     int xpSize = (int)((double)(getWidth()-(getLostSpacing()*2)) * xpRatio);
-    System.out.println(xpSize);
+    //System.out.println(xp);
     graphics.setColor(Color.BLACK);
-    graphics.fillRect(getX()+getLostSpacing(), getY()+getHeight()+10, getWidth()-(getLostSpacing()*2), 10);
+    graphics.fillRect(localX+getLostSpacing(), localY+getHeight()+10, getWidth()-(getLostSpacing()*2), 10);
     graphics.setColor(Color.CYAN);
-    graphics.fillRect(getX()+getLostSpacing(), getY()+getHeight()+10, xpSize, 10);
+    graphics.fillRect(localX+getLostSpacing(), localY+getHeight()+10, xpSize, 10);
     // Draw Character's XP point ratio below the bar
     UIManager.findMaxFontSize(xp + "/" + xpToNextLevel, graphics, (getWidth()-getLostSpacing()*2) / 2, 12, true, true);
     UIManager.setTextColor(graphics, Color.BLACK);
-    UIManager.drawCenteredStringInBox(graphics, xp + "/" + xpToNextLevel, getX()+getLostSpacing(), getY()+getHeight()+32, (getWidth()-getLostSpacing()*2), 12);
+    UIManager.drawCenteredStringInBox(graphics, xp + "/" + xpToNextLevel, localX+getLostSpacing(), localY+getHeight()+32, (getWidth()-getLostSpacing()*2), 12);
   }
 }

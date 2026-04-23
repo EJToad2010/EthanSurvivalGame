@@ -1,5 +1,7 @@
 package src.Characters.PlayerCharacters;
 
+import java.awt.Graphics;
+
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
@@ -29,6 +31,7 @@ public class Knight extends PlayerCharacter {
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
     setCharacterImage("src/Images/knight.png");
+    attackAnimationLength = 20;
   }
   
   // Overrided getType method
@@ -110,6 +113,15 @@ public class Knight extends PlayerCharacter {
       output.add(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength());
     }
     return output;
+  }
+
+  // Called every time the Character conducts an offensive attack
+  public void drawAttackAnimation(Graphics graphics, int tick){
+    // Move right for 10 ticks, move left back to start for 10 ticks
+    int localX = getX() + 75 - 15 * Math.abs(tick - 10);
+    drawCharImage(graphics, localX, getY());
+    drawHPBar(graphics, localX, getY());
+    drawCharText(graphics, localX, getY());
   }
 
   // The Trial of Strength minigame that appears in the Tournament

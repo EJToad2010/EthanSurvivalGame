@@ -340,6 +340,22 @@ public class PlayerTeam {
     this.selectedCharacterIndex = selectedCharacterIndex;
     playerTeam.get(this.selectedCharacterIndex).setIsSelected(true);
   }
+
+  // Set the isAnimating boolean of all Characters to false
+  public void resetIsAnimating(){
+    for(PlayerCharacter p : playerTeam){
+      p.setIsAnimating(false);
+    }
+  }
+
+  // Look for animatingCharacter and set its isAnimating var to true
+  public void setIsAnimating(PlayerCharacter animatingCharacter){
+    for(PlayerCharacter p : playerTeam){
+      if(p == animatingCharacter){
+        p.setIsAnimating(true);
+      }
+    }
+  }
   
   // To String method prints all character objects the user controls
   public String toString(){
@@ -357,7 +373,9 @@ public class PlayerTeam {
     spaceCharacters(x, y, width);
     for(PlayerCharacter c : playerTeam){
       c.setIsDrawingXP(isDrawingXP);
-      c.drawCharacter(graphics);
+      if(!c.getIsAnimating()){
+        c.drawCharacter(graphics);
+      }
     }
   }
 

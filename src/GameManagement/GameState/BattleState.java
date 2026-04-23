@@ -54,6 +54,7 @@ public class BattleState extends GameState{
   private int targetIndex;
   private EnemyCharacter currentTarget;
   private boolean isTargetingAllEnemies = false;
+  private PlayerCharacter selectedDefenseTarget;
 
   private int enemyRewardIndex;
 
@@ -138,8 +139,16 @@ public class BattleState extends GameState{
         selectedActionType = inputHandler.getButtons().get(input).getText();
         if(selectedActionType.equals("Basic ability") || selectedActionType.equals("Special ability")){
           nextStep();
-        } else{
-          System.out.println("THIS FEATURE ISN'T OUT YET");
+        } else if(selectedActionType.equals("Defend")){
+          setStep(SELECT_DEFENSE_TARGET);
+        }else if(selectedActionType.equals("Use item")){
+          if(playerTeam.getPlayerInventory().getInventory().size() > 0){
+            setStep(SELECT_ITEM);
+          } else{
+            dialogManager.add("Your inventory is empty.");
+          }
+        }else{
+          System.out.println("THIS FEATURE ISN'T OUT YET HELEN KELLER");
         }
       } else if(step == SELECT_ABILITY){
         selectedAbilityIndex = input;
@@ -165,10 +174,15 @@ public class BattleState extends GameState{
         targets.add(enemyTeam.getEnemyTeam().get(targetIndex));
         currentTarget = enemyTeam.getEnemyTeam().get(targetIndex);
         setStep(PERFORM_ABILITY);
-      } else if(step == PERFORM_ABILITY){
-
-      }else if(step == ENEMY_TURN){
-
+      } else if(step == SELECT_DEFENSE_TARGET){
+        selectedDefenseTarget = playerTeam.getPlayerTeam().get(input);
+        if(selectedDefenseTarget == selectedCharacter){
+          dialogManager.add(selectedDefenseTarget.setIsDefending(true));
+        } else{
+          playerTeam.getProtectedCharacters().add(selectedDefenseTarget);
+          playerTeam.getProtectedCharacterAmounts().add(selectedCharacter.getDefenseStrength());
+          dialogManager.add(selectedDefenseTarget.getName() + " will receive " + selectedCharacter.getDefenseStrength() + " defense strength from " + selectedCharacter.getName() + "!");
+        }
       }
     }
   }
@@ -196,36 +210,14 @@ public class BattleState extends GameState{
       // Go to enemy turn if no actions are left
       if(targets.size() < targetAmount || (targetAmount == 999 && targetIndex < targets.size())){
         dialogManager.clear();
-        if(!isTargetingAllEnemies){
+        if(!isTargetingAllEnemies && targetAmount != 999){
           dialogManager.add("You may select " + (targetAmount-targets.size()) + " more targets.");
         }
         if(targetAmount != 999){
           setStep(SELECT_TARGET);
           System.out.println("Next target");
         } else{
-          while(true){
-              targetIndex++;
-              if(targetIndex >= enemyTeam.getEnemyTeam().size()){
-                break;
-              }
-              if(!enemyTeam.getEnemyTeam().get(targetIndex).getIsDead()){
-                break;
-              }
-              
-          }
-          if(targetIndex >= enemyTeam.getEnemyTeam().size()){
-            if(actionPointsLeft > 1){
-              System.out.println("next action path");
-              nextAction();
-            } else{
-              System.out.println("next turn half path");
-              nextTurnHalfActions();
-            }
-          } else{
-            System.out.println("perform ability path");
-            currentTarget = enemyTeam.getEnemyTeam().get(targetIndex);
-            setStep(PERFORM_ABILITY);
-          }
+         findNextTargetAllEnemies(true);
         }
         
       } else if(actionPointsLeft > 1){
@@ -252,6 +244,42 @@ public class BattleState extends GameState{
       setStep(ENEMY_REWARDS);
     } else if(step == ENEMY_REWARDS){
       dayManager.nextPhase();
+    } else if(step == SELECT_DEFENSE_TARGET){
+      if(actionPointsLeft > 1){
+        nextAction();
+      } else{
+        nextTurnHalfActions();
+      }
+    }
+  }
+
+  // If targeting all enemies, automatically find the next relevant target
+  private void findNextTargetAllEnemies(boolean changeStep){
+     while(true){
+      targetIndex++;
+      System.out.println(targetIndex);
+      if(targetIndex >= enemyTeam.getEnemyTeam().size()){
+        break;
+      }
+      if(!enemyTeam.getEnemyTeam().get(targetIndex).getIsDead()){
+        break;
+      }
+    }
+    if(targetIndex >= enemyTeam.getEnemyTeam().size()){
+      if(actionPointsLeft > 1){
+        System.out.println("next action path");
+        nextAction();
+      } else{
+        System.out.println("next turn half path");
+        nextTurnHalfActions();
+      }
+    } else{
+      System.out.println("perform ability path");
+      currentTarget = enemyTeam.getEnemyTeam().get(targetIndex);
+      dialogManager.clear();
+      if(changeStep){
+        setStep(PERFORM_ABILITY);
+      }
     }
   }
 
@@ -304,13 +332,30 @@ public class BattleState extends GameState{
     }else if(signal.equals(Signals.COINS_GAINED)){
       System.out.println("Coins gained");
       playerTeam.increaseCoinBalance((int)amount);
-    } else{
+    } else if(signal.equals(Signals.ATTACK_PERFORMED)){
+
+    } 
+    else{
       System.out.println("No valid signal handler found.");
       isHandlingSignal = false;
     }
     if(!isHandlingSignal){
       System.out.println("Signal concluded");
       isOnSignalCooldown = true;
+    }
+  }
+
+  // Graphical content of a GameState's signal
+  // (Remember to set isHandlingSignal to FALSE when done handling)
+  protected void drawSignal(String signal, Graphics graphics, int tick){
+    if(signal.equals(Signals.ATTACK_PERFORMED) && calculateCurrentTurnOwner().equals("Player")){
+      selectedCharacter.setIsAnimating(true);
+      if(tick > selectedCharacter.getAttackAnimationLength()){
+        isHandlingSignal = false;
+        selectedCharacter.setIsAnimating(false);
+      } else{
+        selectedCharacter.drawAttackAnimation(graphics, tick);
+      }
     }
   }
 
@@ -369,6 +414,14 @@ public class BattleState extends GameState{
         enemyRewardIndex++;
         addDialogForEnemyReward();
       }
+    } else if(step == SELECT_DEFENSE_TARGET){
+      dialogManager.drawDialogBox(graphics);
+      inputHandler.spaceButtons(graphics, buttonFontSize, 900, 550);
+      // Prompt the user to select a Character from their team to defend
+      UIManager.setTextColor(graphics, Color.WHITE);
+      UIManager.setFontSize(40);
+      UIManager.refreshText(graphics);
+      UIManager.drawCenteredStringInBox(graphics, "Select a Character to defend.", 0, 650, 1280, 100);
     }
     dialogManager.draw(graphics);
     if(inputHandler.getButtons().size() > 0 && !dialogManager.getIsActive()){
@@ -431,7 +484,7 @@ public class BattleState extends GameState{
       if(targetAmount == 999){
         System.out.println("targeting all enemies");
         isTargetingAllEnemies = true;
-        
+        findNextTargetAllEnemies(false);
       }
     } else if(step == PERFORM_ABILITY){
       inputHandler = new InputHandler();
@@ -457,7 +510,11 @@ public class BattleState extends GameState{
       }
       output = actionableEnemies.get(actionableEnemyIndex).takeTurn(playerTeam, enemyTeam);
       dialogManager.add(output);
-    } else if(step == PLAYER_VICTORY){
+    } else if(step == SELECT_DEFENSE_TARGET){
+      // Init all characters in player team
+      inputHandler = createCharacterOptions(playerTeam.getPlayerTeam(), new ArrayList<BasicCharacter>());
+      selectedDefenseTarget = new PlayerCharacter("");
+    }else if(step == PLAYER_VICTORY){
       // Update dialog
       dialogManager.clear();
       dialogManager.add("Congratulations! All enemies have been defeated.");
@@ -477,8 +534,7 @@ public class BattleState extends GameState{
     // Between steps, check if a victory condition has been reached
     // Exit the battle if so
     if(step == SELECT_CHARACTER){
-      targetIndex = -1;
-
+      targetIndex = 0;
     } else if(step == SELECT_ABILITY){
       targets.clear();
     } else if(step == ENEMY_PERFORM_ABILITY){
@@ -551,6 +607,10 @@ public class BattleState extends GameState{
     dialogManager.add("It is your turn!");
     dialogManager.add("You may perform " + actionPointsLeft + " actions during your turn.");
     playerTeam.decreasePlayerCooldowns();
+    playerTeam.resetSelectedCharacterIndex();
+    playerTeam.resetProtectedCharacters();
+    playerTeam.resetPlayerDefense();
+    playerTeam.resetIsAnimating();
   }
 
   // Find every Enemy able to perform an action and announce that the Enemy's turn has been reached

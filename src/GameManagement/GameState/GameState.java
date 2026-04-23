@@ -36,6 +36,7 @@ public class GameState {
     // Each step can have multiple unique scenes, which can have multiple unique frames.
     // The animation tick controls the flow of animation
     protected int animationTick = 0;
+    protected int signalTick = 0;
     protected boolean isAnimating = false;
     protected int scene = 0;
     protected int frame = 0;
@@ -71,7 +72,10 @@ public class GameState {
     public void draw(Graphics graphics){
         drawStep(currentStep, graphics);
         if(isHandlingSignal){
-            drawSignal(dialogManager.getSignal(),graphics);
+            drawSignal(dialogManager.getSignal(),graphics, signalTick);
+            signalTick++;
+        } else{
+            signalTick = 0;
         }
     }
 
@@ -159,7 +163,7 @@ public class GameState {
     protected void handleSignal(String signal, double amount){}
     // Graphical content of a GameState's signal
     // (Remember to set isHandlingSignal to FALSE when done handling)
-    protected void drawSignal(String signal, Graphics graphics){}
+    protected void drawSignal(String signal, Graphics graphics, int tick){}
     // Calls once when a new step is first loaded
     protected void onEnterStep(int step){}
     // Calls once when the previous step exits
