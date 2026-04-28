@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.Game;
+import src.GameManagement.Mechanics.ActionResult;
 import src.ItemManager.Inventory;
 import src.ItemManager.Item;
 import src.ItemManager.ItemStack;
@@ -255,14 +256,16 @@ public class PlayerTeam {
 
   // Use THIS method for using an item as it handles quantity decreasing and
   // automatic removal when the ItemStack becomes empty.
-  public void useItem(int itemIndex, BasicCharacter c, EnemyTeam enemyTeam){
+  public ActionResult useItem(int itemIndex, BasicCharacter c, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     ItemStack stack = playerInventory.get(itemIndex);
     Item item = stack.getItem();
-    item.useItem(c, this, enemyTeam);
+    output.add(item.useItem(c, this, enemyTeam));
     stack.remove(1);
     if(stack.getQuantity() <= 0){
         playerInventory.remove(stack);
     }
+    return output;
   }
   
   // Automatically convert all Characters to isEnemyCharacter = false to prevent future issues

@@ -2,6 +2,7 @@ package src.ItemManager.Items;
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
+import src.GameManagement.Mechanics.ActionResult;
 import src.ItemManager.Item;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
@@ -15,7 +16,8 @@ public class RevivalPotion extends Item{
         setUsageType("Heal");
     }
 
-    public void useItem(BasicCharacter c, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    public ActionResult useItem(BasicCharacter c, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+        ActionResult output = new ActionResult();
         // Select a Character to heal
         String message = "\nSelect a character to heal with: \n" + playerTeam.getPlayerTeamNumFormat();
         int selectedCharacterIndex;
@@ -37,6 +39,7 @@ public class RevivalPotion extends Item{
         } else{
             System.out.println("But nothing happened!");
         }
+        return output;
     }
 
     // Revival Potions are equal if they are part of the same class

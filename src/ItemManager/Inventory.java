@@ -1,5 +1,8 @@
 package src.ItemManager;
+import java.awt.Graphics;
 import java.util.ArrayList;
+
+import src.Characters.PlayerCharacter;
 // A container for Item objects with specialized methods
 // Contains stacks for Items, which each contain individual items
 public class Inventory {
@@ -64,17 +67,17 @@ public class Inventory {
   }
   
   // Return all items in the inventory separated by number
-  public String getInventoryNumFormat(){
+  /*public String getInventoryNumFormat(){
     String output = "";
     for(int i = 1; i <= inventory.size(); i++){
       output += i + ": " + inventory.get(i-1).getItem() + " x" + inventory.get(i-1).getQuantity();
       output += "\n";
     }
     return output;
-  }
+  }*/
   
   // Print each item without the numbers in NumFormat
-  public String toString(){
+  /*public String toString(){
     String output = "INVENTORY:\n";
     if(inventory.size() == 0){
       output += "Empty\n";
@@ -85,5 +88,49 @@ public class Inventory {
       output += "\n";
     }
     return output;
+  }*/
+
+  // Return a String[] containing the name of every ItemStack in the inventory
+  // Used for inputHandler
+  public String[] getInventoryNames(){
+    String[] output = new String[inventory.size()];
+    for(int i = 0; i < inventory.size(); i++){
+      output[i] = inventory.get(i).getItem().getName();
+    }
+    return output;
+  }
+
+  // Draw each individual ItemStack
+  // (x, y) is the top left corner
+  public void drawInventory(Graphics graphics, int x, int y, int width){
+    spaceItems(x, y, width);
+    for(ItemStack i : inventory){
+      i.getItem().drawItem(graphics, i.getQuantity());
+    }
+  }
+
+  // Space all ItemStacks equally to fit width and have a top-left corner of (x, y)
+  public void spaceItems(int x, int y, int width){
+    if(inventory.size() == 1){
+      inventory.get(0).getItem().setPosition(x, y-(inventory.get(0).getItem().getHeight()-80));
+      return;
+    } else if(inventory.size() < 1){
+      return;
+    }
+    int totalWidth = 0;
+    for(ItemStack i : inventory){
+      totalWidth += i.getItem().getWidth();
+    }
+    int totalWidthDiff = width - totalWidth;
+    int avgWidthDiff = totalWidthDiff / (inventory.size()-1);
+    int currentX = x;
+    int j = 0;
+    for(ItemStack i : inventory){
+      i.getItem().setPosition(currentX, y-(i.getItem().getHeight()-80));
+      if(j + 1 < inventory.size()){
+        currentX += i.getItem().getWidth() + avgWidthDiff;
+      }
+      j++;
+    }
   }
 }

@@ -3,6 +3,7 @@ package src.ItemManager.Items;
 import src.Characters.BasicCharacter;
 import src.Characters.EnemyCharacter;
 import src.Characters.PlayerCharacter;
+import src.GameManagement.Mechanics.ActionResult;
 import src.ItemManager.Item;
 import src.ItemManager.ItemStack;
 import src.Teams.EnemyTeam;
@@ -20,6 +21,8 @@ public class HealthPool extends Item{
     super("Health Pool", "Heals all characters in your team.", price);
     this.healStrength = healStrength;
     setUsageType("Heal");
+    setTargetAmount(999);
+    setImage("src/Images/healthpool.png");
   }
   public HealthPool(double healStrength){
     this(30, healStrength);
@@ -35,7 +38,8 @@ public class HealthPool extends Item{
   }
   
   // Heal all members of the character's team
-  public void useItem(BasicCharacter c, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+  public ActionResult useItem(BasicCharacter c, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     System.out.println(c.getName() + " used " + getName() + " to heal their team!");
     if(c.getIsEnemyCharacter()){
       for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
@@ -48,6 +52,7 @@ public class HealthPool extends Item{
         p.changeCurrentHP(healStrength);
       }
     }
+    return output;
   }
   
   // HealthPotions are equal if they have the same name, description, and heal strength.

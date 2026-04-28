@@ -1,6 +1,7 @@
 package src.ItemManager.Items;
 
 import src.Characters.BasicCharacter;
+import src.GameManagement.Mechanics.ActionResult;
 import src.ItemManager.Item;
 import src.ItemManager.ItemStack;
 import src.Teams.EnemyTeam;
@@ -18,6 +19,7 @@ public class HealthPotion extends Item {
     super("Health Potion", "Heals one character.", price);
     this.healStrength = healStrength;
     setUsageType("Heal");
+    setImage("src/Images/healthpotion.png");
   }
   public HealthPotion(double healStrength){
     this(20, healStrength);
@@ -32,9 +34,11 @@ public class HealthPotion extends Item {
     return healStrength;
   }
   
-  public void useItem(BasicCharacter c, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+  public ActionResult useItem(BasicCharacter c, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     c.changeCurrentHP(healStrength);
     System.out.println(c.getName() + " used " + getName() + " to heal " + healStrength + " HP!");
+    return output;
   }
   
   // HealthPotions are equal if they have the same name, description, and heal strength.

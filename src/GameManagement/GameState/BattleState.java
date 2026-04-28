@@ -39,7 +39,7 @@ public class BattleState extends GameState{
   private final int SELECT_ITEM = 8;
   private final int SELECT_ITEM_TARGET = 9;
   private final int SELECT_DEFENSE_TARGET = 10;
-  private final int HELP = 11;
+  private final int USE_ITEM = 11;
   private final int PLAYER_VICTORY = 12;
   private final int ENEMY_VICTORY = 13;
   private final int ENEMY_REWARDS = 14;
@@ -183,6 +183,8 @@ public class BattleState extends GameState{
           playerTeam.getProtectedCharacterAmounts().add(selectedCharacter.getDefenseStrength());
           dialogManager.add(selectedDefenseTarget.getName() + " will receive " + selectedCharacter.getDefenseStrength() + " defense strength from " + selectedCharacter.getName() + "!");
         }
+      } else if(step == SELECT_ITEM){
+
       }
     }
   }
@@ -422,6 +424,15 @@ public class BattleState extends GameState{
       UIManager.setFontSize(40);
       UIManager.refreshText(graphics);
       UIManager.drawCenteredStringInBox(graphics, "Select a Character to defend.", 0, 650, 1280, 100);
+    } else if(step == SELECT_ITEM){
+      dialogManager.drawDialogBox(graphics);
+      inputHandler.spaceButtons(graphics, buttonFontSize, 900, 550);
+      playerTeam.getPlayerInventory().drawInventory(graphics, 0, 450, 1280);
+      // Prompt the user to select a Character from their team
+      UIManager.setTextColor(graphics, Color.WHITE);
+      UIManager.setFontSize(40);
+      UIManager.refreshText(graphics);
+      UIManager.drawCenteredStringInBox(graphics, "Select an Item to use.", 0, 650, 1280, 100);
     }
     dialogManager.draw(graphics);
     if(inputHandler.getButtons().size() > 0 && !dialogManager.getIsActive()){
@@ -527,6 +538,8 @@ public class BattleState extends GameState{
       playerTeam.setIsDrawingXP(true);
       dialogManager.clear();
       enemyRewardIndex = -1;
+    } else if(step == SELECT_ITEM){
+      inputHandler = createOptions(playerTeam.getPlayerInventory().getInventoryNames());
     }
   }
   // Calls once when the previous step exits

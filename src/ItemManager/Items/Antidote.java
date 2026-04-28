@@ -1,7 +1,7 @@
 package src.ItemManager.Items;
 import src.Characters.BasicCharacter;
 import src.GameManagement.GameManager;
-
+import src.GameManagement.Mechanics.ActionResult;
 import src.ItemManager.Item;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
@@ -16,13 +16,15 @@ public class Antidote extends Item{
     }
 
     // Unfinished
-    public void useItem(BasicCharacter c, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    public ActionResult useItem(BasicCharacter c, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+        ActionResult output = new ActionResult();
         System.out.println(c.getName() + " used " + getName() + " to recover from poison!");
         if(StatusEffect.hasStatusEffect(c, "Poison")){
             StatusEffect.removeStatusEffect(c, "Poison");
         } else{
             System.out.println("But nothing happened!");
         }
+        return output;
     }
 
     // Antidotes are equal if they are part of the same class

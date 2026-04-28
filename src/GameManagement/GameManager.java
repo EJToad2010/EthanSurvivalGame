@@ -636,15 +636,15 @@ public class GameManager {
             } else{
               int limit = playerTeam.getPlayerInventory().getInventory().size();
               // Prompt the user to choose one item from a printed list of their inventory
-              int itemIndex = GameManager.obtainInputWithCancel("Select an item to use: \n" + playerTeam.getPlayerInventory().getInventoryNumFormat(), 1, limit, true);
-              if(itemIndex != -1){
+              //int itemIndex = GameManager.obtainInputWithCancel("Select an item to use: \n" + playerTeam.getPlayerInventory().getInventoryNumFormat(), 1, limit, true);
+              /*if(itemIndex != -1){
                 playerTeam.useItem(itemIndex, selectedCharacter, enemyTeam);
               	anythingToContinue();
               } else{
                 // The player chose to cancel
                 currentActionPoints++;
                 canGainAnotherAction = false;
-              }
+              }*/
             }
 
           } else if(selectedAction == 4){
