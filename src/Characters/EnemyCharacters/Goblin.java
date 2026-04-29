@@ -21,6 +21,7 @@ public class Goblin extends EnemyCharacter{
                                                              "During the player's turn, all attacks toward the Goblin deal 25% less damage."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
+    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{0, 0});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Taunt", "Pickpocket"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Target a single character. The target cannot use an ability next turn.",
                                                                "Attack a single character for moderate damage. The Goblin has a 25% to steal gold from the player. The Goblin consumes the gold to heal."});
@@ -28,6 +29,7 @@ public class Goblin extends EnemyCharacter{
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{3, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{3, 3});
+    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{0, 0});
     setCharacterImage("src/Images/goblin.png");
   }
   
@@ -135,7 +137,7 @@ public class Goblin extends EnemyCharacter{
     if(specialAbilityIndex == 0){
       // Taunt
       //System.out.println(getName() + " taunted " + target.getName() + "!");
-      output.add(getName() + " taunted " + target.getName() + "!");
+      output.add(getName() + " taunted " + target.getName() + "!", Signals.ATTACK_PERFORMED);
       //Thread.sleep(1000);
       //System.out.println(target.getName() + " cannot use an ability next turn!");
       StatusEffect.addStatusEffect(target, "Taunt", 1);

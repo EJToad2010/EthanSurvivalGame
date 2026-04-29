@@ -36,7 +36,6 @@ public class BasicCharacter {
   // The amount of space the Character loses when displayed on screen
   private int lostSpacing = 0;
   private boolean isAnimating = false;
-  protected int attackAnimationLength = 0;
   // Integer value used to uniquely identify a Character
   // (Used within signals)
   private int id;
@@ -288,10 +287,6 @@ public class BasicCharacter {
 
   public boolean getIsAnimating(){
     return isAnimating;
-  }
-
-  public int getAttackAnimationLength(){
-    return attackAnimationLength;
   }
 
   // Setter methods

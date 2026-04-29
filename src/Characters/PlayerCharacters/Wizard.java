@@ -22,14 +22,16 @@ public class Wizard extends PlayerCharacter {
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 999});
-    addToArrayList(getSpecialAbilityNames(), new String[]{"Fireball", "Spirit Incantation"});
+    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{0, 0});
+    addToArrayList(getSpecialAbilityNames(), new String[]{"Fireball", "Spirit Calling"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Deals heavy damage to a single target and has a 25% chance to burn the enemy.",
-                                                               "The Wizard calls on the spirits to unleash a powerful attack. The player must memorize a seven digit code and retype it. If they correctly memorized the code, attack power will be doubled towards a target. Otherwise, attack power will be reduced."});
+                                                               "The Wizard calls on the spirits to unleash a powerful attack. There is a 50% for attack power to be doubled, but a 50% for attack power to be halved."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 4});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
+    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{0, 0});
     setCharacterImage("src/Images/wizard.png");
   }
   
@@ -51,7 +53,7 @@ public class Wizard extends PlayerCharacter {
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
       if((int)(Math.random() * 100) < 10 && enemyHPChange > 0){
-        StatusEffect.addStatusEffect(target, "Stun", 1);
+        output.add(StatusEffect.addStatusEffect(target, "Stun", 1));
       }
       //System.out.println(target.getSimpleOutput());
     } else if(basicAbilityIndex == 1){
@@ -77,11 +79,20 @@ public class Wizard extends PlayerCharacter {
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
       if((int)(Math.random() * 100) < 25 && enemyHPChange > 0){
-        StatusEffect.addStatusEffect(target, "Burn", 2);
+        output.add(StatusEffect.addStatusEffect(target, "Burn", 2));
       }
     } else if(specialAbilityIndex == 1){
       // Spirit Incantation
-      int correctDigits = promptMemorizationCode(7);
+      if(Math.random() < 0.5){
+        output.add("The spirits have answered your call!");
+        output.add(getName() + " casted an ancient spell at " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!");
+        output.add(handleEnemyDefense(target, (getAttackStrength() * 2), playerTeam, enemyTeam));
+      } else{
+        output.add("The spirits have not answered your call...");
+        output.add(getName() + " casted a weak spell at " + target.getName() + " for " + (getAttackStrength() /2) + " HP!");
+        output.add(handleEnemyDefense(target, (getAttackStrength() / 2), playerTeam, enemyTeam));
+      }
+      /*int correctDigits = promptMemorizationCode(7);
       if(correctDigits == 7){
         System.out.println("The spirits have answered your call!");
         System.out.println(getName() + " casted the ancient spell at " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!");
@@ -90,7 +101,7 @@ public class Wizard extends PlayerCharacter {
         System.out.println("The spirits have rejected your call.");
         System.out.println(getName() + " casted a weak spell at " + target.getName() + " for " + (getAttackStrength() * 0.75) + " HP.");
         output.add(handleEnemyDefense(target, (getAttackStrength() * 0.75), playerTeam, enemyTeam));
-      }
+      }*/
     }
     //System.out.println(target.getSimpleOutput());
     return output;

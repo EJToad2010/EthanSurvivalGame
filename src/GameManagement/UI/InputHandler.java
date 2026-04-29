@@ -17,6 +17,16 @@ public class InputHandler {
 
     public void addButton(Button b){
         buttons.add(b);
+        setDefaultSelectedIndex();
+    }
+
+    private void setDefaultSelectedIndex(){
+        for(int i = 0; i < buttons.size(); i++){
+            if(buttons.get(i).getIsSelectable()){
+                selectedIndex = i;
+                break;
+            }
+        }
     }
 
     // Return the x of the left edge of each button

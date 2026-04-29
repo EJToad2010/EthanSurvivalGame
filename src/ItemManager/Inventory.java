@@ -112,7 +112,7 @@ public class Inventory {
   // Space all ItemStacks equally to fit width and have a top-left corner of (x, y)
   public void spaceItems(int x, int y, int width){
     if(inventory.size() == 1){
-      inventory.get(0).getItem().setPosition(x, y-(inventory.get(0).getItem().getHeight()-80));
+      inventory.get(0).getItem().setPosition((x+width)/2 - (inventory.get(0).getItem().getWidth()/2), y-(inventory.get(0).getItem().getHeight()-80));
       return;
     } else if(inventory.size() < 1){
       return;

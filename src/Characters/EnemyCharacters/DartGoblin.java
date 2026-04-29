@@ -21,6 +21,7 @@ public class DartGoblin extends EnemyCharacter{
                                                              "During the player's turn, all attacks toward the Goblin deal 25% less damage."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
+    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{0, 0});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Poison Cloud", "Poison Mark"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Shoot slightly weaker poison clouds at all targets. 33% chance for each target to be poisoned for 2 turns.",
                                                                "Shoot a poison dart at a target. This target gets a 75% chance to be poisoned for 3 turns."});
@@ -28,6 +29,7 @@ public class DartGoblin extends EnemyCharacter{
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
+    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{0, 0});
     setCharacterImage("src/Images/dartgoblin.png");
   }
   

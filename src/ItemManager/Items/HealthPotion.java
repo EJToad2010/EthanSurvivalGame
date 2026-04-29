@@ -2,6 +2,7 @@ package src.ItemManager.Items;
 
 import src.Characters.BasicCharacter;
 import src.GameManagement.Mechanics.ActionResult;
+import src.GameManagement.Mechanics.Signals;
 import src.ItemManager.Item;
 import src.ItemManager.ItemStack;
 import src.Teams.EnemyTeam;
@@ -37,7 +38,8 @@ public class HealthPotion extends Item {
   public ActionResult useItem(BasicCharacter c, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
     c.changeCurrentHP(healStrength);
-    System.out.println(c.getName() + " used " + getName() + " to heal " + healStrength + " HP!");
+    //System.out.println(c.getName() + " used " + getName() + " to heal " + healStrength + " HP!");
+    output.add(c.getName() + " used " + getName() + " to heal " + healStrength + " HP!", Signals.HEALTH_GAINED, healStrength);
     return output;
   }
   

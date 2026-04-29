@@ -75,6 +75,10 @@ public class Item {
     return height;
   }
 
+  public int getTargetAmount(){
+    return targetAmount;
+  }
+
   // Setter methods
   public void setPrice(int price){
     this.price = price;
@@ -140,6 +144,6 @@ public class Item {
   graphics.drawImage(itemImage, x, y, null);
   UIManager.setTextColor(graphics, Color.WHITE);
   UIManager.findMaxFontSize(name + ": x" + quantity, graphics, width, 20, true, true);
-  UIManager.drawCenteredStringInBox(graphics, name + ": x" + quantity, x, y-getHeight()-20, width, 20);
+  UIManager.drawCenteredStringInBox(graphics, name + ": x" + quantity, x, y+getHeight()+20, width, 20);
  }
 }

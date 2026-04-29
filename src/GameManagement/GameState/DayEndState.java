@@ -22,13 +22,14 @@ public class DayEndState extends GameState {
     // Handles all logic of a panel
     public void update(){
         if(currentStep == 1){
+            isAnimating = true;
             nextTick();
             if(animationTick % 5 == 0){
                 frame++;
-                if(frame > 10){
-                    System.out.println("anim end");
-                    dayManager.nextPhase();
-                }
+            }
+            if(frame > 10){
+                System.out.println("anim end");
+                dayManager.nextPhase();
             }
         }
     }
@@ -67,6 +68,7 @@ public class DayEndState extends GameState {
     public void onEnter(GamePanel panel){
         panel.setBackground(new Color(28, 47, 74));
         panel.repaint();
+        playerTeam.resetSelectedCharacterIndex();
     }
     // Calls once when panel is unloaded
     public void onExit(GamePanel panel){

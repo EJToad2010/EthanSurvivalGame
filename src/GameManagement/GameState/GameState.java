@@ -282,10 +282,20 @@ public class GameState {
 
     // Automatically create an InputHandler containing the given labels for each Button, and given ids for each
     // options and ids must be the same length
-    public InputHandler createOptions(String[] options, int[] ids){
+    public InputHandler createOptions(String[] options, int[] unacceptableInputs){
         InputHandler output = new InputHandler();
         for(int i = 0; i < options.length; i++){
-            output.addButton(new Button(options[i], 0, 0, ids[i]));
+            boolean isUnacceptable = false;
+            for(int u : unacceptableInputs){
+                if(u == i){
+                    isUnacceptable = true;
+                }
+            }
+            if(!isUnacceptable){
+                output.addButton(new Button(options[i], 0, 0, i));
+            } else{
+                output.addButton(new Button(options[i], 0, 0, i, false));
+            }
         }
         return output;
     }

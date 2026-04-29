@@ -24,9 +24,8 @@ public class Main {
   // Class: EnemyTeam
   // Class: GameManager
   public static void main(String[] args) throws IOException, InterruptedException{
-    // Running the restructured game
+    // Running the restructured game.
     new GameFrame();
-    
 
     // Running the original console game
     GameManager gm = new GameManager();

@@ -123,6 +123,7 @@ public class PlayerCharacter extends BasicCharacter {
     output.add("+5 MAX HP, +2 ATK, +2 DEF, +2 SPD");
     //System.out.println("+5 MAX HP");
     changeMaxHP(5);
+    changeCurrentHP(5);
     //System.out.println("+2 ATK");
     changeAttackStrength(2);
     //System.out.println("+2 DEF");

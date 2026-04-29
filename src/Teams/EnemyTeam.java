@@ -6,6 +6,7 @@ import src.Characters.BasicCharacter;
 import src.Characters.EnemyCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.Game;
+import src.GameManagement.Mechanics.ActionResult;
 import src.ItemManager.Inventory;
 import src.ItemManager.Item;
 import src.ItemManager.ItemStack;
@@ -109,6 +110,10 @@ public class EnemyTeam {
         return e;
       }
     }
+    System.out.println("FATAL ERROR: NO CHARACTER WITH ID " + id + " FOUND IN ENEMY TEAM");
+    for(EnemyCharacter p : enemyTeam){
+      System.out.println(p.getID());
+    }
     return null;
   }
   
@@ -133,14 +138,16 @@ public class EnemyTeam {
 
   // Use THIS method for using an item as it handles quantity decreasing and
   // automatic removal when the ItemStack becomes empty.
-  public void useItem(int itemIndex, BasicCharacter c, PlayerTeam playerTeam){
+  public ActionResult useItem(int itemIndex, BasicCharacter c, PlayerTeam playerTeam){
+    ActionResult output = new ActionResult();
     ItemStack stack = enemyInventory.get(itemIndex);
     Item item = stack.getItem();
-    item.useItem(c, playerTeam, this);
+    output.add(item.useItem(c, playerTeam, this));
     stack.remove(1);
     if(stack.getQuantity() <= 0){
         enemyInventory.remove(stack);
     }
+    return output;
   }
   
   // Automatically convert all Characters to isEnemyCharacter = true to prevent future issues

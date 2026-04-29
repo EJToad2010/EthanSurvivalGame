@@ -13,7 +13,7 @@ import src.Teams.PlayerTeam;
 // High health and ability, low defense and healing
 public class Knight extends PlayerCharacter {
   public Knight(String name){
-    super(name, 100.0, 30.0, 15.0, 5.0);
+    super(name, 100.0, 30.0, 12.0, 5.0);
     // Set the names, descriptions, and cooldowns of all the Knight's abilities.
     setDescription("An offensive tank who can withstand the front lines of battle, at the cost of speed.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Sword Swing", "Cautious Attack"});
@@ -22,6 +22,7 @@ public class Knight extends PlayerCharacter {
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 1});
+    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{20, 20});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Last Push", "Rage Strike"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Deals +10 damage from Sword Swing. Deals an additional 50% damage if the enemy is below 50% HP.",
                                                                "Attack power is doubled from Sword Swing, but lose HP equal to 25% of your doubled attack power."});
@@ -30,8 +31,8 @@ public class Knight extends PlayerCharacter {
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
+    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{0, 0});
     setCharacterImage("src/Images/knight.png");
-    attackAnimationLength = 20;
   }
   
   // Overrided getType method

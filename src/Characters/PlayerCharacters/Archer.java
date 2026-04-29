@@ -23,6 +23,7 @@ public class Archer extends PlayerCharacter {
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 2});
+    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{0, 0});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Volley", "Armor Piercer"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Fires an arrow at every enemy, dealing moderate damage. Each enemy has a 10% chance of being burned for 1 turn.",
                                                                "Deals moderate damage to a single target. The enemy has a 50% chance of receiving massively reduced defensive strength for 2 turns."});
@@ -31,6 +32,7 @@ public class Archer extends PlayerCharacter {
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 2});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 2});
+    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{0, 0});
     setCharacterImage("src/Images/archer.png");
   }
   

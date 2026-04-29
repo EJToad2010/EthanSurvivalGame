@@ -158,6 +158,10 @@ public class PlayerTeam {
         return p;
       }
     }
+    System.out.println("FATAL ERROR: NO CHARACTER WITH ID " + id + " FOUND IN PLAYER TEAM");
+    for(PlayerCharacter p : playerTeam){
+      System.out.println(p.getID());
+    }
     return null;
   }
 
@@ -256,12 +260,14 @@ public class PlayerTeam {
 
   // Use THIS method for using an item as it handles quantity decreasing and
   // automatic removal when the ItemStack becomes empty.
-  public ActionResult useItem(int itemIndex, BasicCharacter c, EnemyTeam enemyTeam){
+  public ActionResult useItem(int itemIndex, BasicCharacter c, EnemyTeam enemyTeam, boolean isConsuming){
     ActionResult output = new ActionResult();
     ItemStack stack = playerInventory.get(itemIndex);
     Item item = stack.getItem();
     output.add(item.useItem(c, this, enemyTeam));
-    stack.remove(1);
+    if(isConsuming){
+      stack.remove(1);
+    }
     if(stack.getQuantity() <= 0){
         playerInventory.remove(stack);
     }

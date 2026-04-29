@@ -4,6 +4,7 @@ import src.Characters.BasicCharacter;
 import src.Characters.EnemyCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.Mechanics.ActionResult;
+import src.GameManagement.Mechanics.Signals;
 import src.ItemManager.Item;
 import src.ItemManager.ItemStack;
 import src.Teams.EnemyTeam;
@@ -40,17 +41,15 @@ public class HealthPool extends Item{
   // Heal all members of the character's team
   public ActionResult useItem(BasicCharacter c, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    System.out.println(c.getName() + " used " + getName() + " to heal their team!");
+    //System.out.println(c.getName() + " used " + getName() + " to heal their team!");
     if(c.getIsEnemyCharacter()){
-      for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
-        System.out.println(e.getName() + " was healed for " + Math.min(healStrength, e.getMaxHP() - e.getCurrentHP()) + " HP!");
-        e.changeCurrentHP(healStrength);
-      }
+      //System.out.println(e.getName() + " was healed for " + Math.min(healStrength, e.getMaxHP() - e.getCurrentHP()) + " HP!");
+      output.add(c.getName() + " was healed for " + Math.min(healStrength, c.getMaxHP() - c.getCurrentHP()) + " HP!", Signals.HEALTH_GAINED,Math.min(healStrength, c.getMaxHP() - c.getCurrentHP()) );
+      c.changeCurrentHP(healStrength);
     } else{
-      for(PlayerCharacter p : playerTeam.getPlayerTeam()){
-        System.out.println(p.getName() + " was healed for " + Math.min(healStrength, p.getMaxHP() - p.getCurrentHP()) + " HP!");
-        p.changeCurrentHP(healStrength);
-      }
+      //System.out.println(c.getName() + " was healed for " + Math.min(healStrength, c.getMaxHP() - c.getCurrentHP()) + " HP!");
+      output.add(c.getName() + " was healed for " + Math.min(healStrength, c.getMaxHP() - c.getCurrentHP()) + " HP!", Signals.HEALTH_GAINED, Math.min(healStrength, c.getMaxHP() - c.getCurrentHP()));
+      c.changeCurrentHP(healStrength);
     }
     return output;
   }

@@ -55,6 +55,8 @@ public class BattleState extends GameState{
   private EnemyCharacter currentTarget;
   private boolean isTargetingAllEnemies = false;
   private PlayerCharacter selectedDefenseTarget;
+  private int selectedItemIndex;
+  private ArrayList<BasicCharacter> itemTargets = new ArrayList<BasicCharacter>();
 
   private int enemyRewardIndex;
 
@@ -148,20 +150,22 @@ public class BattleState extends GameState{
             dialogManager.add("Your inventory is empty.");
           }
         }else{
-          System.out.println("THIS FEATURE ISN'T OUT YET HELEN KELLER");
+          System.out.println("THIS FEATURE ISN'T OUT YET");
         }
       } else if(step == SELECT_ABILITY){
         selectedAbilityIndex = input;
-        selectedAbilityName = selectedCharacter.getSpecialAbilityNames().get(selectedAbilityIndex);
         if(inputHandler.getButtons().get(selectedAbilityIndex).getText().equals("Cancel")){
           setStep(SELECT_ACTION);
         } else if(selectedActionType.equals("Special ability") && selectedCharacter.getCurrentSpecialAbilityCooldowns().get(selectedAbilityIndex) > 0){
+          selectedAbilityName = selectedCharacter.getSpecialAbilityNames().get(selectedAbilityIndex);
           dialogManager.add(selectedAbilityName + " is on a cooldown for " + selectedCharacter.getCurrentSpecialAbilityCooldowns().get(selectedAbilityIndex) + " more turns!");
         } else{
           if(selectedActionType.equals("Basic ability")){
             targetAmount = selectedCharacter.getBasicAbilityEnemyCount(selectedAbilityIndex);
+            selectedAbilityName = selectedCharacter.getBasicAbilityNames().get(selectedAbilityIndex);
           } else{
             targetAmount = selectedCharacter.getSpecialAbilityEnemyCount(selectedAbilityIndex);
+            selectedAbilityName = selectedCharacter.getSpecialAbilityNames().get(selectedAbilityIndex);
           }
           if(targetAmount == 999){
             dialogManager.add(selectedAbilityName + " will target all enemies!");
@@ -184,7 +188,17 @@ public class BattleState extends GameState{
           dialogManager.add(selectedDefenseTarget.getName() + " will receive " + selectedCharacter.getDefenseStrength() + " defense strength from " + selectedCharacter.getName() + "!");
         }
       } else if(step == SELECT_ITEM){
-
+        selectedItemIndex = input;
+        targetAmount = playerTeam.getPlayerInventory().get(input).getItem().getTargetAmount();
+        if(targetAmount == 999){
+          dialogManager.add(selectedAbilityName + " will target all players!");
+        } else{
+          setStep(SELECT_ITEM_TARGET);
+        }
+      } else if(step == SELECT_ITEM_TARGET){
+        targetIndex = input;
+        itemTargets.add(playerTeam.getPlayerTeam().get(input));
+        setStep(USE_ITEM);
       }
     }
   }
@@ -211,7 +225,6 @@ public class BattleState extends GameState{
       // Return to next action if no targets are left
       // Go to enemy turn if no actions are left
       if(targets.size() < targetAmount || (targetAmount == 999 && targetIndex < targets.size())){
-        dialogManager.clear();
         if(!isTargetingAllEnemies && targetAmount != 999){
           dialogManager.add("You may select " + (targetAmount-targets.size()) + " more targets.");
         }
@@ -221,7 +234,6 @@ public class BattleState extends GameState{
         } else{
          findNextTargetAllEnemies(true);
         }
-        
       } else if(actionPointsLeft > 1){
         nextAction();
       } else{
@@ -240,7 +252,7 @@ public class BattleState extends GameState{
         nextTurnHalf();
         setStep(SELECT_CHARACTER);
       }else{
-        setStep(ENEMY_TURN);
+        setStep(ENEMY_PERFORM_ABILITY);
       }
     } else if(step == PLAYER_VICTORY){
       setStep(ENEMY_REWARDS);
@@ -248,6 +260,28 @@ public class BattleState extends GameState{
       dayManager.nextPhase();
     } else if(step == SELECT_DEFENSE_TARGET){
       if(actionPointsLeft > 1){
+        nextAction();
+      } else{
+        nextTurnHalfActions();
+      }
+    } else if(step == SELECT_ITEM){
+      if(targetAmount == 999){
+        setStep(SELECT_ITEM_TARGET);
+      }
+    } else if(step == USE_ITEM){
+      // Return to selecting the next target if more targets are left
+      // Return to next action if no targets are left
+      // Go to enemy turn if no actions are left
+      if(itemTargets.size() < targetAmount || (targetAmount == 999 && targetIndex < itemTargets.size())){
+        // dialogManager.clear();
+        if(targetAmount != 999){
+          dialogManager.add("You may select " + (targetAmount-itemTargets.size()) + " more targets.");
+          setStep(SELECT_ITEM_TARGET);
+          System.out.println("Next target");
+        } else{
+         findNextTargetAllEnemies(true);
+        }
+      } else if(actionPointsLeft > 1){
         nextAction();
       } else{
         nextTurnHalfActions();
@@ -278,7 +312,7 @@ public class BattleState extends GameState{
     } else{
       System.out.println("perform ability path");
       currentTarget = enemyTeam.getEnemyTeam().get(targetIndex);
-      dialogManager.clear();
+      // dialogManager.clear();
       if(changeStep){
         setStep(PERFORM_ABILITY);
       }
@@ -289,7 +323,7 @@ public class BattleState extends GameState{
   private void nextAction(){
     actionPointsLeft--;
     playerTeam.resetSelectedCharacterIndex();
-    dialogManager.clear();
+    // dialogManager.clear();
     dialogManager.add("You have " + actionPointsLeft + " actions left this turn.");
     isTargetingAllEnemies = false;
     System.out.println("Next action");
@@ -351,8 +385,14 @@ public class BattleState extends GameState{
   // (Remember to set isHandlingSignal to FALSE when done handling)
   protected void drawSignal(String signal, Graphics graphics, int tick){
     if(signal.equals(Signals.ATTACK_PERFORMED) && calculateCurrentTurnOwner().equals("Player")){
+      int attackAnimationLength;
+      if(selectedActionType.equals("Basic ability")){
+        attackAnimationLength = selectedCharacter.getBasicAbilityAnimationLengths().get(selectedAbilityIndex);
+      } else{
+        attackAnimationLength = selectedCharacter.getSpecialAbilityAnimationLengths().get(selectedAbilityIndex);
+      }
       selectedCharacter.setIsAnimating(true);
-      if(tick > selectedCharacter.getAttackAnimationLength()){
+      if(tick > attackAnimationLength){
         isHandlingSignal = false;
         selectedCharacter.setIsAnimating(false);
       } else{
@@ -427,12 +467,23 @@ public class BattleState extends GameState{
     } else if(step == SELECT_ITEM){
       dialogManager.drawDialogBox(graphics);
       inputHandler.spaceButtons(graphics, buttonFontSize, 900, 550);
-      playerTeam.getPlayerInventory().drawInventory(graphics, 0, 450, 1280);
+      playerTeam.getPlayerInventory().drawInventory(graphics, 0, 380, 1280);
       // Prompt the user to select a Character from their team
       UIManager.setTextColor(graphics, Color.WHITE);
       UIManager.setFontSize(40);
       UIManager.refreshText(graphics);
       UIManager.drawCenteredStringInBox(graphics, "Select an Item to use.", 0, 650, 1280, 100);
+    } else if(step == SELECT_ITEM_TARGET){
+      dialogManager.drawDialogBox(graphics);
+      inputHandler.spaceButtons(graphics, buttonFontSize, 900, 550);
+      // Prompt the user to select a Character from their team to use an item on
+      UIManager.setTextColor(graphics, Color.WHITE);
+      UIManager.setFontSize(40);
+      UIManager.refreshText(graphics);
+      UIManager.drawCenteredStringInBox(graphics, "Select a Character to use " + playerTeam.getPlayerInventory().get(selectedItemIndex).getItem().getName() + " on.", 0, 650, 1280, 100);
+      UIManager.setFontSize(20);
+      UIManager.refreshText(graphics);
+      UIManager.drawCenteredStringInBox(graphics, "(" + (targetAmount - itemTargets.size()) + " targets left)", 0, 700, 1280, 20);
     }
     dialogManager.draw(graphics);
     if(inputHandler.getButtons().size() > 0 && !dialogManager.getIsActive()){
@@ -482,6 +533,10 @@ public class BattleState extends GameState{
     } else if(step == SELECT_ACTION){
       // Init the possible choice the player can make
       inputHandler = createOptions(new String[]{"Basic ability", "Special ability", "Use item", "Defend"});
+      if(StatusEffect.hasStatusEffect(selectedCharacter, "Taunt")){
+        System.out.println("Char is taunted");
+        inputHandler = createOptions(new String[]{"Basic ability", "Special ability", "Use item", "Defend"}, new int[]{0, 1});
+      }
     } else if(step == SELECT_ABILITY){
       // Init the possible abilities the player can pick from
       if(selectedActionType.equals("Basic ability")){
@@ -501,20 +556,22 @@ public class BattleState extends GameState{
       inputHandler = new InputHandler();
       // Get the ActionResult of the Character's ability function
       ActionResult output;
-      dialogManager.clear();
+      // dialogManager.clear();
       if(selectedActionType.equals("Basic ability")){
         output = selectedCharacter.basicAbility(selectedAbilityIndex, currentTarget, playerTeam, enemyTeam);
       } else{
         output = selectedCharacter.specialAbility(selectedAbilityIndex, currentTarget, playerTeam, enemyTeam);
+        playerTeam.resetPlayerCooldowns();
       }
       dialogManager.add(output);
-    } else if(step== ENEMY_PERFORM_ABILITY){
+    } else if(step == ENEMY_TURN){
+    }else if(step== ENEMY_PERFORM_ABILITY){
       inputHandler = new InputHandler();
       // Get the ActionResult of the Enemy's ability function
       ActionResult output;
-      dialogManager.clear();
+      // dialogManager.clear();
       // Emergency break
-      if(actionableEnemyIndex >= actionableEnemies.size()){
+      if(actionableEnemyIndex >= actionableEnemies.size() || actionableEnemyIndex == -1){
         nextTurnHalf();
         initializePlayerTurn();
         return;
@@ -527,19 +584,32 @@ public class BattleState extends GameState{
       selectedDefenseTarget = new PlayerCharacter("");
     }else if(step == PLAYER_VICTORY){
       // Update dialog
-      dialogManager.clear();
+      // dialogManager.clear();
       dialogManager.add("Congratulations! All enemies have been defeated.");
     } else if(step == ENEMY_VICTORY){
       // Update dialog
-      dialogManager.clear();
+      // dialogManager.clear();
       dialogManager.add("Oh no! All your characters have died.");
     } else if(step == ENEMY_REWARDS){
       // Init variables to track enemy rewards
       playerTeam.setIsDrawingXP(true);
-      dialogManager.clear();
+      // dialogManager.clear();
       enemyRewardIndex = -1;
     } else if(step == SELECT_ITEM){
       inputHandler = createOptions(playerTeam.getPlayerInventory().getInventoryNames());
+    } else if(step == SELECT_ITEM_TARGET){
+      refreshAvailableItemTargets();
+    } else if(step == USE_ITEM){
+      inputHandler = new InputHandler();
+      // Get the ActionResult of the team's use item function
+      ActionResult output;
+      // dialogManager.clear();
+      if(itemTargets.size() < targetAmount || (targetAmount == 999 && targetIndex < itemTargets.size())){
+        output = (playerTeam.useItem(selectedItemIndex, itemTargets.get(itemTargets.size() - 1), enemyTeam, false));
+      } else{
+        output = (playerTeam.useItem(selectedItemIndex, itemTargets.get(itemTargets.size() - 1), enemyTeam, true));
+      }
+      dialogManager.add(output);
     }
   }
   // Calls once when the previous step exits
@@ -551,6 +621,9 @@ public class BattleState extends GameState{
     } else if(step == SELECT_ABILITY){
       targets.clear();
     } else if(step == ENEMY_PERFORM_ABILITY){
+    } else if(step == SELECT_ITEM){
+      targetIndex = 0;
+      itemTargets.clear();
     }
   }
 
@@ -571,9 +644,15 @@ public class BattleState extends GameState{
       turnHalf = 0;
       initializeEnemy();
       playerTeam.setIsDrawingXP(false);
+      playerTeam.getPlayerInventory().add(new HealthPotion(), 1);
+      playerTeam.resetPlayerCooldowns();
+      playerTeam.resetPlayerDefense();
+      playerTeam.resetProtectedCharacters();
+      playerTeam.resetSelectedCharacterIndex();
+      playerTeam.resetIsAnimating();
       resetScene();
       currentStep = INTRO_ANIM;
-      dialogManager.clear();
+      // dialogManager.clear();
       dialogManager.setIsActive(false);
       sky = ImageManager.loadImage("src/Images/sky.png");
       ground = ImageManager.loadImage("src/Images/ground.png");
@@ -586,7 +665,26 @@ public class BattleState extends GameState{
 
   // Update the inputHandler to select all available enemy characters
   private void refreshAvailableTargets(){
-    inputHandler = createCharacterOptions(enemyTeam.getEnemyTeam(), targets);
+    // Invalid if Character is in targets or dead
+    resetActionableEnemies();
+    ArrayList<EnemyCharacter> invalidTargets = new ArrayList<EnemyCharacter>();
+    for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
+      boolean isInTargets = false;
+      for(EnemyCharacter c : targets){
+        if(e == c){
+          isInTargets = true;
+        }
+      }
+      if(isInTargets || e.getIsDead()){
+        invalidTargets.add(e);
+      }
+    }
+    inputHandler = createCharacterOptions(enemyTeam.getEnemyTeam(), invalidTargets);
+  }
+
+  // Update the inputHandler to select all available player targets
+  private void refreshAvailableItemTargets(){
+    inputHandler = createCharacterOptions(playerTeam.getPlayerTeam(), itemTargets);
   }
 
   // Add the proper messages and signals for DialogManager within Enemy loot
@@ -630,12 +728,7 @@ public class BattleState extends GameState{
   private void initializeEnemyTurn(){
     System.out.println("Enemy turn initialized");
     dialogManager.add("It is the enemy's turn!");
-    actionableEnemies.clear();
-    for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
-      if(!e.getIsDead() && !StatusEffect.hasStatusEffect(e, "Stun")){
-        actionableEnemies.add(e);
-      }
-    }
+    resetActionableEnemies();
     if(actionableEnemies.isEmpty()){
       actionableEnemyIndex = -1;
     } else{
@@ -646,9 +739,19 @@ public class BattleState extends GameState{
     }
   }
 
+  private void resetActionableEnemies(){
+    actionableEnemies.clear();
+    for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
+      if(!e.getIsDead() && !StatusEffect.hasStatusEffect(e, "Stun")){
+        actionableEnemies.add(e);
+      }
+    }
+  }
+
   // Increment turn half
   // If turnOwner returned to original, increment turnNum
   private void nextTurnHalf(){
+    dialogManager.add(StatusEffect.handleStatusTurn());
     turnHalf++;
     if(turnHalf > 1){
       turnHalf = 0;

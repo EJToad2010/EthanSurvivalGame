@@ -93,11 +93,11 @@ public class EnemyCharacter extends BasicCharacter{
     ActionResult output = new ActionResult();
     hasTakenTurn = false;
     // Prioritize using an item
-    itemAI(playerTeam, enemyTeam);
+    output.add(itemAI(playerTeam, enemyTeam));
     // Prioritize using an available special attack
     ArrayList<Integer> availableSpecialAbilityIndices = getAvailableSpecialAbilityIndices();
     if(availableSpecialAbilityIndices.size() > 0 && (Math.random() * 100) < 50){
-      specialAbilityAI(availableSpecialAbilityIndices, playerTeam, enemyTeam);
+      output.add(specialAbilityAI(availableSpecialAbilityIndices, playerTeam, enemyTeam));
       // System.out.println("DEBUG: Special Ability Used");
       hasTakenTurn = true;
       resetSpecialAbilityCooldowns();
@@ -119,27 +119,29 @@ public class EnemyCharacter extends BasicCharacter{
   }
   
   // Check the EnemyCharacter's shared inventory for situational items
-  private void itemAI(PlayerTeam playerTeam, EnemyTeam enemyTeam){
+  private ActionResult itemAI(PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     Inventory enemyInventory = enemyTeam.getEnemyInventory();
     // Selfish AI prioritizes self-heal over team heal
     // 50% chance to use either item if remaining HP is under 50%
     for(int i = 0; i < enemyInventory.getInventory().size(); i++){
       if(enemyInventory.get(i).getItem() instanceof HealthPotion){
         if(getCurrentHP() / getMaxHP() < 0.5 && (int)(Math.random()) * 100 < 50){
-          enemyTeam.useItem(i, this, playerTeam);
+          output.add(enemyTeam.useItem(i, this, playerTeam));
           hasTakenTurn = true;
           // System.out.println("DEBUG: Health Potion Used");
           break;
         }
       } else if(enemyInventory.get(i).getItem() instanceof HealthPool){
         if(enemyTeam.getTotalHPPercentage() < 0.5 && (int)(Math.random()) * 100 < 50){
-          enemyTeam.useItem(i, this, playerTeam);
+          output.add(enemyTeam.useItem(i, this, playerTeam));
           hasTakenTurn = true;
           // System.out.println("DEBUG: Health Pool Used");
           break;
         }
       }
     }
+    return output;
   }
   
   // Intended to be overridden by subclasses since each class has unique basic / special abilities

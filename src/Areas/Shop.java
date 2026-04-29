@@ -90,7 +90,7 @@ public class Shop {
       } else if(input == 2){
         // Buy item
         message = "What would you like to buy?\n";
-        int itemNum = GameManager.obtainInputWithCancel(message + shopInventory.getInventoryNumFormat(), 1, shopInventory.getInventory().size(), true);
+        int itemNum = GameManager.obtainInputWithCancel(message, 1, shopInventory.getInventory().size(), true);
       	if(itemNum != -1){
           ItemStack i = shopInventory.get(itemNum);
           // Check if the player has enough coins to buy the item
@@ -143,7 +143,7 @@ public class Shop {
     String output = "";
     output += "SHOP STOCK:\n";
     for(ItemStack i : shopInventory.getInventory()){
-      output += i.getItem().shopDisplay(i);
+      output += i.getItem();//.shopDisplay(i);
       output += "\n";
     }
     return output;
