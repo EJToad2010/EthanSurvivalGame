@@ -61,7 +61,7 @@ public class StartScreenState extends GameState{
         panel.add(welcomeMessage);
         panel.repaint();
         // Setup inputHandler
-        inputHandler = createOptions(new String[]{"Start", "Options"}, new int[]{START, OPTIONS});
+        inputHandler = createOptions(new String[]{"Start", "Options"});
         panel.repaint();
         // Setup castle image
         castle = ImageManager.loadImage("src/Images/castle.png");

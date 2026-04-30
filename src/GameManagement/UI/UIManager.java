@@ -47,6 +47,21 @@ public class UIManager {
             graphics.drawString(lines.get(i), drawX, drawY+i*textHeight);
         }
     }
+    // Draw a piece of text with centered width and top aligned y
+    public static void drawTopAlignedStringInBox(Graphics graphics, String text, int x, int y, int width, int height){
+        ArrayList<String> lines = wrapText(text, graphics, width);
+        int startY = y;
+
+        // Setup fontmetrics
+        FontMetrics fontMetrics = graphics.getFontMetrics(font);
+        int textHeight = fontMetrics.getHeight();
+
+        for(int i = 0; i < lines.size(); i++){
+            int textWidth = fontMetrics.stringWidth(lines.get(i));
+            int drawX = x + (width-textWidth) / 2;
+            graphics.drawString(lines.get(i), drawX, startY+i*textHeight);
+        }
+    }
     // Draw several lines of text, centered around an invisible rectangle with defined bounds
     public static void drawCeneterdStringInBoxSeparateLines(Graphics graphics, String[] text, int x, int y, int width, int height){
         for(String line : text){
@@ -62,6 +77,7 @@ public class UIManager {
             }
         }
     }
+    
     // Wrap text around lines so it doesn't overflow
     public static ArrayList<String> wrapText(String text, Graphics graphics, int width){
         FontMetrics fontMetrics = graphics.getFontMetrics(font);

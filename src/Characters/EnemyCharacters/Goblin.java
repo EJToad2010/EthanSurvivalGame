@@ -138,6 +138,7 @@ public class Goblin extends EnemyCharacter{
       // Taunt
       //System.out.println(getName() + " taunted " + target.getName() + "!");
       output.add(getName() + " taunted " + target.getName() + "!", Signals.ATTACK_PERFORMED);
+      output.add(target.getName() + " cannot use an ability next turn!");
       //Thread.sleep(1000);
       //System.out.println(target.getName() + " cannot use an ability next turn!");
       StatusEffect.addStatusEffect(target, "Taunt", 1);

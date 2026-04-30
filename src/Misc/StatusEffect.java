@@ -237,7 +237,7 @@ public class StatusEffect {
       UIManager.setTextColor(graphics, colorTypes[statusIndex]);
       UIManager.findMaxFontSize("["+statusType+"]", graphics, c.getWidth()-(c.getLostSpacing()*2), 20, true, true);
       UIManager.drawCenteredStringInBox(graphics, "["+statusType+"]", c.getX()+c.getLostSpacing(), c.getY()-heightOffset, c.getWidth()-(c.getLostSpacing()*2), 20);
-      heightOffset -= 20;
+      heightOffset += 20;
     }
   }
 }

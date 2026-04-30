@@ -70,6 +70,7 @@ public class DartGoblin extends EnemyCharacter{
 
   // AI for deciding a special ability to use
   public ActionResult specialAbilityAI(ArrayList<Integer> availableSpecialAbilityIndices, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
     // Fetch alive Characters from playerTeam
     ArrayList<PlayerCharacter> aliveCharacters = playerTeam.getAliveCharacters();
     resetSpecialAbilityCooldowns();
@@ -77,13 +78,13 @@ public class DartGoblin extends EnemyCharacter{
     if(randomAbilityIndex == 0){
       // Poison Dart Volley automatically targets all characters. No special decision making needed.
       for(PlayerCharacter c : aliveCharacters){
-        return specialAbility(0, c, playerTeam, enemyTeam);
+        output.add(specialAbility(0, c, playerTeam, enemyTeam));
       }
     } else if(randomAbilityIndex == 1){
-      // Pickpocket ability
-      return new ActionResult();
+      // Poison mark
+      output.add(specialAbility(1, aliveCharacters.get((int)(Math.random() * aliveCharacters.size())), playerTeam, enemyTeam));
     }
-    return new ActionResult();
+    return output;
   }
   
   // Overrided battle methods

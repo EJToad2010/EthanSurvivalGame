@@ -54,6 +54,7 @@ public class BattleState extends GameState{
   private int targetIndex;
   private EnemyCharacter currentTarget;
   private boolean isTargetingAllEnemies = false;
+  private boolean isEnemySpdAction = false;
   private PlayerCharacter selectedDefenseTarget;
   private int selectedItemIndex;
   private ArrayList<BasicCharacter> itemTargets = new ArrayList<BasicCharacter>();
@@ -243,16 +244,28 @@ public class BattleState extends GameState{
       // Move automatically to an enemy ability
       setStep(ENEMY_PERFORM_ABILITY);
     } else if(step == ENEMY_PERFORM_ABILITY){
-      // Make the next enemy perform an action
-      // Move on to player turn if no enemies are left
-      actionableEnemyIndex++;
-      if(actionableEnemyIndex == -1 || actionableEnemyIndex >= actionableEnemies.size()){
-        System.out.println("Enemy turn over");
-        initializePlayerTurn();
-        nextTurnHalf();
-        setStep(SELECT_CHARACTER);
-      }else{
+      if(isEnemySpdAction){
+        isEnemySpdAction = false;
         setStep(ENEMY_PERFORM_ABILITY);
+        return;
+      }
+      // Extra action chance (SPD)
+      if((Math.random() * 100) < Math.min(actionableEnemies.get(actionableEnemyIndex).getSpeed()/4, 50) && !isEnemySpdAction){
+        isEnemySpdAction = true;
+        dialogManager.add(actionableEnemies.get(actionableEnemyIndex).getName() + " has earned another action due to their speed! ("+Math.min(actionableEnemies.get(actionableEnemyIndex).getSpeed()/4, 50)+"% chance)");
+      } else{
+        // Make the next enemy perform an action
+        // Move on to player turn if no enemies are left
+        isEnemySpdAction = false;
+        actionableEnemyIndex++;
+        if(actionableEnemyIndex == -1 || actionableEnemyIndex >= actionableEnemies.size()){
+          System.out.println("Enemy turn over");
+          initializePlayerTurn();
+          nextTurnHalf();
+          setStep(SELECT_CHARACTER);
+        }else{
+          setStep(ENEMY_PERFORM_ABILITY);
+        }
       }
     } else if(step == PLAYER_VICTORY){
       setStep(ENEMY_REWARDS);
@@ -322,12 +335,19 @@ public class BattleState extends GameState{
   // Move on to the next action
   private void nextAction(){
     actionPointsLeft--;
-    playerTeam.resetSelectedCharacterIndex();
-    // dialogManager.clear();
-    dialogManager.add("You have " + actionPointsLeft + " actions left this turn.");
-    isTargetingAllEnemies = false;
-    System.out.println("Next action");
-    setStep(SELECT_CHARACTER);
+    if((Math.random() * 100) < Math.min(selectedCharacter.getSpeed()/2, 50)){
+      actionPointsLeft++;
+      dialogManager.add(selectedCharacter.getName() + " has earned another action due to their speed! ("+Math.min(selectedCharacter.getSpeed()/2, 50)+"% chance)");
+      isTargetingAllEnemies = false;
+      setStep(SELECT_ACTION);
+    } else{
+      playerTeam.resetSelectedCharacterIndex();
+      // dialogManager.clear();
+      dialogManager.add("You have " + actionPointsLeft + " actions left this turn.");
+      isTargetingAllEnemies = false;
+      System.out.println("Next action");
+      setStep(SELECT_CHARACTER);
+    }
   }
 
   // Move on to enemy turn after actions run out
@@ -729,6 +749,7 @@ public class BattleState extends GameState{
     System.out.println("Enemy turn initialized");
     dialogManager.add("It is the enemy's turn!");
     resetActionableEnemies();
+    isEnemySpdAction = false;
     if(actionableEnemies.isEmpty()){
       actionableEnemyIndex = -1;
     } else{
@@ -801,8 +822,10 @@ public class BattleState extends GameState{
       return;
     }
     if(hasPlayerWon()){
+      dialogManager.clear();
       setStep(PLAYER_VICTORY);
     } else if(hasEnemyWon()){
+      dialogManager.clear();
       setStep(ENEMY_VICTORY);
     }
   }

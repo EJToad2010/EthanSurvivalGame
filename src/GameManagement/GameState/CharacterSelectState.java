@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.*;
 
+import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacters.Archer;
 import src.Characters.PlayerCharacters.Knight;
 import src.Characters.PlayerCharacters.Wizard;
@@ -205,6 +206,32 @@ public class CharacterSelectState extends GameState{
             graphics.fillRect(390, 140, 720, 420);
             graphics.setColor(new Color(117, 97, 70));
             graphics.fillRect(400, 150, 700, 400);
+            UIManager.setTextColor(graphics, Color.WHITE);
+            UIManager.setFontSize(40);
+            UIManager.refreshText(graphics);
+            UIManager.drawCenteredStringInBox(graphics, selectedClass, 400, 200, 700, 20);
+            UIManager.setFontSize(30);
+            UIManager.refreshText(graphics);
+            UIManager.drawCenteredStringInBox(graphics, "Starter basic ability:", 400, 300, 700, 15);
+            UIManager.drawCenteredStringInBox(graphics, "Starter special ability:", 400, 425, 700, 15);
+            UIManager.setTextColor(graphics, Color.LIGHT_GRAY);
+            UIManager.setFontSize(20);
+            UIManager.refreshText(graphics);
+            BasicCharacter temp;
+            if(selectedClass.equals("Knight")){
+                temp = new Knight("");
+            } else if(selectedClass.equals("Archer")){
+                temp = new Archer("");
+            } else{
+                temp = new Wizard("");
+            }
+            UIManager.drawTopAlignedStringInBox(graphics, temp.getDescription(), 400, 210, 700, 50);
+            UIManager.drawTopAlignedStringInBox(graphics, temp.getBasicAbilityNames().get(0) + ": " + temp.getBasicAbilityDescriptions().get(0), 400, 315, 700, 50);
+            UIManager.drawTopAlignedStringInBox(graphics, temp.getSpecialAbilityNames().get(0) + ": " + temp.getSpecialAbilityDescriptions().get(0), 400, 440, 700, 50);
+            UIManager.setTextColor(graphics, Color.WHITE);
+            UIManager.setFontSize(30);
+            UIManager.refreshText(graphics);
+            UIManager.drawCenteredStringInBox(graphics, "HP: "+temp.getMaxHP() + " ATK: " + temp.getAttackStrength() + " DEF: " + temp.getDefenseStrength() + " SPD: " + temp.getSpeed(), 400, 550, 700, 15);
             // Draw the selected Character class on the left side of the screen
             int leftX = inputHandler.getButtonsX()[0];
             graphics.drawImage(selectedImage, leftX-40, 260, null);
@@ -254,12 +281,12 @@ public class CharacterSelectState extends GameState{
     // Reset the inputHandler to include buttons for selecting Character class
     private void initInputHandlerCharClass(){
         // Setup inputHandler for Character classes
-        inputHandler = createOptions(new String[]{"Knight", "Archer", "Wizard"}, new int[]{KNIGHT, ARCHER, WIZARD});
+        inputHandler = createOptions(new String[]{"Knight", "Archer", "Wizard"});
     }
 
     // Reset the inputHandler to include buttons for selecting confirmtaion
     private void initInputHandlerConfirmation(){
         // Setup inputHandler for YES / NO
-        inputHandler = createOptions(new String[]{"YES", "NO"}, new int[]{YES, NO});
+        inputHandler = createOptions(new String[]{"YES", "NO"});
     }
 }

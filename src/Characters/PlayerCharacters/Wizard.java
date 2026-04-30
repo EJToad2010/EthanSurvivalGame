@@ -59,8 +59,8 @@ public class Wizard extends PlayerCharacter {
     } else if(basicAbilityIndex == 1){
       // Electro Spirit
       //System.out.println(getName() + "'s Electro Spirit zapped " + target.getName() + " for " + (getAttackStrength() - 15) + " HP!");
-      output.add(getName() + "'s Electro Spirit zapped " + target.getName() + " for " + (getAttackStrength() - 15) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()-15);
-      output.add(handleEnemyDefense(target, getAttackStrength() - 15, playerTeam, enemyTeam));
+      output.add(getName() + "'s Electro Spirit zapped " + target.getName() + " for " + (getAttackStrength() - 20) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()-20);
+      output.add(handleEnemyDefense(target, getAttackStrength() - 20, playerTeam, enemyTeam));
       //System.out.println(target.getSimpleOutput());
     }
     return output;
