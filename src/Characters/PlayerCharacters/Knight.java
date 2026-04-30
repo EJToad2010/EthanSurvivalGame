@@ -1,17 +1,22 @@
 package src.Characters.PlayerCharacters;
 
 import java.awt.Graphics;
+import java.awt.Image;
 
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
 import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.Mechanics.Signals;
+import src.GameManagement.UI.ImageManager;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
 
 // High health and ability, low defense and healing
 public class Knight extends PlayerCharacter {
+  // Rendered during character animations
+  Image purpleParticle = ImageManager.loadImage("src/Images/purpleparticle.png");
+  Image redParticle = ImageManager.loadImage("src/Images/redparticle.png");
   public Knight(String name){
     super(name, 100.0, 30.0, 12.0, 5.0);
     // Set the names, descriptions, and cooldowns of all the Knight's abilities.
@@ -22,7 +27,7 @@ public class Knight extends PlayerCharacter {
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 1});
-    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{20, 20});
+    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{20, 10});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Last Push", "Rage Strike"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Deals +10 damage from Sword Swing. Deals an additional 50% damage if the enemy is below 50% HP.",
                                                                "Attack power is doubled from Sword Swing, but lose HP equal to 25% of your doubled attack power."});
@@ -31,7 +36,7 @@ public class Knight extends PlayerCharacter {
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
-    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{0, 0});
+    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{40, 40});
     setCharacterImage("src/Images/knight.png");
   }
   
@@ -118,8 +123,43 @@ public class Knight extends PlayerCharacter {
 
   // Called every time the Character conducts an offensive attack
   public void drawAttackAnimation(String abilityType, int abilityIndex, Graphics graphics, int tick){
-    // Move right for 10 ticks, move left back to start for 10 ticks
-    int localX = getX() + 75 - 15 * Math.abs(tick - 10);
+    int localX = getX();
+    if(abilityType.equals("Basic ability")){
+      if(abilityIndex == 0){
+        // Sword Swing
+        // Move right for 10 ticks, move left back to start for 10 ticks
+        localX = getX() -25 * Math.abs(tick - 10) + 250;
+      } else if(abilityIndex == 1){
+        // Cautious Swing
+        // Move right for 5 ticks, move left back to start for 5 ticks
+        localX = getX() -25 * Math.abs(tick - 5) + 125;
+      }
+    } else{
+      if(abilityIndex == 0){
+        // Last Push
+        // Charge for 20 ticks, move right for 10 ticks, move left for 10 ticks
+        // Speed of movement depends on enemy HP
+        if(tick > 20){
+          localX = getX() -45 * Math.abs(tick - 20) + 450;
+        } else{
+          // Render charging particles which move vertically
+          graphics.drawImage(purpleParticle, localX, getY()-(5*tick), null);
+          graphics.drawImage(purpleParticle, localX+getWidth()-10, getY()-(5*Math.min(0, tick-2)), null);
+          graphics.drawImage(purpleParticle, localX+(getWidth()/2)-10, getY()-(5*Math.min(0, tick-4)), null);
+        }
+      } else if(abilityIndex == 1){
+        // Rage Strike
+        // Charge for 20 ticks, move right fast for 10 ticks, move back to start position fast for 10 ticks
+        if(tick > 20){
+          localX = getX() -60 * Math.abs(tick - 20) + 600;
+        } else{
+          // Render charging particles which move vertically
+          graphics.drawImage(redParticle, localX, getY()-(5*tick), null);
+          graphics.drawImage(redParticle, localX+getWidth()-10, getY()-(5*Math.min(0, tick-2)), null);
+          graphics.drawImage(redParticle, localX+(getWidth()/2)-10, getY()-(5*Math.min(0, tick-4)), null);
+        }
+      }
+    }
     drawCharImage(graphics, localX, getY());
     drawHPBar(graphics, localX, getY());
     drawCharText(graphics, localX, getY());

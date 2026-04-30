@@ -1,16 +1,21 @@
 package src.Characters.PlayerCharacters;
 import java.io.IOException;
 import java.util.Scanner;
+import java.awt.Graphics;
+import java.awt.Image;
 
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
 import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.Mechanics.Signals;
+import src.GameManagement.UI.ImageManager;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
 public class Archer extends PlayerCharacter {
+  // Rendered during character animations
+  Image arrow = ImageManager.loadImage("src/Images/arrow.png");
   // Used in a precision minigame
   private Scanner s = new Scanner(System.in);
   public Archer(String name){
@@ -18,15 +23,15 @@ public class Archer extends PlayerCharacter {
     // Set the names, descriptions, and cooldowns of all the Archer's abilities.
     setDescription("A quick fighter who can attack multiple enemies and control the battlefield.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Softening Arrow", "Double Shot"});
-    addToArrayList(getBasicAbilityDescriptions(), new String[]{"A single ranged attack that has a 33% chance to reduce the enemy's attack strength for 2 turns.",
+    addToArrayList(getBasicAbilityDescriptions(), new String[]{"A single ranged attack that has a 40% chance to reduce the enemy's attack strength for 2 turns.",
                                                              "A slightly weaker attack that targets two enemies."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 2});
-    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{0, 0});
+    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{20, 20});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Volley", "Armor Piercer"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Fires an arrow at every enemy, dealing moderate damage. Each enemy has a 10% chance of being burned for 1 turn.",
-                                                               "Deals moderate damage to a single target. The enemy has a 50% chance of receiving massively reduced defensive strength for 2 turns."});
+                                                               "Deals moderate damage to a single target. The enemy has a 67% chance of receiving massively reduced defensive strength for 2 turns."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 4});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
@@ -52,7 +57,7 @@ public class Archer extends PlayerCharacter {
       ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
-      if((int)(Math.random() * 100) < 33 && enemyHPChange > 0){
+      if((int)(Math.random() * 100) < 40 && enemyHPChange > 0){
         output.add(StatusEffect.addStatusEffect(target, "Soft", 2));
       }
       //System.out.println(target.getSimpleOutput());
@@ -86,7 +91,7 @@ public class Archer extends PlayerCharacter {
       //System.out.println(getName() + " fired an armor piercing arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!");
       output.add(getName() + " fired an armor piercing arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()+5);
       output.add(handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam));
-      if((int)(Math.random() * 100) < 50){
+      if((int)(Math.random() * 100) < 67){
         output.add(StatusEffect.addStatusEffect(target, "Pierce", 2));
       }
     }
@@ -108,6 +113,45 @@ public class Archer extends PlayerCharacter {
       output.add(getName() + " lightly dodged " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength());
     }
     return output;
+  }
+
+  // Called every time the Character conducts an offensive attack
+  public void drawAttackAnimation(String abilityType, int abilityIndex, Graphics graphics, int tick){
+    int localX = getX();
+    int arrowX = getX() + getWidth();
+    int arrowY = getY() + getWidth()/2-10;
+    if(abilityType.equals("Basic ability")){
+      if(abilityIndex == 0){
+        // Softening arrow
+        // Arrow moves right for 20 ticks
+        arrowX = getX() + getWidth() + 25*tick;
+        graphics.drawImage(arrow, arrowX, arrowY, null);
+      } else if(abilityIndex == 1){
+        // Double shot
+        // Two arrows move right for 20 ticks
+        arrowX = getX() + getWidth() + 25*tick;
+        graphics.drawImage(arrow, arrowX, arrowY-30, null);
+        graphics.drawImage(arrow, arrowX, arrowY+30, null);
+      }
+    } else{
+      if(abilityIndex == 0){
+        // Volley
+        // Charge for 20 ticks, move right for 10 ticks, move left for 10 ticks
+        // Speed of movement depends on enemy HP
+        if(tick > 20){
+          localX = getX() -45 * Math.abs(tick - 20) + 450;
+        }
+      } else if(abilityIndex == 1){
+        // Armor Piercer
+        // Charge for 20 ticks, arrow moves right fast for 30 ticks
+        if(tick > 20){
+          localX = getX() -60 * Math.abs(tick - 20) + 600;
+        }
+      }
+    }
+    drawCharImage(graphics, localX, getY());
+    drawHPBar(graphics, localX, getY());
+    drawCharText(graphics, localX, getY());
   }
 
   // A precision minigame that is not implemented yet
