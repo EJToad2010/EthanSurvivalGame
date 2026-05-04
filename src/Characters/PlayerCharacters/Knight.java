@@ -48,7 +48,7 @@ public class Knight extends PlayerCharacter {
   // Overrided battle methods
   public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Signals.TARGET_OBJECT, target.getID());
+    output.add(getCharInfoSignals(target));
     if(basicAbilityIndex == 0){
       // Sword Swing
       //System.out.println(getName() + " swung their sword at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -78,7 +78,7 @@ public class Knight extends PlayerCharacter {
   // Knight has two special attacks to choose from
   public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Signals.TARGET_OBJECT, target.getID());
+    output.add(getCharInfoSignals(target));
     if(specialAbilityIndex == 0){
       // Last Push
       if(target.getCurrentHP() / target.getMaxHP() < 0.5){
@@ -122,7 +122,7 @@ public class Knight extends PlayerCharacter {
   }
 
   // Called every time the Character conducts an offensive attack
-  public void drawAttackAnimation(String abilityType, int abilityIndex, Graphics graphics, int tick){
+  public void drawAttackAnimation(BasicCharacter target, String abilityType, int abilityIndex, Graphics graphics, int tick){
     int localX = getX();
     if(abilityType.equals("Basic ability")){
       if(abilityIndex == 0){
@@ -140,7 +140,7 @@ public class Knight extends PlayerCharacter {
         // Charge for 20 ticks, move right for 10 ticks, move left for 10 ticks
         // Speed of movement depends on enemy HP
         if(tick > 20){
-          localX = getX() -45 * Math.abs(tick - 20) + 450;
+          localX = getX() -45 * Math.abs(tick - 30) + 450;
         } else{
           // Render charging particles which move vertically
           graphics.drawImage(purpleParticle, localX, getY()-(5*tick), null);
@@ -151,7 +151,7 @@ public class Knight extends PlayerCharacter {
         // Rage Strike
         // Charge for 20 ticks, move right fast for 10 ticks, move back to start position fast for 10 ticks
         if(tick > 20){
-          localX = getX() -60 * Math.abs(tick - 20) + 600;
+          localX = getX() -60 * Math.abs(tick - 30) + 600;
         } else{
           // Render charging particles which move vertically
           graphics.drawImage(redParticle, localX, getY()-(5*tick), null);

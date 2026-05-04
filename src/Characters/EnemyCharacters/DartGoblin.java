@@ -92,7 +92,7 @@ public class DartGoblin extends EnemyCharacter{
   // Same for specialAbility()
   public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Signals.TARGET_OBJECT, target.getID());
+    output.add(getCharInfoSignals(target));
     if(basicAbilityIndex == 0){
       // Poison Dart
       //System.out.println(getName() + " shot a poison dart at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -116,7 +116,7 @@ public class DartGoblin extends EnemyCharacter{
   
   public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Signals.TARGET_OBJECT, target.getID());
+    output.add(getCharInfoSignals(target));
     if(specialAbilityIndex == 0){
       // Poison Cloud
       //System.out.println(getName() + " shot a poison cloud at " + target.getName() + " for " + (getAttackStrength()-5) + " HP!");

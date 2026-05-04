@@ -28,7 +28,7 @@ public class Archer extends PlayerCharacter {
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 2});
-    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{20, 20});
+    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{40, 40});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Volley", "Armor Piercer"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Fires an arrow at every enemy, dealing moderate damage. Each enemy has a 10% chance of being burned for 1 turn.",
                                                                "Deals moderate damage to a single target. The enemy has a 67% chance of receiving massively reduced defensive strength for 2 turns."});
@@ -37,7 +37,7 @@ public class Archer extends PlayerCharacter {
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 2});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 2});
-    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{0, 0});
+    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{40, 0});
     setCharacterImage("src/Images/archer.png");
   }
   
@@ -49,7 +49,7 @@ public class Archer extends PlayerCharacter {
   // Overrided battle methods
   public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Signals.TARGET_OBJECT, target.getID());
+    output.add(getCharInfoSignals(target));
     if(basicAbilityIndex == 0){
       // Softening Arrow
       //System.out.println(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -74,7 +74,7 @@ public class Archer extends PlayerCharacter {
   // Archer has two special attacks to choose from
   public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(Signals.TARGET_OBJECT, target.getID());
+    output.add(getCharInfoSignals(target));
     if(specialAbilityIndex == 0){
       // Volley
       //System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -116,7 +116,7 @@ public class Archer extends PlayerCharacter {
   }
 
   // Called every time the Character conducts an offensive attack
-  public void drawAttackAnimation(String abilityType, int abilityIndex, Graphics graphics, int tick){
+  public void drawAttackAnimation(BasicCharacter target, String abilityType, int abilityIndex, Graphics graphics, int tick){
     int localX = getX();
     int arrowX = getX() + getWidth();
     int arrowY = getY() + getWidth()/2-10;
@@ -125,21 +125,30 @@ public class Archer extends PlayerCharacter {
         // Softening arrow
         // Arrow moves right for 20 ticks
         arrowX = getX() + getWidth() + 25*tick;
-        graphics.drawImage(arrow, arrowX, arrowY, null);
+        if(arrowX < target.getX()){
+          graphics.drawImage(arrow, arrowX, arrowY, null);
+        }
       } else if(abilityIndex == 1){
         // Double shot
         // Two arrows move right for 20 ticks
         arrowX = getX() + getWidth() + 25*tick;
-        graphics.drawImage(arrow, arrowX, arrowY-30, null);
-        graphics.drawImage(arrow, arrowX, arrowY+30, null);
+        if(arrowX < target.getX()){
+          graphics.drawImage(arrow, arrowX, arrowY-30, null);
+          graphics.drawImage(arrow, arrowX, arrowY+30, null);
+        } 
       }
     } else{
       if(abilityIndex == 0){
         // Volley
-        // Charge for 20 ticks, move right for 10 ticks, move left for 10 ticks
-        // Speed of movement depends on enemy HP
-        if(tick > 20){
-          localX = getX() -45 * Math.abs(tick - 20) + 450;
+        // Launch 10 arrows vertically for 10 ticks, wait 20 ticks, and land all over the enemy team area for 10 ticks
+        if(tick > 30){
+          for(int i = 0; i < 10; i++){
+            graphics.drawImage(arrow, 680 + i*120, i*25, null);
+          }
+        } else if(tick <= 10){
+          for(int i = 0; i < 10; i++){
+            graphics.drawImage(arrow, getX() + i*10, getY() - 25*i, null);
+          }
         }
       } else if(abilityIndex == 1){
         // Armor Piercer

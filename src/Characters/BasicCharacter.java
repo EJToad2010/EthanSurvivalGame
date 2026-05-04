@@ -515,6 +515,13 @@ public class BasicCharacter {
     System.out.println("This character does not have a specialAbility function implemented.");
     return new ActionResult();
   }
+
+  // Returns an ActionResult with invisible signals that allow a program to access key info of another BasicCharacter
+  public ActionResult getCharInfoSignals(BasicCharacter c){
+    ActionResult output = new ActionResult();
+    output.add(Signals.TARGET_OBJECT, c.getID());
+    return output;
+  }
   
   // Overrided toString method
   public String toString(){
@@ -526,7 +533,7 @@ public class BasicCharacter {
 
   // Animation methods to override
   // Called every time the Character conducts an offensive attack
-  public void drawAttackAnimation(String abilityType, int abilityIndex, Graphics graphics, int tick){}
+  public void drawAttackAnimation(BasicCharacter target, String abilityType, int abilityIndex, Graphics graphics, int tick){}
 
   // Draw the given Character sprite at top left corner (x, y)
   public void drawCharacter(Graphics graphics){

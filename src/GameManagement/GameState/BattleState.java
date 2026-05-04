@@ -404,19 +404,29 @@ public class BattleState extends GameState{
   // Graphical content of a GameState's signal
   // (Remember to set isHandlingSignal to FALSE when done handling)
   protected void drawSignal(String signal, Graphics graphics, int tick){
-    if(signal.equals(Signals.ATTACK_PERFORMED) && calculateCurrentTurnOwner().equals("Player")){
+    if(signal.equals(Signals.ATTACK_PERFORMED)){
+      BasicCharacter performingCharacter;
+      BasicCharacter performingTarget;
+      if(calculateCurrentTurnOwner().equals("Player")){
+        performingCharacter = selectedCharacter;
+        performingTarget = currentTarget;
+      } else{
+        performingCharacter = actionableEnemies.get(actionableEnemyIndex);
+        performingTarget = selectedCharacter;
+      }
+
       int attackAnimationLength;
       if(selectedActionType.equals("Basic ability")){
-        attackAnimationLength = selectedCharacter.getBasicAbilityAnimationLengths().get(selectedAbilityIndex);
+        attackAnimationLength = performingCharacter.getBasicAbilityAnimationLengths().get(selectedAbilityIndex);
       } else{
-        attackAnimationLength = selectedCharacter.getSpecialAbilityAnimationLengths().get(selectedAbilityIndex);
+        attackAnimationLength = performingCharacter.getSpecialAbilityAnimationLengths().get(selectedAbilityIndex);
       }
-      selectedCharacter.setIsAnimating(true);
+      performingCharacter.setIsAnimating(true);
       if(tick > attackAnimationLength){
         isHandlingSignal = false;
-        selectedCharacter.setIsAnimating(false);
+        performingCharacter.setIsAnimating(false);
       } else{
-        selectedCharacter.drawAttackAnimation(selectedActionType, selectedAbilityIndex, graphics, tick);
+        performingCharacter.drawAttackAnimation(performingTarget, selectedActionType, selectedAbilityIndex, graphics, tick);
       }
     }
   }
