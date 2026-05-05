@@ -93,10 +93,11 @@ public class Inventory {
   // Return a String[] containing the name of every ItemStack in the inventory
   // Used for inputHandler
   public String[] getInventoryNames(){
-    String[] output = new String[inventory.size()];
+    String[] output = new String[inventory.size() + 1];
     for(int i = 0; i < inventory.size(); i++){
       output[i] = inventory.get(i).getItem().getName();
     }
+    output[inventory.size()] = "Cancel";
     return output;
   }
 

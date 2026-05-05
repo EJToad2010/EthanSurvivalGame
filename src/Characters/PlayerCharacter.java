@@ -162,7 +162,7 @@ public class PlayerCharacter extends BasicCharacter {
 
   public void drawXPBar(Graphics graphics, int localX, int localY){
     updateXPToNextLevel();
-    double xpRatio = xp / xpToNextLevel;
+    double xpRatio = (double)(xp) / xpToNextLevel;
     int xpSize = (int)((double)(getWidth()-(getLostSpacing()*2)) * xpRatio);
     //System.out.println(xp);
     graphics.setColor(Color.BLACK);

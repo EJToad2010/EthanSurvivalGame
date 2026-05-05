@@ -23,6 +23,7 @@ public class Signals {
     // Used for sending information (null message)
     public static final String TARGET_OBJECT = "TARGET_OBJECT";
     public static final String CURRENT_OBJECT = "CURRENT_OBJECT";
-    public static final String TARGET_X = "TARGET_X";
-    public static final String TARGET_Y = "TARGET_Y";
+    // 0 = basic ability 1 = special ability
+    public static final String CURRENT_ABILITY_TYPE = "CURRENT_ABILITY_TYPE";
+    public static final String CURRENT_ABILITY_INDEX = "CURRENT_ABILITY_INDEX";
 }

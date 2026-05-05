@@ -6,6 +6,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 
 // Handle storing and positioning images as a static class
 public class ImageManager {
@@ -24,5 +26,14 @@ public class ImageManager {
     }
     public static ImageIcon loadIcon(String path){
         return new ImageIcon(ImageManager.loadImage(path));
+    }
+    public static BufferedImage rotateImage(BufferedImage image, double degrees) {
+        double radians = Math.toRadians(degrees);
+        double centerX = image.getWidth() / 2.0;
+        double centerY = image.getHeight() / 2.0;
+
+        AffineTransform tx = AffineTransform.getRotateInstance(radians, centerX, centerY);
+        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+        return op.filter(image, null);
     }
 }

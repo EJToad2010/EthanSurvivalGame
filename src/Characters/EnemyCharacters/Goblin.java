@@ -110,7 +110,7 @@ public class Goblin extends EnemyCharacter{
   // Same for specialAbility()
   public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(getCharInfoSignals(target));
+    output.add(getCharInfoSignals(target, 0, basicAbilityIndex));
     if(basicAbilityIndex == 0){
       //System.out.println(getName() + " stabbed " + target.getName() + " with their dagger for " + getAttackStrength() + " HP!");
       output.add(getName() + " stabbed " + target.getName() + " with their dagger for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
@@ -133,7 +133,7 @@ public class Goblin extends EnemyCharacter{
   
   public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(getCharInfoSignals(target));
+    output.add(getCharInfoSignals(target, 1, specialAbilityIndex));
     if(specialAbilityIndex == 0){
       // Taunt
       //System.out.println(getName() + " taunted " + target.getName() + "!");

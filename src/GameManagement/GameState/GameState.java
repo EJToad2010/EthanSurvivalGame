@@ -257,6 +257,9 @@ public class GameState {
         if(!(keyCode == KeyEvent.VK_ENTER) && !dialogManager.getMessage().equals("")){
             return -1;
         }
+        if(isHandlingSignal){
+            return -1;
+        }
         dialogManager.nextLine();
         isOnSignalCooldown = false;
         if(dialogManager.getIsActive()){

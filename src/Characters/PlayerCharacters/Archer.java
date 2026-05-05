@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
@@ -15,7 +16,9 @@ import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
 public class Archer extends PlayerCharacter {
   // Rendered during character animations
-  Image arrow = ImageManager.loadImage("src/Images/arrow.png");
+  BufferedImage arrow = ImageManager.loadImage("src/Images/arrow.png");
+  BufferedImage rotatedArrow90 = ImageManager.rotateImage(arrow, 90.0);
+  BufferedImage rotatedArrow270 = ImageManager.rotateImage(arrow, 270.0);
   // Used in a precision minigame
   private Scanner s = new Scanner(System.in);
   public Archer(String name){
@@ -37,7 +40,7 @@ public class Archer extends PlayerCharacter {
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 2});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 2});
-    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{40, 0});
+    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{60, 0});
     setCharacterImage("src/Images/archer.png");
   }
   
@@ -49,7 +52,7 @@ public class Archer extends PlayerCharacter {
   // Overrided battle methods
   public ActionResult basicAbility(int basicAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(getCharInfoSignals(target));
+    output.add(getCharInfoSignals(target, 0, basicAbilityIndex));
     if(basicAbilityIndex == 0){
       // Softening Arrow
       //System.out.println(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -74,7 +77,7 @@ public class Archer extends PlayerCharacter {
   // Archer has two special attacks to choose from
   public ActionResult specialAbility(int specialAbilityIndex, BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
-    output.add(getCharInfoSignals(target));
+    output.add(getCharInfoSignals(target, 1, specialAbilityIndex));
     if(specialAbilityIndex == 0){
       // Volley
       //System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
@@ -140,14 +143,14 @@ public class Archer extends PlayerCharacter {
     } else{
       if(abilityIndex == 0){
         // Volley
-        // Launch 10 arrows vertically for 10 ticks, wait 20 ticks, and land all over the enemy team area for 10 ticks
-        if(tick > 30){
-          for(int i = 0; i < 10; i++){
-            graphics.drawImage(arrow, 680 + i*120, i*25, null);
+        // Launch 10 arrows vertically for 20 ticks, wait 20 ticks, and land all over the enemy team area for 20 ticks
+        if(tick > 40){
+          for(int i = 0; i < 5; i++){
+            graphics.drawImage(rotatedArrow90, 680 + i*120, (tick-41)*14, null);
           }
-        } else if(tick <= 10){
-          for(int i = 0; i < 10; i++){
-            graphics.drawImage(arrow, getX() + i*10, getY() - 25*i, null);
+        } else if(tick <= 20){
+          for(int i = 0; i < 5; i++){
+            graphics.drawImage(rotatedArrow270, getX() + i*20, getY() - 14*tick, null);
           }
         }
       } else if(abilityIndex == 1){

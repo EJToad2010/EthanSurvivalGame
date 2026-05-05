@@ -477,9 +477,15 @@ public class BasicCharacter {
     }
     if(playerTeam.getIndexOfProtectedCharacter(target) != -1){
       int index = playerTeam.getIndexOfProtectedCharacter(target);
+      double totalProtectedAmount = 0.0;
+      for(int i = 0; i < playerTeam.getProtectedCharacters().size(); i++){
+        if(playerTeam.getProtectedCharacters().get(i).equals(target)){
+          totalProtectedAmount += playerTeam.getProtectedCharacterAmounts().get(i);
+        }
+      }
       // System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
-      output.add(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!", Signals.DEFENSE_RECEIVED, playerTeam.getProtectedCharacterAmounts().get(index));
-      actualDamage -= playerTeam.getProtectedCharacterAmounts().get(index);
+      output.add(target.getName() + " received " + totalProtectedAmount + " defensive strength!", Signals.DEFENSE_RECEIVED, playerTeam.getProtectedCharacterAmounts().get(index));
+      actualDamage -= totalProtectedAmount;
     }
     return Math.max(actualDamage, 0);
   }
@@ -517,9 +523,11 @@ public class BasicCharacter {
   }
 
   // Returns an ActionResult with invisible signals that allow a program to access key info of another BasicCharacter
-  public ActionResult getCharInfoSignals(BasicCharacter c){
+  public ActionResult getCharInfoSignals(BasicCharacter c, int abilityType, int abilityIndex){
     ActionResult output = new ActionResult();
     output.add(Signals.TARGET_OBJECT, c.getID());
+    output.add(Signals.CURRENT_ABILITY_TYPE, abilityType);
+    output.add(Signals.CURRENT_ABILITY_INDEX, abilityIndex);
     return output;
   }
   

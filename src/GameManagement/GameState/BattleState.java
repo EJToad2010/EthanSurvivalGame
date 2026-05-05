@@ -58,6 +58,8 @@ public class BattleState extends GameState{
   private PlayerCharacter selectedDefenseTarget;
   private int selectedItemIndex;
   private ArrayList<BasicCharacter> itemTargets = new ArrayList<BasicCharacter>();
+  private int performingAbilityType;
+  private int performingAbilityIndex;
 
   private int enemyRewardIndex;
 
@@ -190,12 +192,20 @@ public class BattleState extends GameState{
         }
       } else if(step == SELECT_ITEM){
         selectedItemIndex = input;
-        targetAmount = playerTeam.getPlayerInventory().get(input).getItem().getTargetAmount();
-        if(targetAmount == 999){
-          dialogManager.add(selectedAbilityName + " will target all players!");
+        if(inputHandler.getButtons().get(input).getText().equals("Cancel")){
+          setStep(SELECT_ACTION);
         } else{
-          setStep(SELECT_ITEM_TARGET);
+          targetAmount = playerTeam.getPlayerInventory().get(input).getItem().getTargetAmount();
+          if(targetAmount == 999){
+            dialogManager.add(playerTeam.getPlayerInventory().get(input).getItem().getName() + " will target all players!");
+            for(PlayerCharacter p : playerTeam.getPlayerTeam()){
+              itemTargets.add(p);
+            }
+          } else{
+            setStep(SELECT_ITEM_TARGET);
+          }
         }
+        
       } else if(step == SELECT_ITEM_TARGET){
         targetIndex = input;
         itemTargets.add(playerTeam.getPlayerTeam().get(input));
@@ -279,7 +289,7 @@ public class BattleState extends GameState{
       }
     } else if(step == SELECT_ITEM){
       if(targetAmount == 999){
-        setStep(SELECT_ITEM_TARGET);
+        setStep(USE_ITEM);
       }
     } else if(step == USE_ITEM){
       // Return to selecting the next target if more targets are left
@@ -292,7 +302,7 @@ public class BattleState extends GameState{
           setStep(SELECT_ITEM_TARGET);
           System.out.println("Next target");
         } else{
-         findNextTargetAllEnemies(true);
+          findNextTargetAllEnemies(false);
         }
       } else if(actionPointsLeft > 1){
         nextAction();
@@ -388,6 +398,7 @@ public class BattleState extends GameState{
     }else if(signal.equals(Signals.COINS_GAINED)){
       System.out.println("Coins gained");
       playerTeam.increaseCoinBalance((int)amount);
+      isHandlingSignal = false;
     } else if(signal.equals(Signals.ATTACK_PERFORMED)){
 
     } 
@@ -407,26 +418,41 @@ public class BattleState extends GameState{
     if(signal.equals(Signals.ATTACK_PERFORMED)){
       BasicCharacter performingCharacter;
       BasicCharacter performingTarget;
+      int attackAnimationLength = 0;
       if(calculateCurrentTurnOwner().equals("Player")){
         performingCharacter = selectedCharacter;
         performingTarget = currentTarget;
+        if(selectedActionType.equals("Basic ability")){
+          attackAnimationLength = performingCharacter.getBasicAbilityAnimationLengths().get(selectedAbilityIndex);
+        } else{
+          attackAnimationLength = performingCharacter.getSpecialAbilityAnimationLengths().get(selectedAbilityIndex);
+        }
       } else{
         performingCharacter = actionableEnemies.get(actionableEnemyIndex);
         performingTarget = selectedCharacter;
+        if(performingAbilityType == 0){
+          attackAnimationLength = performingCharacter.getBasicAbilityAnimationLengths().get(performingAbilityIndex);
+        } else{
+          attackAnimationLength = performingCharacter.getSpecialAbilityAnimationLengths().get(performingAbilityIndex);
+        }
       }
-
-      int attackAnimationLength;
-      if(selectedActionType.equals("Basic ability")){
-        attackAnimationLength = performingCharacter.getBasicAbilityAnimationLengths().get(selectedAbilityIndex);
-      } else{
-        attackAnimationLength = performingCharacter.getSpecialAbilityAnimationLengths().get(selectedAbilityIndex);
-      }
+      
       performingCharacter.setIsAnimating(true);
       if(tick > attackAnimationLength){
         isHandlingSignal = false;
         performingCharacter.setIsAnimating(false);
       } else{
-        performingCharacter.drawAttackAnimation(performingTarget, selectedActionType, selectedAbilityIndex, graphics, tick);
+        if(calculateCurrentTurnOwner().equals("Player")){
+          performingCharacter.drawAttackAnimation(performingTarget, selectedActionType, selectedAbilityIndex, graphics, tick);
+        } else{
+          String performingActionType;
+          if(performingAbilityType == 0){
+            performingActionType = "Basic ability";
+          } else{
+            performingActionType = "Special ability";
+          }
+          performingCharacter.drawAttackAnimation(performingTarget, performingActionType, performingAbilityIndex, graphics, tick);
+        }
       }
     }
   }
@@ -648,12 +674,12 @@ public class BattleState extends GameState{
     // Exit the battle if so
     if(step == SELECT_CHARACTER){
       targetIndex = 0;
+      itemTargets.clear();
     } else if(step == SELECT_ABILITY){
       targets.clear();
     } else if(step == ENEMY_PERFORM_ABILITY){
     } else if(step == SELECT_ITEM){
       targetIndex = 0;
-      itemTargets.clear();
     }
   }
 
@@ -674,7 +700,11 @@ public class BattleState extends GameState{
       turnHalf = 0;
       initializeEnemy();
       playerTeam.setIsDrawingXP(false);
-      playerTeam.getPlayerInventory().add(new HealthPotion(), 1);
+      if(Math.random() < 0.5){
+        playerTeam.getPlayerInventory().add(new HealthPotion(), 1);
+      } else{
+        playerTeam.getPlayerInventory().add(new HealthPool(), 1);
+      }
       playerTeam.resetPlayerCooldowns();
       playerTeam.resetPlayerDefense();
       playerTeam.resetProtectedCharacters();
