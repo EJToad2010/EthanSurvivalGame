@@ -17,6 +17,8 @@ public class Wizard extends PlayerCharacter {
   private Scanner s = new Scanner(System.in);
   // Rendered during character animations
   BufferedImage zap = ImageManager.loadImage("src/Images/zap.png");
+  BufferedImage fireball = ImageManager.loadImage("src/Images/fireball.png");
+  BufferedImage explosion = ImageManager.loadImage("src/Images/explosion.png");
   public Wizard(String name){
     super(name, 80.0, 40.0, 5.0, 15.0);
     // Set the names, descriptions, and cooldowns of all the Wizard's abilities.
@@ -36,7 +38,7 @@ public class Wizard extends PlayerCharacter {
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
-    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{0, 0});
+    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{40, 0});
     setCharacterImage("src/Images/wizard.png");
   }
   
@@ -144,6 +146,16 @@ public class Wizard extends PlayerCharacter {
     } else{
       if(abilityIndex == 0){
         // Fireball
+        // Fireball flys in from top-left corner to enemy location for 20 ticks
+        if(tick <= 20){
+          int targetX = target.getX();
+          int targetY = target.getY();
+          int fireballX = (targetX / 20) * tick;
+          int fireballY = (targetY / 20) * tick;
+          graphics.drawImage(fireball, fireballX, fireballY, null);
+        } else{
+          graphics.drawImage(explosion, target.getX() - (360-target.getWidth())/2, target.getY() - (360-target.getHeight())/2, null);
+        }
         
       } else if(abilityIndex == 1){
         // Spirit Calling
