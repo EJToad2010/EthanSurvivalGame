@@ -1,17 +1,24 @@
 package src.Characters.EnemyCharacters;
 
 import java.util.ArrayList;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 import src.Characters.BasicCharacter;
 import src.Characters.EnemyCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.Mechanics.Signals;
+import src.GameManagement.UI.ImageManager;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
 
 public class Goblin extends EnemyCharacter{
+  // Rendered during character animations
+  BufferedImage orangeParticle = ImageManager.loadImage("src/Images/orangeparticle.png");
+  BufferedImage redParticle = ImageManager.loadImage("src/Images/redparticle.png");
+
   // Items that the Goblin steals from the player. They are not used by the Goblin and will be returned on death.
   public Goblin(String name, String behaviorType){
     super(name, 60.0, 10.0, 4.0, 20.0, 50, 20, behaviorType);
@@ -21,7 +28,7 @@ public class Goblin extends EnemyCharacter{
                                                              "During the player's turn, all attacks toward the Goblin deal 25% less damage."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
-    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{0, 0});
+    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{20, 20});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Taunt", "Pickpocket"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Target a single character. The target cannot use an ability next turn.",
                                                                "Attack a single character for moderate damage. The Goblin has a 25% to steal gold from the player. The Goblin consumes the gold to heal."});
@@ -29,7 +36,7 @@ public class Goblin extends EnemyCharacter{
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{3, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{3, 3});
-    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{0, 0});
+    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{20, 30});
     setCharacterImage("src/Images/goblin.png");
   }
   
@@ -112,6 +119,7 @@ public class Goblin extends EnemyCharacter{
     ActionResult output = new ActionResult();
     output.add(getCharInfoSignals(target, 0, basicAbilityIndex));
     if(basicAbilityIndex == 0){
+      // Rusty Dagger
       //System.out.println(getName() + " stabbed " + target.getName() + " with their dagger for " + getAttackStrength() + " HP!");
       output.add(getName() + " stabbed " + target.getName() + " with their dagger for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       // Check for how much damage the attack did to the enemy
@@ -180,5 +188,42 @@ public class Goblin extends EnemyCharacter{
       output.add(getName() + " tried to hide from " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength());
     }
     return output;
+  }
+
+  // Called every time the Character conducts an offensive attack
+  public void drawAttackAnimation(BasicCharacter target, String abilityType, int abilityIndex, Graphics graphics, int tick){
+    int localX = getX();
+    if(abilityType.equals("Basic ability")){
+      if(abilityIndex == 0){
+        // Rusty Dagger
+        // Move left for 10 ticks, move right back to start for 10 ticks
+        localX = getX() +20 * Math.abs(tick - 10) - 200;
+      } else if(abilityIndex == 1){
+        // Nimble Dodge
+        // Render charging particles for 20 ticks
+        graphics.drawImage(orangeParticle, localX, getY()-(5*tick), null);
+        graphics.drawImage(orangeParticle, localX+getWidth()-10, getY()-(5*tick), null);
+        graphics.drawImage(orangeParticle, localX+getWidth()/2-10, getY()-(5*tick), null);
+      }
+    } else{
+      if(abilityIndex == 0){
+        // Taunt
+        // Render charging particles for 20 ticks
+        graphics.drawImage(redParticle, localX, getY()-(5*tick), null);
+        graphics.drawImage(redParticle, localX+getWidth()-10, getY()-(5*tick), null);
+        graphics.drawImage(redParticle, localX+getWidth()/2-10, getY()-(5*tick), null);
+      } else if(abilityIndex == 1){
+        // Pickpocket
+        // Move left for 20 ticks, move right back to start for 10 ticks
+        if(tick <= 20){
+          localX = getX() - 15 * tick;
+        } else{
+          localX = getX() - 300 + 10 * tick;
+        }
+      }
+    }
+    drawCharImage(graphics, localX, getY());
+    drawHPBar(graphics, localX, getY());
+    drawCharText(graphics, localX, getY());
   }
 }

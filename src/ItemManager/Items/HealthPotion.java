@@ -17,7 +17,7 @@ public class HealthPotion extends Item {
   // Name and description will always be default. Only price, quantity, and healStrength
   // can be manually modified.
   public HealthPotion(int price, double healStrength){
-    super("Health Potion", "Heals one character.", price);
+    super("Health Potion ("+healStrength+")", "Heals one character.", price);
     this.healStrength = healStrength;
     setUsageType("Heal");
     setImage("src/Images/healthpotion.png");

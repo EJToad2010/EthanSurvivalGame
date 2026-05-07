@@ -1,17 +1,25 @@
 package src.Characters.EnemyCharacters;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.awt.Graphics;
 
 import src.Characters.BasicCharacter;
 import src.Characters.EnemyCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.Mechanics.Signals;
+import src.GameManagement.UI.ImageManager;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
 
 public class DartGoblin extends EnemyCharacter{
+  // Rendered during character animations
+  BufferedImage dart = ImageManager.loadImage("src/Images/dart.png");
+  BufferedImage greenDart = ImageManager.loadImage("src/Images/greendart.png");
+  BufferedImage poisonParticle = ImageManager.loadImage("src/Images/poisonparticle.png");
+  BufferedImage orangeParticle = ImageManager.loadImage("src/Images/orangeparticle.png");
   public DartGoblin(String name, String behaviorType){
     // Set the names, descriptions, and cooldowns of the Dart Goblin.
     super(name, 50.0, 8.0, 3.0, 25.0, 50, 20, behaviorType);
@@ -21,7 +29,7 @@ public class DartGoblin extends EnemyCharacter{
                                                              "During the player's turn, all attacks toward the Goblin deal 25% less damage."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
-    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{0, 0});
+    addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{40, 20});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Poison Cloud", "Poison Mark"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Shoot slightly weaker poison clouds at all targets. 33% chance for each target to be poisoned for 2 turns.",
                                                                "Shoot a poison dart at a target. This target gets a 75% chance to be poisoned for 3 turns."});
@@ -29,7 +37,7 @@ public class DartGoblin extends EnemyCharacter{
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{999, 1});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
-    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{0, 0});
+    addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{60, 60});
     setCharacterImage("src/Images/dartgoblin.png");
   }
   
@@ -156,5 +164,53 @@ public class DartGoblin extends EnemyCharacter{
       output.add(getName() + " tried to hide from " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength());
     }
     return output;
+  }
+
+  // Called every time the Character conducts an offensive attack
+  public void drawAttackAnimation(BasicCharacter target, String abilityType, int abilityIndex, Graphics graphics, int tick){
+    int localX = getX();
+    if(abilityType.equals("Basic ability")){
+      if(abilityIndex == 0){
+        // Poison Dart
+        // Move left until enemy hit or 40 ticks passed
+        int dartX = getX() - 20*tick;
+        if(dartX > target.getX() + target.getWidth()){
+          graphics.drawImage(dart, dartX, getY() + getHeight()/2 - 10, null);
+        }
+      } else if(abilityIndex == 1){
+        // Nimble Dodge
+        // Render charging particles for 20 ticks
+        graphics.drawImage(orangeParticle, localX, getY()-(5*tick), null);
+        graphics.drawImage(orangeParticle, localX+getWidth()-10, getY()-(5*tick), null);
+        graphics.drawImage(orangeParticle, localX+getWidth()/2-10, getY()-(5*tick), null);
+      }
+    } else{
+      if(abilityIndex == 0){
+        // Poison Cloud
+        // Move dart left until enemy hit, then release poison particles at enemy location
+        int dartX = getX() - 30*tick;
+        if(dartX > target.getX() + target.getWidth()){
+          graphics.drawImage(dart, dartX, getY() + getHeight()/2 - 10, null);
+        } else{
+          graphics.drawImage(poisonParticle, target.getX(), target.getY()-(5*tick), null);
+          graphics.drawImage(poisonParticle, target.getX()+getWidth()-10, target.getY()-(5*tick), null);
+          graphics.drawImage(poisonParticle, target.getX()+getWidth()/2-10, target.getY()-(5*tick), null);
+        }
+      } else if(abilityIndex == 1){
+        // Poison Mark
+        // Move green dart toward enemy location, then release poison particles
+        int dartX = getX() - 30*tick;
+        if(dartX > target.getX() + target.getWidth()){
+          graphics.drawImage(greenDart, dartX, getY() + getHeight()/2 - 10, null);
+        } else{
+          graphics.drawImage(poisonParticle, target.getX(), target.getY()-(5*tick), null);
+          graphics.drawImage(poisonParticle, target.getX()+getWidth()-10, target.getY()-(5*tick), null);
+          graphics.drawImage(poisonParticle, target.getX()+getWidth()/2-10, target.getY()-(5*tick), null);
+        }
+      }
+    }
+    drawCharImage(graphics, localX, getY());
+    drawHPBar(graphics, localX, getY());
+    drawCharText(graphics, localX, getY());
   }
 }

@@ -177,6 +177,13 @@ public class EnemyTeam {
       c.resetSpecialAbilityCooldowns();
     }
   }
+
+  // Set the isAnimating boolean of all Characters to false
+  public void resetIsAnimating(){
+    for(EnemyCharacter e : enemyTeam){
+      e.setIsAnimating(false);
+    }
+  }
   
   // Erase the enemy team
   public void clearEnemyTeam(){
@@ -210,7 +217,9 @@ public class EnemyTeam {
   public void drawEnemyTeam(Graphics graphics, int x, int y, int width){
     spaceCharacters(x, y, width);
     for(EnemyCharacter c : enemyTeam){
-      c.drawCharacter(graphics);
+      if(!c.getIsAnimating()){
+        c.drawCharacter(graphics);
+      }
     }
   }
 

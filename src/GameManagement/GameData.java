@@ -37,8 +37,6 @@ public class GameData {
   
   // Attributes used within battles, which are the core part of the gameplay loop
   private int playerActionPoints = playerBattleCapacity;
-  private int actionPointsLeft;
-  private int currentActionPoints;
   private PlayerTeam playerTeam;
   private EnemyTeam enemyTeam;
 

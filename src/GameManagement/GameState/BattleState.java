@@ -27,7 +27,6 @@ import src.Teams.PlayerTeam;
 
 public class BattleState extends GameState{
   // Constants used to define each major step
-  private final int INPUT_ERROR = -1;
   private final int INTRO_ANIM = 0;
   private final int SELECT_CHARACTER = 1;
   private final int SELECT_ACTION = 2;
@@ -171,6 +170,7 @@ public class BattleState extends GameState{
             selectedAbilityName = selectedCharacter.getSpecialAbilityNames().get(selectedAbilityIndex);
           }
           if(targetAmount == 999){
+            targetIndex = 0;
             dialogManager.add(selectedAbilityName + " will target all enemies!");
           } else{
             setStep(SELECT_TARGET);
@@ -260,7 +260,7 @@ public class BattleState extends GameState{
         return;
       }
       // Extra action chance (SPD)
-      if((Math.random() * 100) < Math.min(actionableEnemies.get(actionableEnemyIndex).getSpeed()/4, 50) && !isEnemySpdAction){
+      if(!actionableEnemies.isEmpty() && (Math.random() * 100) < Math.min(actionableEnemies.get(actionableEnemyIndex).getSpeed()/4, 50) && !isEnemySpdAction){
         isEnemySpdAction = true;
         dialogManager.add(actionableEnemies.get(actionableEnemyIndex).getName() + " has earned another action due to their speed! ("+Math.min(actionableEnemies.get(actionableEnemyIndex).getSpeed()/4, 50)+"% chance)");
       } else{
@@ -302,7 +302,29 @@ public class BattleState extends GameState{
           setStep(SELECT_ITEM_TARGET);
           System.out.println("Next target");
         } else{
-          findNextTargetAllEnemies(false);
+          // Automatically find next target
+          while(true){
+            targetIndex++;
+            System.out.println(targetIndex);
+            if(targetIndex >= playerTeam.getPlayerTeam().size()){
+              break;
+            }
+            if(!playerTeam.getPlayerTeam().get(targetIndex).getIsDead()){
+              break;
+            }
+          }
+          if(targetIndex >= playerTeam.getPlayerTeam().size()){
+            if(actionPointsLeft > 1){
+              System.out.println("next action path");
+              nextAction();
+            } else{
+              System.out.println("next turn half path");
+              nextTurnHalfActions();
+            }
+          } else{
+            System.out.println("perform ability path");
+            setStep(USE_ITEM);
+          }
         }
       } else if(actionPointsLeft > 1){
         nextAction();
@@ -661,11 +683,16 @@ public class BattleState extends GameState{
       ActionResult output;
       // dialogManager.clear();
       if(itemTargets.size() < targetAmount || (targetAmount == 999 && targetIndex < itemTargets.size())){
-        output = (playerTeam.useItem(selectedItemIndex, itemTargets.get(itemTargets.size() - 1), enemyTeam, false));
+        if(itemTargets.size() > 0){
+          output = (playerTeam.useItem(selectedItemIndex, itemTargets.get(targetIndex), enemyTeam, false));
+          dialogManager.add(output);
+        }
       } else{
-        output = (playerTeam.useItem(selectedItemIndex, itemTargets.get(itemTargets.size() - 1), enemyTeam, true));
+        if(itemTargets.size() > 0){
+          output = (playerTeam.useItem(selectedItemIndex, itemTargets.get(targetIndex), enemyTeam, true));
+          dialogManager.add(output);
+        }
       }
-      dialogManager.add(output);
     }
   }
   // Calls once when the previous step exits
@@ -700,16 +727,25 @@ public class BattleState extends GameState{
       turnHalf = 0;
       initializeEnemy();
       playerTeam.setIsDrawingXP(false);
-      if(Math.random() < 0.5){
-        playerTeam.getPlayerInventory().add(new HealthPotion(), 1);
-      } else{
-        playerTeam.getPlayerInventory().add(new HealthPool(), 1);
+
+      String[] earlyGameEnemyItems = game.getGameData().getEarlyGameEnemyItems();
+      String randomItemStr = earlyGameEnemyItems[(int)(Math.random() * earlyGameEnemyItems.length)];
+      if(randomItemStr.equals("HealthPotion")){
+        // Health Potion can be 20, 30, 40, or 50
+        playerTeam.getPlayerInventory().add(new HealthPotion(((int)(Math.random() * 4) + 2) * 10), 1);
+      } else if(randomItemStr.equals("HealthPool")){
+        // Health Pool can be 10, 20, 30, or 40
+        playerTeam.getPlayerInventory().add(new HealthPool(((int)(Math.random() * 3) + 1) * 10), 1);
       }
+
       playerTeam.resetPlayerCooldowns();
       playerTeam.resetPlayerDefense();
       playerTeam.resetProtectedCharacters();
       playerTeam.resetSelectedCharacterIndex();
       playerTeam.resetIsAnimating();
+      enemyTeam.resetIsAnimating();
+      enemyTeam.resetEnemyCooldowns();
+      enemyTeam.resetEnemyDefense();
       resetScene();
       currentStep = INTRO_ANIM;
       // dialogManager.clear();
@@ -927,7 +963,6 @@ public class BattleState extends GameState{
 
   // Given a list from adjectives.txt, generate a name containing a random adjective + the enemy type
   private String nameEnemy(GameData data, String enemyType){
-    String output = "";
     String[] adjectives = data.getAdjectives();
     String[] nouns = data.getNouns();
     return adjectives[(int)(Math.random() * adjectives.length)] + " " + nouns[(int)(Math.random() * nouns.length)];

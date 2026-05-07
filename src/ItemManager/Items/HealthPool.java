@@ -19,7 +19,7 @@ public class HealthPool extends Item{
   // Name and description will always be default. Only price, quantity, and healStrength
   // can be manually modified.
   public HealthPool(int price, double healStrength){
-    super("Health Pool", "Heals all characters in your team.", price);
+    super("Health Pool ("+healStrength+")", "Heals all characters in your team.", price);
     this.healStrength = healStrength;
     setUsageType("Heal");
     setTargetAmount(999);
