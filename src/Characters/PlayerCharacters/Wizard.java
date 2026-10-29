@@ -32,7 +32,7 @@ public class Wizard extends PlayerCharacter {
     addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{10, 0});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Fireball", "Spirit Calling"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Deals heavy damage to a single target and has a 25% chance to burn the enemy.",
-                                                               "The Wizard calls on the spirits to unleash a powerful attack. There is a 50% for attack power to be doubled, but a 50% for attack power to be halved."});
+                                                               "The Wizard calls on the spirits to unleash a powerful attack. There is a 50% for attack power to be doubled, but a 50% for attack power to be reduced by 75%."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 4});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
@@ -99,7 +99,7 @@ public class Wizard extends PlayerCharacter {
       } else{
         output.add("The spirits have not answered your call...");
         output.add(getName() + " casted a weak spell at " + target.getName() + " for " + (getAttackStrength() /2) + " HP!", Signals.ATTACK_PERFORMED, (getAttackStrength() / 2));
-        output.add(handleEnemyDefense(target, (getAttackStrength() / 2), playerTeam, enemyTeam));
+        output.add(handleEnemyDefense(target, (getAttackStrength() / 4), playerTeam, enemyTeam));
       }
       /*int correctDigits = promptMemorizationCode(7);
       if(correctDigits == 7){

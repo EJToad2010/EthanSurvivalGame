@@ -170,7 +170,7 @@ public class BattleState extends GameState{
             selectedAbilityName = selectedCharacter.getSpecialAbilityNames().get(selectedAbilityIndex);
           }
           if(targetAmount == 999){
-            targetIndex = 0;
+            targetIndex = -1;
             dialogManager.add(selectedAbilityName + " will target all enemies!");
           } else{
             setStep(SELECT_TARGET);
@@ -207,8 +207,8 @@ public class BattleState extends GameState{
         }
         
       } else if(step == SELECT_ITEM_TARGET){
-        targetIndex = input;
         itemTargets.add(playerTeam.getPlayerTeam().get(input));
+        targetIndex = itemTargets.size() - 1;
         setStep(USE_ITEM);
       }
     }
@@ -232,10 +232,18 @@ public class BattleState extends GameState{
         setStep(PERFORM_ABILITY);
       }
     }else if(step == PERFORM_ABILITY){
+      // Determine which targets are dead
+      ArrayList<EnemyCharacter> unavailableTargets = new ArrayList<EnemyCharacter>();
+      for(EnemyCharacter target : targets){
+        if(target.getIsDead()){
+          unavailableTargets.add(target);
+        }
+      }
+
       // Return to selecting the next target if more targets are left
       // Return to next action if no targets are left
       // Go to enemy turn if no actions are left
-      if(targets.size() < targetAmount || (targetAmount == 999 && targetIndex < targets.size())){
+      if(targets.size() < targetAmount || (targetAmount == 999 && targetIndex < targets.size()) && targets.size() > unavailableTargets.size()){
         if(!isTargetingAllEnemies && targetAmount != 999){
           dialogManager.add("You may select " + (targetAmount-targets.size()) + " more targets.");
         }
@@ -545,7 +553,7 @@ public class BattleState extends GameState{
     } else if(step == SELECT_ITEM){
       dialogManager.drawDialogBox(graphics);
       inputHandler.spaceButtons(graphics, buttonFontSize, 900, 550);
-      playerTeam.getPlayerInventory().drawInventory(graphics, 0, 380, 1280);
+      playerTeam.getPlayerInventory().drawInventory(graphics, 100, 380, 1080);
       // Prompt the user to select a Character from their team
       UIManager.setTextColor(graphics, Color.WHITE);
       UIManager.setFontSize(40);
@@ -606,8 +614,16 @@ public class BattleState extends GameState{
   // Calls once when a new step is first loaded
   protected void onEnterStep(int step){
     if(step == SELECT_CHARACTER){
-      // Init the character the player can choose from
-      inputHandler = createCharacterOptions(playerTeam.getPlayerTeam(), new ArrayList<BasicCharacter>());
+      // Obtain dead characters
+      ArrayList<BasicCharacter> deadCharacters = new ArrayList<BasicCharacter>();
+      for(PlayerCharacter p : playerTeam.getPlayerTeam()){
+        if(p.getIsDead()){
+          deadCharacters.add(p);
+        }
+      }
+
+      // Init the character the player can choose from, excluding dead characters
+      inputHandler = createCharacterOptions(playerTeam.getPlayerTeam(), deadCharacters);
     } else if(step == SELECT_ACTION){
       // Init the possible choice the player can make
       inputHandler = createOptions(new String[]{"Basic ability", "Special ability", "Use item", "Defend"});
@@ -683,14 +699,18 @@ public class BattleState extends GameState{
       ActionResult output;
       // dialogManager.clear();
       if(itemTargets.size() < targetAmount || (targetAmount == 999 && targetIndex < itemTargets.size())){
-        if(itemTargets.size() > 0){
+        if(!itemTargets.isEmpty()){
           output = (playerTeam.useItem(selectedItemIndex, itemTargets.get(targetIndex), enemyTeam, false));
           dialogManager.add(output);
+        } else{
+          System.out.println("ERROR: ITEM TARGETS EMPTY");
         }
       } else{
-        if(itemTargets.size() > 0){
+        if(!itemTargets.isEmpty()){
           output = (playerTeam.useItem(selectedItemIndex, itemTargets.get(targetIndex), enemyTeam, true));
           dialogManager.add(output);
+        } else{
+          System.out.println("ERROR: ITEM TARGETS EMPTY");
         }
       }
     }
