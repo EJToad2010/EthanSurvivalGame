@@ -71,6 +71,7 @@ public class BasicCharacter {
   private double attackStrength;
   private double defenseStrength;
   private double speed;
+  private double accuracyModifier;
   
   // This variable is automatically modified if a Character is added to either
   // a Player team or an Enemy team
@@ -194,6 +195,10 @@ public class BasicCharacter {
     return speed;
   }
   
+  public double getAccuracyModifier(){
+    return accuracyModifier;
+  }
+
   public boolean getIsEnemyCharacter(){
     return isEnemyCharacter;
   }
@@ -350,6 +355,14 @@ public class BasicCharacter {
       speed = 0.0;
     }
   }
+
+  public void changeAccuracyModifier(double amount){
+    accuracyModifier += amount;
+  }
+
+  public void resetAccuracyModifier(){
+    accuracyModifier = 0;
+  }
   
   public void setIsEnemyCharacter(boolean newValue){
     isEnemyCharacter = newValue;
@@ -490,11 +503,11 @@ public class BasicCharacter {
     double attackAddifier = 0;
     attackMultiplier = calculateAttackReductionEffects(target, attackMultiplier, output);
     actualDamage = calculateActualDamage(target, (attack+attackAddifier)*attackMultiplier, playerTeam, enemyTeam, output);
-    if(abilityType == 0 && Math.random() > target.getBasicAbilityAccuracies().get(abilityIndex)){
+    if(abilityType == 0 && Math.random() > getBasicAbilityAccuracies().get(abilityIndex) + getAccuracyModifier()){
       // Missed attack
       // Assumption that only basic abilities can miss
       output.add(this.getName() + "'s attack missed!");
-      System.out.println("Missed attack");
+      System.out.println("Missed attack " + (1-(getBasicAbilityAccuracies().get(abilityIndex) + getAccuracyModifier()))*100 + "% chance");
       actualDamage = 0;
     }
     output.add(target.defend(this, actualDamage));
@@ -508,8 +521,8 @@ public class BasicCharacter {
       return attackMultiplier * 0.75;
     }
     if(StatusEffect.hasStatusEffect(target, "Calcified")){
-      output.add("Attack was reduced by 25% from " + target.getName() + " being CALCIFIED!");
-      return attackMultiplier * 0.75;
+      output.add("Attack was reduced by 10% from " + target.getName() + " being CALCIFIED!");
+      return attackMultiplier * 0.9;
     }
     return attackMultiplier;
   }
@@ -521,11 +534,12 @@ public class BasicCharacter {
 
     if(StatusEffect.hasStatusEffect(target, "Pierce")){
       output.add("Defensive strength reduced by 75% from " + target.getName() + " being PIERCED!");
+      defensiveStrength *= 0.25;
     }
 
     double actualDamage;
     if(target.isDefending){
-      actualDamage = attack - (defensiveStrength * 2);
+      actualDamage = attack - (defensiveStrength * 1.5);
     } else{
       actualDamage = attack - defensiveStrength;
     }

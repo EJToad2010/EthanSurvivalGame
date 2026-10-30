@@ -99,8 +99,12 @@ public class Archer extends PlayerCharacter {
       // 50% chance of receiving PIERCE status effect regardless of if they received any damage
       //System.out.println(getName() + " fired an armor piercing arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!");
       output.add(getName() + " fired an armor piercing arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()+5);
-      output.add(handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam));
-      output.add(StatusEffect.addStatusEffect(target, "Pierce", 2));
+      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam);
+      Double enemyHPChange = getAttackStrength()+5 - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      output.add(defenseResult);
+      if(enemyHPChange > 0){
+        output.add(StatusEffect.addStatusEffect(target, "Pierce", 2));
+      }
     }
     //System.out.println(target.getSimpleOutput());
     return output;

@@ -22,15 +22,15 @@ public class Skeleton extends EnemyCharacter{
     super(name, 75.0, 10.0, 10.0, 8.0, 50, 20, behaviorType);
     setStartingLevel(2);
     setDescription("An undead creature that lost its muscular strength but is tough as bone.");
-    addToArrayList(getBasicAbilityNames(), new String[]{"Bone Chuck", ""});
-    addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage to a single target.",
-                                                             ""});
+    addToArrayList(getBasicAbilityNames(), new String[]{"Bone Chuck", "Bone Bash"});
+    addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a moderate amount of damage to a single target.",
+                                                             "Deals a small amount of damage to a single target and reduces their accuracy for 1 turn."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
     addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{0, 0});
-    addToArrayList(getBasicAbilityAccuracies(), new Double[]{0.95, 1.0});
+    addToArrayList(getBasicAbilityAccuracies(), new Double[]{0.95, 0.9});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Calcify", "Ossify"});
-    addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Reduce 25% of all incoming danage for the next 2 turns.",
+    addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Reduce 10% of all incoming danage for the next 2 turns.",
                                                                "Restore HP equal to 50% of health lost."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{0, 1});
@@ -52,8 +52,17 @@ public class Skeleton extends EnemyCharacter{
     ArrayList<PlayerCharacter> aliveCharacters = playerTeam.getAliveCharacters();
     // System.out.println("DEBUG: Dart Goblin basic ability AI");
     int basicAbilityLimit = getBasicAbilityLimit();
-    if(basicAbilityLimit >= 1){
-      
+    if(basicAbilityLimit >= 1 && Math.random() < 0.5){
+      // Use Bone Bash 50% of the time against the highest attack strength player
+      double highestAttackStrength = aliveCharacters.get(0).getAttackStrength();
+      PlayerCharacter target = aliveCharacters.get(0);
+      for(PlayerCharacter p : aliveCharacters){
+        if(p.getAttackStrength() > highestAttackStrength){
+          target = p;
+          highestAttackStrength = p.getAttackStrength();
+        }
+      }
+      return basicAbility(1, target, playerTeam, enemyTeam);
     }
     // Use Bone Chuck on a random Character if all other options are exhausted
     return basicAbility(0, aliveCharacters.get((int)(Math.random() * aliveCharacters.size())), playerTeam, enemyTeam);
@@ -89,14 +98,21 @@ public class Skeleton extends EnemyCharacter{
     output.add(getCharInfoSignals(target, 0, basicAbilityIndex));
     if(basicAbilityIndex == 0){
       // Bone Chuck
-      output.add(getName() + " chucked a bone at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
+      output.add(getName() + " chucked a bone at " + target.getName() + " for " + getAttackStrength()+3 + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       // Check for how much damage the attack did to the enemy
-      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      ActionResult defenseResult = handleEnemyDefense(target, 0, basicAbilityIndex, getAttackStrength()+3, playerTeam, enemyTeam);
       output.add(defenseResult);
       //System.out.println(target.getSimpleOutput());
     } else if(basicAbilityIndex == 1){
-      // Nimble Dodge (shared with Goblin class since they are both speedy Goblin types)
-      
+      // Bone Bash
+      output.add(getName() + " bashed itself at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
+      ActionResult defenseResult = handleEnemyDefense(target, 0, basicAbilityIndex, getAttackStrength(), playerTeam, enemyTeam);
+      output.add(defenseResult);
+      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      if(enemyHPChange > 0){
+        // Apply BASHED Effect
+        StatusEffect.addStatusEffect(target, "Bashed", 1);
+      }
     }
     return output;
   }

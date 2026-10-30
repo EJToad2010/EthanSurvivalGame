@@ -659,7 +659,8 @@ public class BattleState extends GameState{
         output = selectedCharacter.basicAbility(selectedAbilityIndex, currentTarget, playerTeam, enemyTeam);
       } else{
         output = selectedCharacter.specialAbility(selectedAbilityIndex, currentTarget, playerTeam, enemyTeam);
-        playerTeam.resetPlayerCooldowns();
+        selectedCharacter.resetSpecialAbilityCooldowns();
+        //playerTeam.resetPlayerCooldowns();
       }
       dialogManager.add(output);
     } else if(step == ENEMY_TURN){
@@ -981,11 +982,11 @@ public class BattleState extends GameState{
         // Choose a random item from the predetermined rates defined in GameManager
         String randomItemStr = earlyGameEnemyItems[(int)(Math.random() * earlyGameEnemyItems.length)];
         if(randomItemStr.equals("HealthPotion")){
-          // Health Potion can be 20, 30, 40, or 50
-          enemyTeam.getEnemyInventory().add(new HealthPotion(((int)(Math.random() * 4) + 2) * 10), 1);
+          // Health Potion can be 20, 30, 40
+          enemyTeam.getEnemyInventory().add(new HealthPotion(((int)(Math.random() * 2) + 2) * 10), 1);
         } else if(randomItemStr.equals("HealthPool")){
-          // Health Pool can be 10, 20, 30, or 40
-          enemyTeam.getEnemyInventory().add(new HealthPool(((int)(Math.random() * 3) + 1) * 10), 1);
+          // Health Pool can be 10, 20
+          enemyTeam.getEnemyInventory().add(new HealthPool(((int)(Math.random() * 2) + 1) * 10), 1);
         }
       }
     }
