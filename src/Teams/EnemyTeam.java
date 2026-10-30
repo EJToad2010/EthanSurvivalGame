@@ -50,10 +50,10 @@ public class EnemyTeam {
     // Math.max prevents negative inflation of stats in the unlikely case that the highest player level is 0
     if(Math.random() < 0.5){
       // 50% chance of spawning near highest level
-      c.inflateStats((int)(Math.random() * 2) + Math.max(0, highestPlayerLevel-1));
+      c.inflateStats(Math.max(0,(int)(Math.random() * 2) + Math.max(0, highestPlayerLevel-1) - c.getStartingLevel()));
     } else{
       // 50% chance of spawning near average level
-      c.inflateStats((int)(Math.random() * 2) + Math.max(0, (int)(avgPlayerLevel)+1));
+      c.inflateStats(Math.max(0,(int)(Math.random() * 2) + Math.max(0, (int)(avgPlayerLevel)+1) - c.getStartingLevel()));
     }
     convertAllToEnemy();
   }

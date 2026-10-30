@@ -114,7 +114,8 @@ public class StatusEffect {
     if(type.equals("Slow")){
       c.changeSpeed(-15);
     } else if(type.equals("Soft")){
-      c.changeAttackStrength(-10);
+      c.changeAttackStrength(-5);
+      c.changeDefenseStrength(-5);
     } else if(type.equals("Pierce")){
       c.changeDefenseStrength(-15);
     }
@@ -125,7 +126,8 @@ public class StatusEffect {
     if(type.equals("Slow")){
       c.changeSpeed(15);
     } else if(type.equals("Soft")){
-      c.changeAttackStrength(10);
+      c.changeAttackStrength(5);
+      c.changeDefenseStrength(5);
     } else if(type.equals("Pierce")){
       c.changeDefenseStrength(15);
     }

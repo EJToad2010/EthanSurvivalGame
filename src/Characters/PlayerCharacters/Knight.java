@@ -28,6 +28,7 @@ public class Knight extends PlayerCharacter {
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{20, 10});
+    addToArrayList(getBasicAbilityAccuracies(), new Double[]{0.95, 1.0});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Last Push", "Rage Strike"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Deals +10 damage from Sword Swing. Deals an additional 50% damage if the enemy is below 50% HP.",
                                                                "Attack power is doubled from Sword Swing, but lose HP equal to 25% of your doubled attack power."});
@@ -53,7 +54,7 @@ public class Knight extends PlayerCharacter {
       // Sword Swing
       //System.out.println(getName() + " swung their sword at " + target.getName() + " for " + getAttackStrength() + " HP!");
       output.add(getName() + " swung their sword at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
-      output.add(handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam));
+      output.add(handleEnemyDefense(target, 0, basicAbilityIndex, getAttackStrength(), playerTeam, enemyTeam));
       //System.out.println(target.getSimpleOutput());
       
       if(!target.getIsDead()){

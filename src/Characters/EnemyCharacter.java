@@ -19,6 +19,11 @@ public class EnemyCharacter extends BasicCharacter{
   private int basicAbilityLimit = 0;
   private int specialAbilityLimit = 0;
   private boolean hasTakenTurn;
+
+  // Affects the stat inflation mechanic to work differently for easy, medium, hard enemies
+  // Lower startingLevel = easier
+  // Accounts for the fact that base attributes may be higher
+  private int startingLevel;
   
   // Possible behaviorTypes:
   // RANDOM, AGGRESSIVE, DEFENSIVE
@@ -67,16 +72,24 @@ public class EnemyCharacter extends BasicCharacter{
     return specialAbilityLimit;
   }
 
+  public int getStartingLevel(){
+    return startingLevel;
+  }
+
   // Update if an EnemyCharacter has taken a turn yet
   protected void setHasTakenTurn(boolean newValue){
     hasTakenTurn = newValue;
+  }
+
+  protected void setStartingLevel(int startingLevel){
+    this.startingLevel = startingLevel;
   }
   
   // Instead of creating a unique leveling and xp system for each enemy,
   // adjust its base stats to a similar value as the player's level
   // Saves time, processing power, and improves simplicity
   public void inflateStats(int playerLevel){
-    // +5 MAX HP, +3 ATK, +2 DEF, +2 SPD per playerLevel
+    // +5 MAX HP, +2 ATK, +2 DEF, +2 SPD per playerLevel
     changeMaxHP(5 * playerLevel);
     changeCurrentHP(5 * playerLevel);
     changeAttackStrength(2 * playerLevel);
@@ -182,8 +195,9 @@ public class EnemyCharacter extends BasicCharacter{
   // Prioritize staying alive and safe over offensive abilities
   private ActionResult defensive(PlayerTeam playerTeam, EnemyTeam enemyTeam) {
     // Focus on staying defended / healing
-    if((int)(Math.random() * 100) < 33){
-      // Attack a random player
+    if((int)(Math.random() * 100) < 33 || enemyTeam.getNumAlive() == 1){
+      // Attack a random player for 33% chance OR if last one left.
+      // Prevents softlocking where enemy constantly defends itself
       return basicAbilityAI(playerTeam, enemyTeam);
     } else{
         // Either defend itself or another teammate; priority changes baesd on others HP

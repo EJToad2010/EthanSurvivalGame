@@ -48,6 +48,8 @@ public class BasicCharacter {
   private ArrayList<String> basicAbilityDescriptions = new ArrayList<String>();
   // How many enemies each basic ability targets. This must be known in the main gameplay loop and user prompts.
   private ArrayList<Integer> basicAbilityEnemyCounts = new ArrayList<Integer>();
+  // The chance of each basic ability hitting as fractional % (accuracy)
+  private ArrayList<Double> basicAbilityAccuracies = new ArrayList<Double>();
   // The type of basic ability (EX: offensive, defensive)
   private ArrayList<String> basicAbilityTypes = new ArrayList<String>();
   private ArrayList<Integer> basicAbilityAnimationLengths = new ArrayList<Integer>();
@@ -234,6 +236,10 @@ public class BasicCharacter {
 
   public ArrayList<Integer> getBasicAbilityAnimationLengths(){
     return basicAbilityAnimationLengths;
+  }
+
+  public ArrayList<Double> getBasicAbilityAccuracies(){
+    return basicAbilityAccuracies;
   }
   
   public ArrayList<String> getSpecialAbilityNames(){
@@ -428,6 +434,13 @@ public class BasicCharacter {
       arrayList.add(i);
     }
   }
+
+  // Used for basicAbilityAccuracies
+  protected void addToArrayList(ArrayList<Double> arrayList, Double[] values){
+    for(Double d : values){
+      arrayList.add(d);
+    }
+  }
   
   // Convert an ArrayList<String> of a Character to a String[] to be used in other class methods
   public String[] convertArrToList(ArrayList<String> charArr){
@@ -455,24 +468,50 @@ public class BasicCharacter {
   
   // Calls the enemy target's defend function against the attacker
   // Reduce enemy HP by the appropriate amount
+  // Use this version of handleEnemyDefense if accuracy should be guaranteed (100%)
   protected ActionResult handleEnemyDefense(BasicCharacter target, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
     double actualDamage;
     double attackMultiplier = 1.0;
     double attackAddifier = 0;
-    if(StatusEffect.hasStatusEffect(target, "Nimble")){
-      output.add("Attack was reduced by 25% from " + target.getName() + " being NIMBLE!");
-      attackMultiplier *= 0.75;
-    }
-    if(StatusEffect.hasStatusEffect(target, "Calcified")){
-      output.add("Attack was reduced by 33% from " + target.getName() + " being CALCIFIED!");
-      attackMultiplier *= 0.67;
-      attackMultiplier = Math.round(attackMultiplier * 100) / 100;
-    }
+    attackMultiplier = calculateAttackReductionEffects(target, attackMultiplier, output);
     actualDamage = calculateActualDamage(target, (attack+attackAddifier)*attackMultiplier, playerTeam, enemyTeam, output);
+
     output.add(target.defend(this, actualDamage));
     output.add(Signals.TARGET_HEALTH_LOST, actualDamage);
     return output;
+  }
+
+  // Use this version of handleEnemyDefense to handle accuracy
+  protected ActionResult handleEnemyDefense(BasicCharacter target, int abilityType, int abilityIndex, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    ActionResult output = new ActionResult();
+    double actualDamage;
+    double attackMultiplier = 1.0;
+    double attackAddifier = 0;
+    attackMultiplier = calculateAttackReductionEffects(target, attackMultiplier, output);
+    actualDamage = calculateActualDamage(target, (attack+attackAddifier)*attackMultiplier, playerTeam, enemyTeam, output);
+    if(abilityType == 0 && Math.random() > target.getBasicAbilityAccuracies().get(abilityIndex)){
+      // Missed attack
+      // Assumption that only basic abilities can miss
+      output.add(this.getName() + "'s attack missed!");
+      System.out.println("Missed attack");
+      actualDamage = 0;
+    }
+    output.add(target.defend(this, actualDamage));
+    output.add(Signals.TARGET_HEALTH_LOST, actualDamage);
+    return output;
+  }
+
+  private double calculateAttackReductionEffects(BasicCharacter target, double attackMultiplier, ActionResult output){
+    if(StatusEffect.hasStatusEffect(target, "Nimble")){
+      output.add("Attack was reduced by 25% from " + target.getName() + " being NIMBLE!");
+      return attackMultiplier * 0.75;
+    }
+    if(StatusEffect.hasStatusEffect(target, "Calcified")){
+      output.add("Attack was reduced by 25% from " + target.getName() + " being CALCIFIED!");
+      return attackMultiplier * 0.75;
+    }
+    return attackMultiplier;
   }
   
   // If a character did not actively defend, their normal defenseStrength is applied

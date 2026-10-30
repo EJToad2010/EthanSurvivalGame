@@ -19,7 +19,8 @@ public class Skeleton extends EnemyCharacter{
 
   public Skeleton(String name, String behaviorType){
     // Set the names, descriptions, and cooldowns of the Dart Goblin.
-    super(name, 70.0, 9.0, 6.0, 8.0, 50, 20, behaviorType);
+    super(name, 75.0, 10.0, 10.0, 8.0, 50, 20, behaviorType);
+    setStartingLevel(2);
     setDescription("An undead creature that lost its muscular strength but is tough as bone.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Bone Chuck", ""});
     addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage to a single target.",
@@ -27,12 +28,13 @@ public class Skeleton extends EnemyCharacter{
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
     addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{0, 0});
-    addToArrayList(getSpecialAbilityNames(), new String[]{"Calcify", "Poison Mark"});
-    addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Reduce 33% of all incoming danage for the next 2 turns.",
-                                                               ""});
+    addToArrayList(getBasicAbilityAccuracies(), new Double[]{0.95, 1.0});
+    addToArrayList(getSpecialAbilityNames(), new String[]{"Calcify", "Ossify"});
+    addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Reduce 25% of all incoming danage for the next 2 turns.",
+                                                               "Restore HP equal to 50% of health lost."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{0, 1});
-    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{4, 3});
+    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{4, 4});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{0, 0});
     setCharacterImage("src/Images/skeleton.png");
@@ -69,14 +71,13 @@ public class Skeleton extends EnemyCharacter{
     // Fetch alive Characters from playerTeam
     ArrayList<PlayerCharacter> aliveCharacters = playerTeam.getAliveCharacters();
     resetSpecialAbilityCooldowns();
-    int randomAbilityIndex = availableSpecialAbilityIndices.get((int)(Math.random() * availableSpecialAbilityIndices.size()));
-    if(randomAbilityIndex == 0){
-      // Calcify automatically targets itself. No special decision making needed.
-      output.add(specialAbility(0, this, playerTeam, enemyTeam));
-    } else if(randomAbilityIndex == 1){
-      // Poison mark
-      output.add(specialAbility(1, aliveCharacters.get((int)(Math.random() * aliveCharacters.size())), playerTeam, enemyTeam));
+    if(availableSpecialAbilityIndices.contains(1) && (getCurrentHP()/getMaxHP()) < 0.5 && Math.random() < 1.25-(getCurrentHP()/getMaxHP())){
+      // Ossify available starting at 50% HP
+      // Probaility to use Ossify increases until guaranteed at 25% HP
+      output.add(specialAbility(1, this, playerTeam, enemyTeam));
     }
+    // Calcify automatically targets itself. No special decision making needed.
+    output.add(specialAbility(0, this, playerTeam, enemyTeam));
     return output;
   }
   
@@ -108,7 +109,9 @@ public class Skeleton extends EnemyCharacter{
       output.add(getName() + " is calcifying its bones for the next 2 turns!");
       StatusEffect.addStatusEffect(this, "Calcified", 2);
     } else if(specialAbilityIndex == 1){
-      // Poison Mark
+      double healingAmount = 0.5 * 1- getCurrentHP()/getMaxHP() * getMaxHP();
+      // Ossify
+      output.add(getName() + " ossified its broken bones to heal " + healingAmount + " HP! ", Signals.HEALTH_GAINED, healingAmount);
     }
     //System.out.println(target.getSimpleOutput());
     return output;
@@ -119,13 +122,13 @@ public class Skeleton extends EnemyCharacter{
     ActionResult output = new ActionResult();
     if(actualDamage == 0){
       //System.out.println(getName() + " successfully hid from " + target.getName() + "'s attack!");
-      output.add(getName() + " successfully hid from " + target.getName() + "'s attack!", Signals.DEFENSE_PERFORMED, 999.0);
+      output.add(getName() + " deflected " + target.getName() + "'s attack!", Signals.DEFENSE_PERFORMED, 999.0);
     }else if(getIsDefending()){
       //System.out.println(getName() + " partially hid from " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
-      output.add(getName() + " partially hid from " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
+      output.add(getName() + " partially deflected " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
     } else{
       //System.out.println(getName() + " tried to hide from " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
-      output.add(getName() + " tried to hide from " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength());
+      output.add(getName() + " tried to deflect " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength());
     }
     return output;
   }

@@ -24,12 +24,13 @@ public class Wizard extends PlayerCharacter {
     // Set the names, descriptions, and cooldowns of all the Wizard's abilities.
     setDescription("A fighter who uses magic for very high damage output, while sacrificing health and defense.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Magic Zap", "Shielding Zap"});
-    addToArrayList(getBasicAbilityDescriptions(), new String[]{"A single ranged attack that deals moderately high damage and has a 10% chance to stun the enemy.",
+    addToArrayList(getBasicAbilityDescriptions(), new String[]{"A single ranged attack that deals moderately high damage, but a small chance to miss.",
                                                              "A single ranged attack that deals moderate damage and grants temporary defensive strength equal to 25% of the damage dealt."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{10, 0});
+    addToArrayList(getBasicAbilityAccuracies(), new Double[]{0.85, 0.95});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Fireball", "Spirit Calling"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Deals heavy damage to a single target and has a 25% chance to burn the enemy.",
                                                                "The Wizard calls on the spirits to unleash a powerful attack. There is a 50% for attack power to be doubled, but a 50% for attack power to be reduced by 75%."});
@@ -56,7 +57,7 @@ public class Wizard extends PlayerCharacter {
       //System.out.println(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()) + " HP!");
       output.add(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       // Check for how much damage the attack did to the enemy
-      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      ActionResult defenseResult = handleEnemyDefense(target,0, basicAbilityIndex, getAttackStrength(), playerTeam, enemyTeam);
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
       /*if((int)(Math.random() * 100) < 10 && enemyHPChange > 0){
@@ -66,7 +67,7 @@ public class Wizard extends PlayerCharacter {
     } else if(basicAbilityIndex == 1){
       // Shielding Zap
       output.add(getName() + " fired a shielding zap at " + target.getName() + " for " + (getAttackStrength() - 10) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()-20);
-      output.add(handleEnemyDefense(target, getAttackStrength() - 10, playerTeam, enemyTeam));
+      output.add(handleEnemyDefense(target,0, basicAbilityIndex, getAttackStrength() - 10, playerTeam, enemyTeam));
       playerTeam.getProtectedCharacters().add(this);
       playerTeam.getProtectedCharacterAmounts().add((getAttackStrength() - 10) / 4);
       output.add(getName() + "'s force field gained " + (getAttackStrength() - 10) / 4 + " defensive strength!");

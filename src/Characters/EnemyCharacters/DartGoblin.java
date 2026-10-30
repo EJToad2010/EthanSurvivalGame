@@ -24,12 +24,14 @@ public class DartGoblin extends EnemyCharacter{
     // Set the names, descriptions, and cooldowns of the Dart Goblin.
     super(name, 50.0, 8.0, 3.0, 25.0, 50, 20, behaviorType);
     setDescription("A fast, ranged, weak enemy who focuses on dealing poison damage to the player's team.");
+    setStartingLevel(0);
     addToArrayList(getBasicAbilityNames(), new String[]{"Poison Dart", "Nimble Dodge"});
     addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto one target, ignoring their defense. 25% to poison the character for two turns.",
                                                              "During the player's turn, all attacks toward the Goblin deal 25% less damage."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
     addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{40, 20});
+    addToArrayList(getBasicAbilityAccuracies(), new Double[]{0.85, 1.0});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Poison Cloud", "Poison Mark"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Shoot slightly weaker poison clouds at all targets. 33% chance for each target to be poisoned for 2 turns.",
                                                                "Shoot a poison dart at a target. This target gets a 75% chance to be poisoned for 3 turns."});
@@ -106,7 +108,7 @@ public class DartGoblin extends EnemyCharacter{
       //System.out.println(getName() + " shot a poison dart at " + target.getName() + " for " + getAttackStrength() + " HP!");
       output.add(getName() + " shot a poison dart at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       // Check for how much damage the attack did to the enemy
-      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      ActionResult defenseResult = handleEnemyDefense(target,0, basicAbilityIndex, getAttackStrength(), playerTeam, enemyTeam);
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
       if((int)(Math.random() * 100) < 25 && enemyHPChange > 0){

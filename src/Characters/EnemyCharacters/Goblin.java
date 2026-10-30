@@ -23,12 +23,14 @@ public class Goblin extends EnemyCharacter{
   public Goblin(String name, String behaviorType){
     super(name, 50.0, 10.0, 4.0, 20.0, 50, 20, behaviorType);
     setDescription("A weak enemy focused on annoying the player and causing chaos.");
+    setStartingLevel(0);
     addToArrayList(getBasicAbilityNames(), new String[]{"Rusty Dagger", "Nimble Dodge"});
     addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto a single target.",
                                                              "During the player's turn, all attacks toward the Goblin deal 25% less damage."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
     addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{20, 20});
+    addToArrayList(getBasicAbilityAccuracies(), new Double[]{0.95, 1.0});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Taunt", "Pickpocket"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Target a single character. The target cannot use an ability next turn.",
                                                                "Attack a single character for moderate damage. The Goblin has a 25% to steal gold from the player. The Goblin consumes the gold to heal."});
@@ -123,7 +125,7 @@ public class Goblin extends EnemyCharacter{
       //System.out.println(getName() + " stabbed " + target.getName() + " with their dagger for " + getAttackStrength() + " HP!");
       output.add(getName() + " stabbed " + target.getName() + " with their dagger for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       // Check for how much damage the attack did to the enemy
-      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      ActionResult defenseResult = handleEnemyDefense(target, 0, basicAbilityIndex, getAttackStrength(), playerTeam, enemyTeam);
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
     } else if(basicAbilityIndex == 1){

@@ -281,8 +281,8 @@ public class BattleState extends GameState{
         actionableEnemyIndex++;
         if(actionableEnemyIndex == -1 || actionableEnemyIndex >= actionableEnemies.size()){
           System.out.println("Enemy turn over");
-          initializePlayerTurn();
           nextTurnHalf();
+          initializePlayerTurn();
           setStep(SELECT_CHARACTER);
         }else{
           setStep(ENEMY_PERFORM_ABILITY);

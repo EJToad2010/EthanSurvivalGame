@@ -26,12 +26,13 @@ public class Archer extends PlayerCharacter {
     // Set the names, descriptions, and cooldowns of all the Archer's abilities.
     setDescription("A quick fighter who can attack multiple enemies and control the battlefield.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Softening Arrow", "Double Shot"});
-    addToArrayList(getBasicAbilityDescriptions(), new String[]{"A single ranged attack that has a 40% chance to reduce the enemy's attack strength for 2 turns.",
+    addToArrayList(getBasicAbilityDescriptions(), new String[]{"A single ranged attack that has a 40% chance to reduce the enemy's attack and defense strength for 2 turns.",
                                                              "A slightly weaker attack that targets two enemies and has a 33% chance to burn for 2 turns."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 2});
     addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{40, 40});
+    addToArrayList(getBasicAbilityAccuracies(), new Double[]{0.9, 0.9});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Volley", "Armor Piercer"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Fires an arrow at every enemy, dealing moderate damage. Each enemy has a 10% chance of being burned for 1 turn.",
                                                                "Deals moderate damage to a single target. The enemy receives 75% reduced defensive strength for 2 turns."});
@@ -57,7 +58,7 @@ public class Archer extends PlayerCharacter {
       // Softening Arrow
       //System.out.println(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
       output.add(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
-      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
+      ActionResult defenseResult = handleEnemyDefense(target, 0, basicAbilityIndex, getAttackStrength(), playerTeam, enemyTeam);
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
       if((int)(Math.random() * 100) < 40 && enemyHPChange > 0){
@@ -68,7 +69,7 @@ public class Archer extends PlayerCharacter {
       // Double Shot
       //System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + (getAttackStrength() - 3) + " HP!");
       output.add(getName() + " fired an arrow at " + target.getName() + " for " + (getAttackStrength() - 3) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()-3);
-      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength()-3, playerTeam, enemyTeam);
+      ActionResult defenseResult = handleEnemyDefense(target,0, basicAbilityIndex,  getAttackStrength()-3, playerTeam, enemyTeam);
       output.add(defenseResult);
       //System.out.println(target.getSimpleOutput());
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
