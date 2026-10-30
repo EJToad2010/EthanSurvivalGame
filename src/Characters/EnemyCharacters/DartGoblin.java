@@ -138,9 +138,9 @@ public class DartGoblin extends EnemyCharacter{
     } else if(specialAbilityIndex == 1){
       // Poison Mark
       //System.out.println(getName() + " marked " + target.getName() + " with poison for " + getAttackStrength() + " HP!");
-      output.add(getName() + " marked " + target.getName() + " with poison for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
-      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
-      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      output.add(getName() + " marked " + target.getName() + " with poison for " + getAttackStrength()+5 + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
+      ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam);
+      Double enemyHPChange = getAttackStrength()+5 - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
       if((int)(Math.random() * 100) < 75 && enemyHPChange > 0){
         output.add(StatusEffect.addStatusEffect(target, "Poison", 3));

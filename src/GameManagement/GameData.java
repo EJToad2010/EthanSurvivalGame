@@ -16,7 +16,8 @@ public class GameData {
   public static boolean skipTutorial = false;
   // Arrays used to track enemy difficulty progression through their class types.
   // Influences the probability that each class will be chosen
-  private String[] earlyGameEnemies = new String[]{"Goblin", "Goblin", "DartGoblin"};
+  private String[] earlyGameEnemies = new String[]{"Goblin", "Goblin", "DartGoblin", "Skeleton"};
+  //private String[] earlyGameEnemies = new String[]{"Skeleton"};
   // Enemy behaviors change as the game progresses, adding more complex roles.
   // This simulates the AI getting smarter.
   //private String[] earlyGameEnemyBehaviors = new String[]{"RANDOM", "RANDOM", "RANDOM", "AGGRESSIVE", "DEFENSIVE"};

@@ -10,6 +10,7 @@ import src.Characters.EnemyCharacter;
 import src.Characters.PlayerCharacter;
 import src.Characters.EnemyCharacters.DartGoblin;
 import src.Characters.EnemyCharacters.Goblin;
+import src.Characters.EnemyCharacters.Skeleton;
 import src.GameManagement.Game;
 import src.GameManagement.GameData;
 import src.GameManagement.Mechanics.ActionResult;
@@ -130,7 +131,7 @@ public class BattleState extends GameState{
     }
 
     // Handle any inputHandler actions that exist
-    if(inputHandler.getButtons().size() > 0 && !dialogManager.getIsActive() && exitCode == -1){
+    if(!inputHandler.getButtons().isEmpty() && !dialogManager.getIsActive() && exitCode == -1){
       int input = inputHandler.keyPressed(keyCode);
       if(input == -1){
         return;
@@ -146,7 +147,7 @@ public class BattleState extends GameState{
         } else if(selectedActionType.equals("Defend")){
           setStep(SELECT_DEFENSE_TARGET);
         }else if(selectedActionType.equals("Use item")){
-          if(playerTeam.getPlayerInventory().getInventory().size() > 0){
+          if(!playerTeam.getPlayerInventory().getInventory().isEmpty()){
             setStep(SELECT_ITEM);
           } else{
             dialogManager.add("Your inventory is empty.");
@@ -171,7 +172,9 @@ public class BattleState extends GameState{
           }
           if(targetAmount == 999){
             targetIndex = -1;
+            System.out.println("Will target all enemies message printed");
             dialogManager.add(selectedAbilityName + " will target all enemies!");
+            findNextTargetAllEnemies(false);
           } else{
             setStep(SELECT_TARGET);
           }
@@ -405,7 +408,7 @@ public class BattleState extends GameState{
     // Signals that take one tick to perform
     if((calculateCurrentTurnOwner().equals("Player") && signal.equals(Signals.HEALTH_GAINED))||(calculateCurrentTurnOwner().equals("Enemy") && signal.equals(Signals.TARGET_HEALTH_GAINED))){
       System.out.println("Player health gained");
-      selectedCharacter.changeCurrentHP(amount);
+      //selectedCharacter.changeCurrentHP(amount);
       isHandlingSignal = false;
     } else if((calculateCurrentTurnOwner().equals("Player") && signal.equals(Signals.HEALTH_LOST))||(calculateCurrentTurnOwner().equals("Enemy") && signal.equals(Signals.TARGET_HEALTH_LOST))){
       System.out.println("Player health lost");
@@ -644,6 +647,7 @@ public class BattleState extends GameState{
       if(targetAmount == 999){
         System.out.println("targeting all enemies");
         isTargetingAllEnemies = true;
+        targetIndex = -1;
         findNextTargetAllEnemies(false);
       }
     } else if(step == PERFORM_ABILITY){
@@ -766,6 +770,7 @@ public class BattleState extends GameState{
       enemyTeam.resetIsAnimating();
       enemyTeam.resetEnemyCooldowns();
       enemyTeam.resetEnemyDefense();
+      enemyTeam.resetProtectedCharacters();
       resetScene();
       currentStep = INTRO_ANIM;
       // dialogManager.clear();
@@ -854,6 +859,7 @@ public class BattleState extends GameState{
     if(turnNum > 1){
       enemyTeam.decreaseEnemyCooldowns();
     }
+    enemyTeam.resetProtectedCharacters();
   }
 
   private void resetActionableEnemies(){
@@ -956,9 +962,14 @@ public class BattleState extends GameState{
       String chosenEnemyType = earlyGameEnemies[(int)(Math.random() * earlyGameEnemies.length)];
       String chosenEnemyBehavior = earlyGameEnemyBehaviors[(int)(Math.random() * earlyGameEnemyBehaviors.length)];
       if(chosenEnemyType.equals("Goblin")){
-        enemyTeam.addEnemy(new Goblin(nameEnemy(data, "Goblin"), chosenEnemyBehavior), playerTeam.getHighestLevel(), playerTeam.getAvgLevel());
+        // Goblin types will always have AGGRESSIVE AI
+        enemyTeam.addEnemy(new Goblin(nameEnemy(data, "Goblin"), "AGGRESSIVE"), playerTeam.getHighestLevel(), playerTeam.getAvgLevel());
       } else if(chosenEnemyType.equals("DartGoblin")){
-        enemyTeam.addEnemy(new DartGoblin(nameEnemy(data, "Dart Goblin"), chosenEnemyBehavior), playerTeam.getHighestLevel(), playerTeam.getAvgLevel());
+        // Goblin types will always have AGGRESSIVE AI
+        enemyTeam.addEnemy(new DartGoblin(nameEnemy(data, "Dart Goblin"), "AGGRESSIVE"), playerTeam.getHighestLevel(), playerTeam.getAvgLevel());
+      } else if (chosenEnemyType.equals("Skeleton")){
+        // Skeleton types will always have DEFENSIVE AI
+        enemyTeam.addEnemy(new Skeleton(nameEnemy(data, "Skeleton"), "DEFENSIVE"), playerTeam.getHighestLevel(), playerTeam.getAvgLevel());
       }
     }
     // Add randomly generated items to the enemy team's inventory

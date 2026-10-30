@@ -11,12 +11,12 @@ import src.GameManagement.UI.UIManager;
 // Static class that can be used flexibly across all other classes
 public class StatusEffect {
   // All types of status effects in the game
-  private static String[] effectTypes = new String[]{"Soft", "Bleed", "Poison", "Slow", "Stun", "Nimble", "Taunt", "Burn", "Pierce"};
+  private static String[] effectTypes = new String[]{"Soft", "Bleed", "Poison", "Slow", "Stun", "Nimble", "Taunt", "Burn", "Pierce", "Calcified"};
   // How each status effect affects a target
-  private static String[] applyTypes = new String[]{"One-time", "Passive", "Passive", "One-time", "One-time", "Other", "Other", "Passive", "One-time"};
+  private static String[] applyTypes = new String[]{"One-time", "Passive", "Passive", "One-time", "One-time", "Other", "Other", "Passive", "One-time", "Other"};
   // The color of each status effect when displayed in-game
   private static Color[] colorTypes = new Color[]{Color.DARK_GRAY, new Color(110, 23, 23), new Color(17, 92, 29), new Color(53, 56, 99), new Color(66, 66, 66),
-    new Color(10, 130, 20), new Color(0, 186, 16), new Color(173, 16, 16), new Color(9, 100, 128)
+    new Color(10, 130, 20), new Color(0, 186, 16), new Color(173, 16, 16), new Color(9, 100, 128), new Color(125, 125, 125)
   };
   
   // These three lists all have corresponding index values
@@ -224,7 +224,7 @@ public class StatusEffect {
   // Draw the text containing all status effects of a Character
   public static void drawStatusEffects(Graphics graphics, BasicCharacter c){
     ArrayList<String> statusTypesOfCharacter = statusEffectListOf(c);
-    int heightOffset = 50;
+    int heightOffset = 50 + 20 * (c.getNameNumLines() - 1);
     for(String statusType : statusTypesOfCharacter){
       // Find corresponding color for status type
       int statusIndex = 0;

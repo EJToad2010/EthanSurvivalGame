@@ -21,10 +21,10 @@ public class Goblin extends EnemyCharacter{
 
   // Items that the Goblin steals from the player. They are not used by the Goblin and will be returned on death.
   public Goblin(String name, String behaviorType){
-    super(name, 60.0, 10.0, 4.0, 20.0, 50, 20, behaviorType);
+    super(name, 50.0, 10.0, 4.0, 20.0, 50, 20, behaviorType);
     setDescription("A weak enemy focused on annoying the player and causing chaos.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Rusty Dagger", "Nimble Dodge"});
-    addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto a single target. 10% chance to inflict bleed.",
+    addToArrayList(getBasicAbilityDescriptions(), new String[]{"Deals a small amount of damage onto a single target.",
                                                              "During the player's turn, all attacks toward the Goblin deal 25% less damage."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 0});
@@ -126,10 +126,6 @@ public class Goblin extends EnemyCharacter{
       ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
-      //System.out.println(target.getSimpleOutput());
-      if((int)(Math.random() * 100) < 10 && enemyHPChange > 0){
-        output.add(StatusEffect.addStatusEffect(target, "Bleed", 2));
-      }
     } else if(basicAbilityIndex == 1){
       // Nimble Dodge (shared with Goblin class since they are both speedy Goblin types)
       //System.out.println(getName() + " prepared Nimble Dodge for the player's next turn!");

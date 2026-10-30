@@ -28,7 +28,8 @@ public class UIManager {
         graphics.setFont(font);
     }
     // Draw a piece of text, centered around an invisible rectangle with defined bounds
-    public static void drawCenteredStringInBox(Graphics graphics, String text, int x, int y, int width, int height){
+    // Return number of lines needed
+    public static int drawCenteredStringInBox(Graphics graphics, String text, int x, int y, int width, int height){
         ArrayList<String> lines = wrapText(text, graphics, width);
         int startY = y;
 
@@ -46,6 +47,7 @@ public class UIManager {
             int drawY = startY + (height - textHeight) / 2;
             graphics.drawString(lines.get(i), drawX, drawY+i*textHeight);
         }
+        return lines.size();
     }
     // Draw a piece of text with centered width and top aligned y
     public static void drawTopAlignedStringInBox(Graphics graphics, String text, int x, int y, int width, int height){

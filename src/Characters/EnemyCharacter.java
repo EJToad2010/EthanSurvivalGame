@@ -182,16 +182,29 @@ public class EnemyCharacter extends BasicCharacter{
   // Prioritize staying alive and safe over offensive abilities
   private ActionResult defensive(PlayerTeam playerTeam, EnemyTeam enemyTeam) {
     // Focus on staying defended / healing
-    if((int)(Math.random() * 100) < 20){
+    if((int)(Math.random() * 100) < 33){
       // Attack a random player
       return basicAbilityAI(playerTeam, enemyTeam);
     } else{
-      if((int)(Math.random() * 100) < 60){
-        setIsDefending(true);
-        return new ActionResult();
-      } else{
-        return basicAbilityAI(playerTeam, enemyTeam);
-      }
+        // Either defend itself or another teammate; priority changes baesd on others HP
+        double lowestHPPercentage = 1.0;
+        EnemyCharacter defenseTarget = this;
+        boolean otherTargetFound = false;
+        for(EnemyCharacter e : enemyTeam.getEnemyTeam()){
+          if(!e.equals(this) && e.getCurrentHP()/e.getMaxHP() < lowestHPPercentage && e.getCurrentHP()/e.getMaxHP() > 0){
+            lowestHPPercentage = e.getCurrentHP()/e.getMaxHP();
+            defenseTarget = e;
+            otherTargetFound = true;
+          }
+        }
+        if((Math.random() * 100) < (1.25-enemyTeam.getTotalHPPercentage())*100 && otherTargetFound){
+          enemyTeam.getProtectedCharacters().add(defenseTarget);
+          enemyTeam.getProtectedCharacterAmounts().add(this.getDefenseStrength());
+          ActionResult output = new ActionResult();
+          output.add(defenseTarget.getName() + " will receive " + this.getDefenseStrength() + " defense strength from " + this.getName() + "!");
+          return output;
+        }
+        return setIsDefending(true);
     }
   }
   

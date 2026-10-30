@@ -26,6 +26,9 @@ public class BasicCharacter {
   private String passiveAbilityDescription = "";
   private Image characterImage;
   private Image deadImage = ImageManager.loadImage("src/Images/dead.png");
+  // The number of lines the character's name takes up on-screen
+  // Necessary for UI elements to be positioned dynamically on battle screen
+  private int nameNumLines = 1;
   private boolean isSelected = false;
   // Location on screen
   private int x = 0;
@@ -289,6 +292,10 @@ public class BasicCharacter {
     return isAnimating;
   }
 
+  public int getNameNumLines(){
+    return nameNumLines;
+  }
+
   // Setter methods
   // Battle-related double values work with both increasing and decreasing
   
@@ -439,9 +446,10 @@ public class BasicCharacter {
   // but it is still usable in case specific situations happen
   public void attack(BasicCharacter target, PlayerTeam playerTeam, EnemyTeam enemyTeam) throws InterruptedException{
     ActionResult output = new ActionResult();
-    System.out.println(name + " attacked " + target.getName() + " for " + attackStrength + " HP!");
-    output.add(name + " attacked " + target.getName() + " for " + attackStrength + " HP!",Signals.ATTACK_PERFORMED);
-    handleEnemyDefense(target, attackStrength, playerTeam, enemyTeam);
+    double actualAttackStrength = attackStrength;
+    System.out.println(name + " attacked " + target.getName() + " for " + actualAttackStrength + " HP!");
+    output.add(name + " attacked " + target.getName() + " for " + actualAttackStrength + " HP!",Signals.ATTACK_PERFORMED);
+    handleEnemyDefense(target, actualAttackStrength, playerTeam, enemyTeam);
     System.out.println(target.getSimpleOutput());
   }
   
@@ -450,13 +458,18 @@ public class BasicCharacter {
   protected ActionResult handleEnemyDefense(BasicCharacter target, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
     double actualDamage;
+    double attackMultiplier = 1.0;
+    double attackAddifier = 0;
     if(StatusEffect.hasStatusEffect(target, "Nimble")){
-      System.out.println("Attack was reduced by 25% from " + target.getName() + " being NIMBLE!");
       output.add("Attack was reduced by 25% from " + target.getName() + " being NIMBLE!");
-      actualDamage = calculateActualDamage(target, attack*0.75, playerTeam, enemyTeam, output);
-    } else{
-      actualDamage = calculateActualDamage(target, attack, playerTeam, enemyTeam, output);
-    } 
+      attackMultiplier *= 0.75;
+    }
+    if(StatusEffect.hasStatusEffect(target, "Calcified")){
+      output.add("Attack was reduced by 33% from " + target.getName() + " being CALCIFIED!");
+      attackMultiplier *= 0.67;
+      attackMultiplier = Math.round(attackMultiplier * 100) / 100;
+    }
+    actualDamage = calculateActualDamage(target, (attack+attackAddifier)*attackMultiplier, playerTeam, enemyTeam, output);
     output.add(target.defend(this, actualDamage));
     output.add(Signals.TARGET_HEALTH_LOST, actualDamage);
     return output;
@@ -465,11 +478,17 @@ public class BasicCharacter {
   // If a character did not actively defend, their normal defenseStrength is applied
   // When a character actively defends, their defenseStrength is doubled
   private double calculateActualDamage(BasicCharacter target, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam,ActionResult output){
+    double defensiveStrength = target.defenseStrength;
+
+    if(StatusEffect.hasStatusEffect(target, "Pierce")){
+      output.add("Defensive strength reduced by 75% from " + target.getName() + " being PIERCED!");
+    }
+
     double actualDamage;
     if(target.isDefending){
-      actualDamage = attack - (target.defenseStrength * 2);
+      actualDamage = attack - (defensiveStrength * 2);
     } else{
-      actualDamage = attack - target.defenseStrength;
+      actualDamage = attack - defensiveStrength;
     }
     // Avoid negative defensive strength which can happen from status effects
     if(target.defenseStrength <= 0){
@@ -485,6 +504,18 @@ public class BasicCharacter {
       }
       // System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
       output.add(target.getName() + " received " + totalProtectedAmount + " defensive strength!", Signals.DEFENSE_RECEIVED, playerTeam.getProtectedCharacterAmounts().get(index));
+      actualDamage -= totalProtectedAmount;
+    }
+
+    if(enemyTeam.getIndexOfProtectedCharacter(target) != -1){
+      int index = enemyTeam.getIndexOfProtectedCharacter(target);
+      double totalProtectedAmount = 0.0;
+      for(int i = 0; i < enemyTeam.getProtectedCharacters().size(); i++){
+        if(enemyTeam.getProtectedCharacters().get(i).equals(target)){
+          totalProtectedAmount += enemyTeam.getProtectedCharacterAmounts().get(i);
+        }
+      }
+      output.add(target.getName() + " received " + totalProtectedAmount + " defensive strength!", Signals.DEFENSE_RECEIVED, enemyTeam.getProtectedCharacterAmounts().get(index));
       actualDamage -= totalProtectedAmount;
     }
     return Math.max(actualDamage, 0);
@@ -576,7 +607,7 @@ public class BasicCharacter {
     UIManager.drawCenteredStringInBox(graphics, currentHP + "/" + maxHP, localX+lostSpacing, localY-12, (width-lostSpacing*2), 12);
     // Draw Character's name
     UIManager.findMaxFontSize(name, graphics, width-(lostSpacing*2), 20, true, true);
-    UIManager.drawCenteredStringInBox(graphics, name, localX+lostSpacing, localY-20-hpFontSize, (width-lostSpacing*2), 20);
+    nameNumLines = UIManager.drawCenteredStringInBox(graphics, name, localX+lostSpacing, localY-20-hpFontSize, (width-lostSpacing*2), 20);
   }
 
   // Draw the HP bar of the Character

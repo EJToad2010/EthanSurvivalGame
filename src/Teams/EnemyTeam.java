@@ -22,6 +22,10 @@ public class EnemyTeam {
 
   // The spacing between Characters when displayed
   private int charSpacing = 0;
+
+  // Handle characters who defend each other from enemy attacks
+  private ArrayList<EnemyCharacter> protectedCharacters = new ArrayList<EnemyCharacter>();
+  private ArrayList<Double> protectedCharacterAmounts = new ArrayList<Double>();
   
   // Constructor that takes in an exisiting ArrayList and modifies its components into an enemy
   public EnemyTeam(ArrayList<EnemyCharacter> enemyTeam, Inventory enemyInventory){
@@ -67,6 +71,16 @@ public class EnemyTeam {
   public int getCharSpacing(){
     return charSpacing;
   }
+
+  // Return the ArrayList of Characters who are being protected by another Character that turn
+  public ArrayList<EnemyCharacter> getProtectedCharacters(){
+    return protectedCharacters;
+  }
+  
+  // Return the ArrayList of the defensive strength each protected Character is receiving that turn
+  public ArrayList<Double> getProtectedCharacterAmounts(){
+    return protectedCharacterAmounts;
+  }
   
   // The total of each player character's speed value
   // Used at the start of battle to decide which team goes first
@@ -101,6 +115,30 @@ public class EnemyTeam {
     }
     return output;
   }
+
+  // Remove all protected Characters
+  // Used at the start of the next turn
+  public void resetProtectedCharacters(){
+    protectedCharacters.clear();
+    protectedCharacterAmounts.clear();
+  }
+
+   // Return the index of a Character in protectedCharacters
+  // Return -1 if not found
+  public int getIndexOfProtectedCharacter(BasicCharacter c){
+    if(!(c instanceof EnemyCharacter)){
+      return -1;
+    }
+    else{
+      for(int i = 0; i < protectedCharacters.size(); i++){
+        if(protectedCharacters.get(i).equals(c)){
+          return i;
+        }
+      }
+      return -1;
+    }
+  }
+  
 
   // Given an ID, look for a EnemyCharacter in this team with that ID
   // return null if none found

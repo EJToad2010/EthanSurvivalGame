@@ -59,9 +59,9 @@ public class Wizard extends PlayerCharacter {
       ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
       Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
-      if((int)(Math.random() * 100) < 10 && enemyHPChange > 0){
+      /*if((int)(Math.random() * 100) < 10 && enemyHPChange > 0){
         output.add(StatusEffect.addStatusEffect(target, "Stun", 1));
-      }
+      }*/
       //System.out.println(target.getSimpleOutput());
     } else if(basicAbilityIndex == 1){
       // Shielding Zap
