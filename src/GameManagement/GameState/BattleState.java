@@ -191,6 +191,10 @@ public class BattleState extends GameState{
         } else{
           playerTeam.getProtectedCharacters().add(selectedDefenseTarget);
           playerTeam.getProtectedCharacterAmounts().add(selectedCharacter.getDefenseStrength());
+          playerTeam.getProtectingCharacters().add(selectedCharacter);
+          if(selectedCharacter.getType().equals("Knight") && StatusEffect.hasStatusEffect(selectedCharacter, "Shielded")){
+            
+          }
           dialogManager.add(selectedDefenseTarget.getName() + " will receive " + selectedCharacter.getDefenseStrength() + " defense strength from " + selectedCharacter.getName() + "!");
         }
       } else if(step == SELECT_ITEM){
@@ -217,7 +221,7 @@ public class BattleState extends GameState{
     }
   }
 
-  private void handleDialogEndedLogic(int step){
+  protected void handleDialogEndedLogic(int step){
     // Dialog ended
     if(step == INTRO_ANIM){
       // After INTRO_ANIM, trigger the event that starts either the enemy or player's turn

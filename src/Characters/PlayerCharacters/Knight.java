@@ -9,6 +9,7 @@ import src.GameManagement.GameManager;
 import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.Mechanics.Signals;
 import src.GameManagement.UI.ImageManager;
+import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
 
@@ -29,9 +30,9 @@ public class Knight extends PlayerCharacter {
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{20, 10});
     addToArrayList(getBasicAbilityAccuracies(), new Double[]{0.95, 1.0});
-    addToArrayList(getSpecialAbilityNames(), new String[]{"Last Push", "Rage Strike"});
+    addToArrayList(getSpecialAbilityNames(), new String[]{"Last Push", "Shield Counter"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Deals +10 damage from Sword Swing. Deals an additional 50% damage if the enemy is below 50% HP.",
-                                                               "Attack power is doubled from Sword Swing, but lose HP equal to 25% of your doubled attack power."});
+                                                               "Reduce incoming damage by 50% for one turn. If attacked or defending a teammate being attacked, automatically counterattack equal to 75% of enemy strength."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 4});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
@@ -58,7 +59,7 @@ public class Knight extends PlayerCharacter {
       //System.out.println(target.getSimpleOutput());
       
       if(!target.getIsDead()){
-        int counterAttackDamage = (int)(Math.random() * 3) + 5;
+        int counterAttackDamage = (int)(Math.random() * 3) + 3;
         //Thread.sleep(1000);
         //System.out.println(target.getName() + " counterattacked for " + (double) counterAttackDamage + " HP!");
         output.add(target.getName() + " counterattacked for " + (double) counterAttackDamage + " HP!", Signals.HEALTH_LOST, (double)counterAttackDamage);
@@ -93,14 +94,14 @@ public class Knight extends PlayerCharacter {
       }
       
     } else if(specialAbilityIndex == 1){
-      // Rage Strike
-      //System.out.println(getName() + " furiously attacked " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!");
-      output.add(getName() + " furiously attacked " + target.getName() + " for " + (getAttackStrength() * 2) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()*2);
-      output.add(handleEnemyDefense(target, (getAttackStrength() * 2), playerTeam, enemyTeam));
-      //System.out.println(getName() + "'s rage made them lose " + (getAttackStrength() * 0.5) + " HP!");
-      output.add(getName() + "'s rage made them lose " + (getAttackStrength() * 0.5) + " HP!", Signals.HEALTH_LOST, getAttackStrength()*0.5);
-      //changeCurrentHP(-(getAttackStrength() * 0.5));
-      //System.out.println(getSimpleOutput());
+      // Shield Counter
+      output.add(getName() + " raised their royal shield in preparation of enemy attacks!");
+      StatusEffect.addStatusEffect(this, "Shielded", 1);
+      for(int i = 0; i < playerTeam.getProtectedCharacters().size(); i++){
+        if(playerTeam.getProtectingCharacters().get(i).equals(this)){
+          StatusEffect.addStatusEffect(playerTeam.getProtectedCharacters().get(i), "Shielded", 1);
+        }
+      }
     }
     //System.out.println(target.getSimpleOutput());
     return output;

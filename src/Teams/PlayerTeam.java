@@ -20,6 +20,7 @@ public class PlayerTeam {
   // Handle characters who defend each other from enemy attacks
   private ArrayList<PlayerCharacter> protectedCharacters = new ArrayList<PlayerCharacter>();
   private ArrayList<Double> protectedCharacterAmounts = new ArrayList<Double>();
+  private ArrayList<PlayerCharacter> protectingCharacters = new ArrayList<PlayerCharacter>();
   
   // How many coins the player's team currently has
   private int coinBalance = 0;
@@ -73,6 +74,11 @@ public class PlayerTeam {
     return protectedCharacterAmounts;
   }
 
+  // Parallel to getProtectedCharacters that describes who is providing the defensive strength
+  public ArrayList<PlayerCharacter> getProtectingCharacters(){
+    return protectingCharacters;
+  }
+
   public boolean getIsDrawingXP(){
     return isDrawingXP;
   }
@@ -113,6 +119,7 @@ public class PlayerTeam {
   public void resetProtectedCharacters(){
     protectedCharacters.clear();
     protectedCharacterAmounts.clear();
+    protectingCharacters.clear();
   }
   
   // Balance of player team's combined money

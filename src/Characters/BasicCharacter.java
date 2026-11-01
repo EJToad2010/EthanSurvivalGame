@@ -490,6 +490,12 @@ public class BasicCharacter {
     attackMultiplier = calculateAttackReductionEffects(target, attackMultiplier, output);
     actualDamage = calculateActualDamage(target, (attack+attackAddifier)*attackMultiplier, playerTeam, enemyTeam, output);
 
+    if(checkForEvasion(target)){
+      // Target evaded attack
+      output.add(target.getName() + " evaded " + getName() + " with their higher speed!", Signals.DEFENSE_PERFORMED, 999);
+      return output;
+    }
+
     output.add(target.defend(this, actualDamage));
     output.add(Signals.TARGET_HEALTH_LOST, actualDamage);
     return output;
@@ -506,13 +512,27 @@ public class BasicCharacter {
     if(abilityType == 0 && Math.random() > getBasicAbilityAccuracies().get(abilityIndex) + getAccuracyModifier()){
       // Missed attack
       // Assumption that only basic abilities can miss
-      output.add(this.getName() + "'s attack missed!");
+      output.add(this.getName() + "'s attack missed!", Signals.DEFENSE_PERFORMED, 999);
       System.out.println("Missed attack " + (1-(getBasicAbilityAccuracies().get(abilityIndex) + getAccuracyModifier()))*100 + "% chance");
       actualDamage = 0;
+      return output;
     }
+
+    if(checkForEvasion(target)){
+      // Target evaded attack
+      output.add(target.getName() + " evaded " + getName() + " with their higher speed!", Signals.DEFENSE_PERFORMED, 999);
+      return output;
+    }
+
     output.add(target.defend(this, actualDamage));
     output.add(Signals.TARGET_HEALTH_LOST, actualDamage);
     return output;
+  }
+
+   // Roll a chance for target to evade attack based on difference between speed (max 15% evasion chance)
+  private boolean checkForEvasion(BasicCharacter target){
+    System.out.println("Evasion chance: " + Math.max(0, Math.min(15, target.getSpeed() - getSpeed())) + "%");
+    return (int)(Math.random() * 100) < Math.max(0, Math.min(15, target.getSpeed() - getSpeed()));
   }
 
   private double calculateAttackReductionEffects(BasicCharacter target, double attackMultiplier, ActionResult output){

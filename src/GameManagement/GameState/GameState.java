@@ -156,6 +156,8 @@ public class GameState {
     // Subclasses must override these for unique functionality
     // Handle the flow of logic between steps
     protected void handleStep(int step, int keyCode){}
+    // Specific function to use after a dialog box runs through all test
+    protected void handleDialogEndedLogic(int step){}
     // Draw relevant information of a single step
     protected void drawStep(int step, Graphics graphics){}
     // Used when a GameState makes use of dialog that contains interaction

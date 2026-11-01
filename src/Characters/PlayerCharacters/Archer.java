@@ -72,7 +72,7 @@ public class Archer extends PlayerCharacter {
       ActionResult defenseResult = handleEnemyDefense(target,0, basicAbilityIndex,  getAttackStrength()-3, playerTeam, enemyTeam);
       output.add(defenseResult);
       //System.out.println(target.getSimpleOutput());
-      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      Double enemyHPChange = getAttackStrength()-3 - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       if((int)(Math.random() * 100) < 33 && enemyHPChange > 0){
         output.add(StatusEffect.addStatusEffect(target, "Burn", 2));
       }
