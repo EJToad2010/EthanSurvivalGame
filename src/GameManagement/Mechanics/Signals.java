@@ -7,6 +7,8 @@ public class Signals {
     public static final String ATTACK_PERFORMED = "ATTACK_PERFORMED";
     public static final String DEFENSE_RECEIVED = "DEFENSE_RECEIVED";
     public static final String DEFENSE_PERFORMED = "DEFENSE_PERFORMED";
+    // 0 = false, 1 = true whether a character took damage while defending
+    public static final String WAS_DAMAGE_TAKEN = "WAS_DAMAGE_TAKEN";
     // Stat changes
     // Used to control any HP changes besides pure attack / defense
     public static final String HEALTH_LOST = "HEALTH_LOST";

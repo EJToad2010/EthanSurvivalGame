@@ -109,9 +109,9 @@ public class DartGoblin extends EnemyCharacter{
       output.add(getName() + " shot a poison dart at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       // Check for how much damage the attack did to the enemy
       ActionResult defenseResult = handleEnemyDefense(target,0, basicAbilityIndex, getAttackStrength(), playerTeam, enemyTeam);
-      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      Double wasDamageTaken = defenseResult.getAmount(Signals.WAS_DAMAGE_TAKEN);
       output.add(defenseResult);
-      if((int)(Math.random() * 100) < 25 && enemyHPChange > 0){
+      if((int)(Math.random() * 100) < 25 && wasDamageTaken == 1.0){
         output.add(StatusEffect.addStatusEffect(target, "Poison", 2));
       }
       //System.out.println(target.getSimpleOutput());
@@ -142,9 +142,9 @@ public class DartGoblin extends EnemyCharacter{
       //System.out.println(getName() + " marked " + target.getName() + " with poison for " + getAttackStrength() + " HP!");
       output.add(getName() + " marked " + target.getName() + " with poison for " + getAttackStrength()+5 + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam);
-      Double enemyHPChange = getAttackStrength()+5 - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      Double wasDamageTaken = defenseResult.getAmount(Signals.WAS_DAMAGE_TAKEN);
       output.add(defenseResult);
-      if((int)(Math.random() * 100) < 75 && enemyHPChange > 0){
+      if((int)(Math.random() * 100) < 75 && wasDamageTaken == 1.0){
         output.add(StatusEffect.addStatusEffect(target, "Poison", 3));
       }
     }
@@ -153,17 +153,14 @@ public class DartGoblin extends EnemyCharacter{
   }
   
   // Defense function which is called when an enemy targets the Knight
-  public ActionResult defend(BasicCharacter target, double actualDamage){
+  public ActionResult defend(BasicCharacter target, double defendedAmount){
     ActionResult output = new ActionResult();
-    if(actualDamage == 0){
-      //System.out.println(getName() + " successfully hid from " + target.getName() + "'s attack!");
-      output.add(getName() + " successfully hid from " + target.getName() + "'s attack!", Signals.DEFENSE_PERFORMED, 999.0);
-    }else if(getIsDefending()){
+    if(getIsDefending()){
       //System.out.println(getName() + " partially hid from " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
-      output.add(getName() + " partially hid from " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
+      output.add(getName() + " partially hid from " + target.getName() + "'s attack for " + defendedAmount + " HP!", Signals.DEFENSE_PERFORMED, defendedAmount);
     } else{
       //System.out.println(getName() + " tried to hide from " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
-      output.add(getName() + " tried to hide from " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength());
+      output.add(getName() + " tried to hide from " + target.getName() + "'s attack for " + defendedAmount + " HP!", Signals.DEFENSE_PERFORMED, defendedAmount);
     }
     return output;
   }

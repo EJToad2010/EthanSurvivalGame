@@ -19,7 +19,7 @@ public class Skeleton extends EnemyCharacter{
 
   public Skeleton(String name, String behaviorType){
     // Set the names, descriptions, and cooldowns of the Dart Goblin.
-    super(name, 75.0, 10.0, 10.0, 8.0, 50, 20, behaviorType);
+    super(name, 75.0, 10.0, 20.0, 8.0, 50, 20, behaviorType);
     setStartingLevel(2);
     setDescription("An undead creature that lost its muscular strength but is tough as bone.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Bone Chuck", "Bone Bash"});
@@ -108,8 +108,8 @@ public class Skeleton extends EnemyCharacter{
       output.add(getName() + " bashed itself at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       ActionResult defenseResult = handleEnemyDefense(target, 0, basicAbilityIndex, getAttackStrength(), playerTeam, enemyTeam);
       output.add(defenseResult);
-      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
-      if(enemyHPChange > 0){
+      Double wasDamageTaken = defenseResult.getAmount(Signals.WAS_DAMAGE_TAKEN);
+      if(wasDamageTaken == 1.0){
         // Apply BASHED Effect
         StatusEffect.addStatusEffect(target, "Bashed", 1);
       }
@@ -134,17 +134,14 @@ public class Skeleton extends EnemyCharacter{
   }
   
   // Defense function which is called when an enemy targets the Knight
-  public ActionResult defend(BasicCharacter target, double actualDamage){
+  public ActionResult defend(BasicCharacter target, double defendedAmount){
     ActionResult output = new ActionResult();
-    if(actualDamage == 0){
-      //System.out.println(getName() + " successfully hid from " + target.getName() + "'s attack!");
-      output.add(getName() + " deflected " + target.getName() + "'s attack!", Signals.DEFENSE_PERFORMED, 999.0);
-    }else if(getIsDefending()){
+    if(getIsDefending()){
       //System.out.println(getName() + " partially hid from " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
-      output.add(getName() + " partially deflected " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
+      output.add(getName() + " partially deflected " + target.getName() + "'s attack for " + defendedAmount + " HP!", Signals.DEFENSE_PERFORMED, defendedAmount);
     } else{
       //System.out.println(getName() + " tried to hide from " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
-      output.add(getName() + " tried to deflect " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength());
+      output.add(getName() + " tried to deflect " + target.getName() + "'s attack for " + defendedAmount + " HP!", Signals.DEFENSE_PERFORMED, defendedAmount);
     }
     return output;
   }

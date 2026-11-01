@@ -20,7 +20,7 @@ public class Wizard extends PlayerCharacter {
   BufferedImage fireball = ImageManager.loadImage("src/Images/fireball.png");
   BufferedImage explosion = ImageManager.loadImage("src/Images/explosion.png");
   public Wizard(String name){
-    super(name, 80.0, 40.0, 5.0, 15.0);
+    super(name, 80.0, 45.0, 7.0, 15.0);
     // Set the names, descriptions, and cooldowns of all the Wizard's abilities.
     setDescription("A fighter who uses magic for very high damage output, while sacrificing health and defense.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Magic Zap", "Shielding Zap"});
@@ -58,7 +58,7 @@ public class Wizard extends PlayerCharacter {
       output.add(getName() + " zapped " + target.getName() + " for " + (getAttackStrength()) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       // Check for how much damage the attack did to the enemy
       ActionResult defenseResult = handleEnemyDefense(target,0, basicAbilityIndex, getAttackStrength(), playerTeam, enemyTeam);
-      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      Double wasDamageTaken = defenseResult.getAmount(Signals.WAS_DAMAGE_TAKEN);
       output.add(defenseResult);
       /*if((int)(Math.random() * 100) < 10 && enemyHPChange > 0){
         output.add(StatusEffect.addStatusEffect(target, "Stun", 1));
@@ -86,9 +86,9 @@ public class Wizard extends PlayerCharacter {
       output.add(getName() + " launched a fireball at " + target.getName() + " for " + getAttackStrength()+5 + " HP!",Signals.ATTACK_PERFORMED, getAttackStrength()+5);
       // Check for how much damage the attack did to the enemy
       ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
-      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      Double wasDamageTaken = defenseResult.getAmount(Signals.WAS_DAMAGE_TAKEN);
       output.add(defenseResult);
-      if((int)(Math.random() * 100) < 25 && enemyHPChange > 0){
+      if((int)(Math.random() * 100) < 25 && wasDamageTaken == 1.0){
         output.add(StatusEffect.addStatusEffect(target, "Burn", 2));
       }
     } else if(specialAbilityIndex == 1){
@@ -118,17 +118,14 @@ public class Wizard extends PlayerCharacter {
   }
   
   // Defense function which is called when an enemy targets the Wizard
-  public ActionResult defend(BasicCharacter target, double actualDamage){
+  public ActionResult defend(BasicCharacter target, double defendedAmount){
     ActionResult output = new ActionResult();
-    if(actualDamage == 0){
-      //System.out.println(getName() + " cancelled " + target.getName() + "'s attack!");
-      output.add(getName() + "'s force field cancelled " + target.getName() + "'s attack!",Signals.DEFENSE_PERFORMED, 999.0);
-    }else if(getIsDefending()){
+    if(getIsDefending()){
       //System.out.println(getName() + " partially cancelled " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
-      output.add(getName() + "'s force field partially cancelled " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
+      output.add(getName() + "'s force field partially cancelled " + target.getName() + "'s attack for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     } else{
       //System.out.println(getName() + " lightly cancelled " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
-      output.add(getName() + "'s force field lightly cancelled " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength());
+      output.add(getName() + "'s force field lightly cancelled " + target.getName() + "'s attack for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     }
     return output;
   }

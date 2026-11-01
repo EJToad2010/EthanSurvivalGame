@@ -108,17 +108,14 @@ public class Knight extends PlayerCharacter {
   }
   
   // Defense function which is called when an enemy targets the Knight
-  public ActionResult defend(BasicCharacter target, double actualDamage){
+  public ActionResult defend(BasicCharacter target, double defendedAmount){
     ActionResult output = new ActionResult();
-    if(actualDamage == 0){
-      //System.out.println(getName() + " fully countered " + target.getName() + " with their shield!");
-      output.add(getName() + " fully countered " + target.getName() + " with their shield!",Signals.DEFENSE_PERFORMED, 999.0);
-    }else if(getIsDefending()){
+    if(getIsDefending()){
       //System.out.println(getName() + " partially blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() * 2 + " HP!");
-      output.add(getName() + " defended against " + target.getName() + " for " + getDefenseStrength() * 2 + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
+      output.add(getName() + " defended against " + target.getName() + " for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     } else{
       //System.out.println(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() + " HP!");
-      output.add(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength());
+      output.add(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     }
     return output;
   }

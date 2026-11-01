@@ -335,4 +335,20 @@ public class GameState {
         }
         return output;
     }
+
+    // Truncate a double value to n decimal points
+    // If there is no decimal point, return value
+    // If the number of trailing decimal points < n, return value
+    public static double truncate(double value, int n){
+        String strValue = Double.toString(value);
+        int periodIndex = strValue.indexOf(".");
+        if(periodIndex == -1){
+        return value;
+        } else{
+        String numBeforeDecimal = strValue.substring(0, periodIndex);
+        String numAfterDecimal = strValue.substring(periodIndex+1, Math.min(strValue.length(), periodIndex + n + 1));
+        String output = numBeforeDecimal + "." + numAfterDecimal;
+        return Double.parseDouble(output);
+        }
+    }
 }

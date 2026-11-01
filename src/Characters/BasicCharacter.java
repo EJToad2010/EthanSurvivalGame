@@ -9,6 +9,8 @@ import src.GameManagement.UI.UIManager;
 import src.Misc.StatusEffect;
 import src.Teams.EnemyTeam;
 import src.Teams.PlayerTeam;
+import src.GameManagement.Game;
+import src.GameManagement.GameState.GameState;
 import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.Mechanics.Signals;
 
@@ -333,6 +335,7 @@ public class BasicCharacter {
     if(currentHP > maxHP){
       currentHP = maxHP;
     }
+    currentHP = GameState.truncate(currentHP, 2);
   }
   
   public void changeAttackStrength(double amount){
@@ -340,6 +343,7 @@ public class BasicCharacter {
     if(attackStrength < 0.0){
       attackStrength = 0.0;
     }
+    attackStrength = GameState.truncate(attackStrength, 2);
   }
   
   public void changeDefenseStrength(double amount){
@@ -347,6 +351,7 @@ public class BasicCharacter {
     if(defenseStrength < 0.0){
       defenseStrength = 0.0;
     }
+    defenseStrength = GameState.truncate(defenseStrength, 2);
   }
   
   public void changeSpeed(double amount){
@@ -354,10 +359,12 @@ public class BasicCharacter {
     if(speed < 0.0){
       speed = 0.0;
     }
+    speed = GameState.truncate(speed, 2);
   }
 
   public void changeAccuracyModifier(double amount){
     accuracyModifier += amount;
+    accuracyModifier = GameState.truncate(accuracyModifier, 2);
   }
 
   public void resetAccuracyModifier(){
@@ -496,8 +503,8 @@ public class BasicCharacter {
       return output;
     }
 
-    output.add(target.defend(this, actualDamage));
-    output.add(Signals.TARGET_HEALTH_LOST, actualDamage);
+    output.add(target.defend(this, GameState.truncate(((attack+attackAddifier)*attackMultiplier)-actualDamage,2)));
+    output.add(Signals.TARGET_HEALTH_LOST, GameState.truncate(actualDamage,2));
     return output;
   }
 
@@ -514,18 +521,20 @@ public class BasicCharacter {
       // Assumption that only basic abilities can miss
       output.add(this.getName() + "'s attack missed!", Signals.DEFENSE_PERFORMED, 999);
       System.out.println("Missed attack " + (1-(getBasicAbilityAccuracies().get(abilityIndex) + getAccuracyModifier()))*100 + "% chance");
-      actualDamage = 0;
+      output.add(Signals.WAS_DAMAGE_TAKEN, 0);
       return output;
     }
 
     if(checkForEvasion(target)){
       // Target evaded attack
       output.add(target.getName() + " evaded " + getName() + " with their higher speed!", Signals.DEFENSE_PERFORMED, 999);
+      output.add(Signals.WAS_DAMAGE_TAKEN, 0);
       return output;
     }
 
-    output.add(target.defend(this, actualDamage));
-    output.add(Signals.TARGET_HEALTH_LOST, actualDamage);
+    output.add(target.defend(this, GameState.truncate(((attack+attackAddifier)*attackMultiplier)-actualDamage, 2)));
+    output.add(Signals.TARGET_HEALTH_LOST, GameState.truncate(actualDamage,2));
+    output.add(Signals.WAS_DAMAGE_TAKEN, 1);
     return output;
   }
 
@@ -559,9 +568,7 @@ public class BasicCharacter {
 
     double actualDamage;
     if(target.isDefending){
-      actualDamage = attack - (defensiveStrength * 1.5);
-    } else{
-      actualDamage = attack - defensiveStrength;
+      defensiveStrength *= 2;
     }
     // Avoid negative defensive strength which can happen from status effects
     if(target.defenseStrength <= 0){
@@ -577,7 +584,7 @@ public class BasicCharacter {
       }
       // System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
       output.add(target.getName() + " received " + totalProtectedAmount + " defensive strength!", Signals.DEFENSE_RECEIVED, playerTeam.getProtectedCharacterAmounts().get(index));
-      actualDamage -= totalProtectedAmount;
+      defensiveStrength += totalProtectedAmount;
     }
 
     if(enemyTeam.getIndexOfProtectedCharacter(target) != -1){
@@ -589,25 +596,26 @@ public class BasicCharacter {
         }
       }
       output.add(target.getName() + " received " + totalProtectedAmount + " defensive strength!", Signals.DEFENSE_RECEIVED, enemyTeam.getProtectedCharacterAmounts().get(index));
-      actualDamage -= totalProtectedAmount;
+      defensiveStrength += totalProtectedAmount;
     }
-    return Math.max(actualDamage, 0);
+    actualDamage = attack * Math.pow((attack/(attack+defensiveStrength)),1.5);
+    System.out.println("Attack: " + attack);
+    System.out.println("Defense: " + defensiveStrength);
+    System.out.println("Actual damage: " + GameState.truncate(actualDamage,2));
+    return Math.max(1, GameState.truncate(actualDamage,2));
   }
   
   // Handle the print statements shown when a character defends.
   // Damage calculations and accessing enemy functions are managed by helper functions
   // to make subclass overloading easier.
-  public ActionResult defend(BasicCharacter target, double actualDamage){
+  public ActionResult defend(BasicCharacter target, double defendedAmount){
     ActionResult output = new ActionResult();
-    if(actualDamage == 0){
-      System.out.println(name + " fully defended against " + target.getName() + "!");
-      output.add(name + " fully defended against " + target.getName() + "!",Signals.DEFENSE_PERFORMED, defenseStrength);
-    }else if(isDefending){
-      System.out.println(name + " defended against " + target.getName() + " for " + defenseStrength * 2 + " HP!");
-      output.add(name + " defended against " + target.getName() + " for " + defenseStrength * 2 + " HP!",Signals.DEFENSE_PERFORMED, defenseStrength*2);
+    if(isDefending){
+      System.out.println(name + " defended against " + target.getName() + " for " + defendedAmount + " HP!");
+      output.add(name + " defended against " + target.getName() + " for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     } else{
-      System.out.println(name + " lightly defended against " + target.getName() + " for " + defenseStrength + " HP!");
-      output.add(name + " lightly defended against " + target.getName() + " for " + defenseStrength + " HP!",Signals.DEFENSE_PERFORMED, defenseStrength);
+      System.out.println(name + " lightly defended against " + target.getName() + " for " + defendedAmount + " HP!");
+      output.add(name + " lightly defended against " + target.getName() + " for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     }
     return output;
   }

@@ -59,9 +59,9 @@ public class Archer extends PlayerCharacter {
       //System.out.println(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
       output.add(getName() + " fired a softening arrow at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       ActionResult defenseResult = handleEnemyDefense(target, 0, basicAbilityIndex, getAttackStrength(), playerTeam, enemyTeam);
-      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      Double wasDamageTaken = defenseResult.getAmount(Signals.WAS_DAMAGE_TAKEN);
       output.add(defenseResult);
-      if((int)(Math.random() * 100) < 40 && enemyHPChange > 0){
+      if((int)(Math.random() * 100) < 40 && wasDamageTaken == 1.0){
         output.add(StatusEffect.addStatusEffect(target, "Soft", 2));
       }
       //System.out.println(target.getSimpleOutput());
@@ -71,9 +71,8 @@ public class Archer extends PlayerCharacter {
       output.add(getName() + " fired an arrow at " + target.getName() + " for " + (getAttackStrength() - 3) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()-3);
       ActionResult defenseResult = handleEnemyDefense(target,0, basicAbilityIndex,  getAttackStrength()-3, playerTeam, enemyTeam);
       output.add(defenseResult);
-      //System.out.println(target.getSimpleOutput());
-      Double enemyHPChange = getAttackStrength()-3 - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
-      if((int)(Math.random() * 100) < 33 && enemyHPChange > 0){
+      Double wasDamageTaken = defenseResult.getAmount(Signals.WAS_DAMAGE_TAKEN);
+      if((int)(Math.random() * 100) < 33 && wasDamageTaken == 1){
         output.add(StatusEffect.addStatusEffect(target, "Burn", 2));
       }
     }
@@ -89,9 +88,9 @@ public class Archer extends PlayerCharacter {
       //System.out.println(getName() + " fired an arrow at " + target.getName() + " for " + getAttackStrength() + " HP!");
       output.add(getName() + " fired an arrow at " + target.getName() + " for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength(), playerTeam, enemyTeam);
-      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      Double wasDamageTaken = defenseResult.getAmount(Signals.WAS_DAMAGE_TAKEN);
       output.add(defenseResult);
-      if((int)(Math.random() * 100) < 10 && enemyHPChange > 0){
+      if((int)(Math.random() * 100) < 10 && wasDamageTaken == 1){
         output.add(StatusEffect.addStatusEffect(target, "Burn", 1));
       }
     } else if(specialAbilityIndex == 1){
@@ -100,9 +99,9 @@ public class Archer extends PlayerCharacter {
       //System.out.println(getName() + " fired an armor piercing arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!");
       output.add(getName() + " fired an armor piercing arrow at " + target.getName() + " for " + (getAttackStrength()+5) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()+5);
       ActionResult defenseResult = handleEnemyDefense(target, getAttackStrength()+5, playerTeam, enemyTeam);
-      Double enemyHPChange = getAttackStrength()+5 - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
+      Double wasDamageTaken = defenseResult.getAmount(Signals.WAS_DAMAGE_TAKEN);
       output.add(defenseResult);
-      if(enemyHPChange > 0){
+      if(wasDamageTaken == 1.0){
         output.add(StatusEffect.addStatusEffect(target, "Pierce", 2));
       }
     }
@@ -111,17 +110,14 @@ public class Archer extends PlayerCharacter {
   }
   
   // Defense function which is called when an enemy targets the Archer
-  public ActionResult defend(BasicCharacter target, double actualDamage){
+  public ActionResult defend(BasicCharacter target, double defendedAmount){
     ActionResult output = new ActionResult();
-    if(actualDamage == 0){
-      //System.out.println(getName() + " evaded " + target.getName() + "'s attack!");
-      output.add(getName() + " evaded " + target.getName() + "'s attack!",Signals.DEFENSE_PERFORMED, 999.0);
-    }else if(getIsDefending()){
+    if(getIsDefending()){
       //System.out.println(getName() + " partially dodged " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
-      output.add(getName() + " partially dodged " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
+      output.add(getName() + " partially dodged " + target.getName() + "'s attack for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     } else{
       //System.out.println(getName() + " lightly dodged " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
-      output.add(getName() + " lightly dodged " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!",Signals.DEFENSE_PERFORMED, getDefenseStrength());
+      output.add(getName() + " lightly dodged " + target.getName() + "'s attack for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     }
     return output;
   }

@@ -36,8 +36,8 @@ public class Goblin extends EnemyCharacter{
                                                                "Attack a single character for moderate damage. The Goblin has a 25% to steal gold from the player. The Goblin consumes the gold to heal."});
     addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
-    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{3, 3});
-    addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{3, 3});
+    addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{4, 4});
+    addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{4, 4});
     addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{20, 30});
     setCharacterImage("src/Images/goblin.png");
   }
@@ -126,7 +126,6 @@ public class Goblin extends EnemyCharacter{
       output.add(getName() + " stabbed " + target.getName() + " with their dagger for " + getAttackStrength() + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength());
       // Check for how much damage the attack did to the enemy
       ActionResult defenseResult = handleEnemyDefense(target, 0, basicAbilityIndex, getAttackStrength(), playerTeam, enemyTeam);
-      Double enemyHPChange = getAttackStrength() - defenseResult.getAmount(Signals.DEFENSE_PERFORMED);
       output.add(defenseResult);
     } else if(basicAbilityIndex == 1){
       // Nimble Dodge (shared with Goblin class since they are both speedy Goblin types)
@@ -173,17 +172,14 @@ public class Goblin extends EnemyCharacter{
   }
   
   // Defense function which is called when an enemy targets the Knight
-  public ActionResult defend(BasicCharacter target, double actualDamage){
+  public ActionResult defend(BasicCharacter target, double defendedAmount){
     ActionResult output = new ActionResult();
-    if(actualDamage == 0){
-      //System.out.println(getName() + " successfully hid from " + target.getName() + "'s attack!");
-      output.add(getName() + " successfully hid from " + target.getName() + "'s attack!", Signals.DEFENSE_PERFORMED, 999.0);
-    }else if(getIsDefending()){
+    if(getIsDefending()){
       //System.out.println(getName() + " partially hid from " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
-      output.add(getName() + " partially hid from " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength()*2);
+      output.add(getName() + " partially hid from " + target.getName() + "'s attack for " + defendedAmount + " HP!", Signals.DEFENSE_PERFORMED, defendedAmount);
     } else{
       //System.out.println(getName() + " tried to hide from " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
-      output.add(getName() + " tried to hide from " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!", Signals.DEFENSE_PERFORMED, getDefenseStrength());
+      output.add(getName() + " tried to hide from " + target.getName() + "'s attack for " + defendedAmount + " HP!", Signals.DEFENSE_PERFORMED, defendedAmount);
     }
     return output;
   }
