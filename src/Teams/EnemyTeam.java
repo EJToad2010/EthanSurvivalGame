@@ -150,6 +150,7 @@ public class EnemyTeam {
   // Given an ID, look for a EnemyCharacter in this team with that ID
   // return null if none found
   public EnemyCharacter findCharWithID(int id){
+    System.out.println("Finding char with ID");
     for(EnemyCharacter e : enemyTeam){
       if(e.getID() == id){
         return e;

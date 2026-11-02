@@ -98,7 +98,7 @@ public class BattleState extends GameState{
       handleDialogEndedLogic(currentStep);
     }
     if(currentStep > 0){
-      //checkWinConditions();
+      checkWinConditions();
     }
     if(currentStep == INTRO_ANIM){
           nextTick();
@@ -179,7 +179,11 @@ public class BattleState extends GameState{
             dialogManager.add(selectedAbilityName + " will target all enemies!");
             findNextTargetAllEnemies(false);
           } else{
-            setStep(SELECT_TARGET);
+            if(targetAmount == 0){
+              setStep(PERFORM_ABILITY);
+            } else{
+              setStep(SELECT_TARGET);
+            }
           }
         }
       } else if(step == SELECT_TARGET){
@@ -196,7 +200,7 @@ public class BattleState extends GameState{
           playerTeam.getProtectedCharacterAmounts().add(selectedCharacter.getDefenseStrength());
           playerTeam.getProtectingCharacters().add(selectedCharacter);
           if(selectedCharacter.getType().equals("Knight") && StatusEffect.hasStatusEffect(selectedCharacter, "Shielded")){
-            
+            dialogManager.add(StatusEffect.addStatusEffect(selectedDefenseTarget, "Shielded", 1));
           }
           dialogManager.add(selectedDefenseTarget.getName() + " will receive " + selectedCharacter.getDefenseStrength() + " defense strength from " + selectedCharacter.getName() + "!");
         }
@@ -238,7 +242,7 @@ public class BattleState extends GameState{
         setStep(ENEMY_TURN);
       }
     } else if(step == SELECT_ABILITY){
-      if(targetAmount == 999){
+      if(targetAmount == 999 || targetAmount == 0){
         setStep(PERFORM_ABILITY);
       }
     }else if(step == PERFORM_ABILITY){
@@ -666,6 +670,7 @@ public class BattleState extends GameState{
       // dialogManager.clear();
       if(selectedActionType.equals("Basic ability")){
         output = selectedCharacter.basicAbility(selectedAbilityIndex, currentTarget, playerTeam, enemyTeam);
+        System.out.println("Basic ability ActionResult received");
       } else{
         output = selectedCharacter.specialAbility(selectedAbilityIndex, currentTarget, playerTeam, enemyTeam);
         selectedCharacter.resetSpecialAbilityCooldowns();

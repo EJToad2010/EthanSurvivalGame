@@ -65,11 +65,13 @@ public class ActionResult {
 
     // Add the values of another ActionResult object to this one
     public void add(ActionResult actionResult){
+        System.out.println("Adding action result");
         for(int i = 0; i < actionResult.getMessages().size(); i++){
-            messages.add(actionResult.getMessage(i));
-            signals.add(actionResult.getSignal(i));
-            amounts.add(actionResult.getAmount(i));
+            this.messages.add(actionResult.getMessage(i));
+            this.signals.add(actionResult.getSignal(i));
+            this.amounts.add(actionResult.getAmount(i));
         }
+        System.out.println("Finished adding action result");
     }
 
     // Add a new value to all ArrayLists

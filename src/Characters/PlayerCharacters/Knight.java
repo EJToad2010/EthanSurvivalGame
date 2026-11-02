@@ -20,7 +20,7 @@ public class Knight extends PlayerCharacter {
   Image purpleParticle = ImageManager.loadImage("src/Images/purpleparticle.png");
   Image redParticle = ImageManager.loadImage("src/Images/redparticle.png");
   public Knight(String name){
-    super(name, 100.0, 30.0, 12.0, 5.0);
+    super(name, 100.0, 30.0, 20.0, 5.0);
     // Set the names, descriptions, and cooldowns of all the Knight's abilities.
     setDescription("An offensive tank who can withstand the front lines of battle, at the cost of speed.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Sword Swing", "Cautious Attack"});
@@ -34,9 +34,9 @@ public class Knight extends PlayerCharacter {
     addToArrayList(getSpecialAbilityNames(), new String[]{"Last Push", "Shield Counter"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Deals +10 damage from Sword Swing. Deals an additional 50% damage if the enemy is below 50% HP.",
                                                                "Reduce incoming damage by 50% for one turn. If attacked or defending a teammate being attacked, automatically counterattack equal to incoming damage."});
-    addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Offensive"});
+    addToArrayList(getSpecialAbilityTypes(), new String[]{"Offensive", "Defensive"});
     addToArrayList(getSpecialAbilityUnlockLevels(), new Integer[]{0, 4});
-    addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 1});
+    addToArrayList(getSpecialAbilityEnemyCounts(), new Integer[]{1, 0});
     addToArrayList(getSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getCurrentSpecialAbilityCooldowns(), new Integer[]{2, 3});
     addToArrayList(getSpecialAbilityAnimationLengths(), new Integer[]{40, 40});
@@ -75,6 +75,7 @@ public class Knight extends PlayerCharacter {
       output.add(handleEnemyDefense(target, getAttackStrength() - 8, playerTeam, enemyTeam));
       //System.out.println(target.getSimpleOutput());
     }
+    System.out.println("Basic ability Knight concluded");
     return output;
   }
   
@@ -100,7 +101,7 @@ public class Knight extends PlayerCharacter {
       StatusEffect.addStatusEffect(this, "Shielded", 1);
       for(int i = 0; i < playerTeam.getProtectedCharacters().size(); i++){
         if(playerTeam.getProtectingCharacters().get(i).equals(this)){
-          StatusEffect.addStatusEffect(playerTeam.getProtectedCharacters().get(i), "Shielded", 1);
+          output.add(StatusEffect.addStatusEffect(playerTeam.getProtectedCharacters().get(i), "Shielded", 1));
         }
       }
     }
@@ -109,7 +110,7 @@ public class Knight extends PlayerCharacter {
   }
   
   // Defense function which is called when an enemy targets the Knight
-  public ActionResult defend(BasicCharacter target, double defendedAmount, ActionResult output){
+  public void defend(BasicCharacter target, double defendedAmount, ActionResult output){
     if(getIsDefending()){
       //System.out.println(getName() + " partially blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() * 2 + " HP!");
       output.add(getName() + " defended against " + target.getName() + " for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
@@ -117,23 +118,20 @@ public class Knight extends PlayerCharacter {
       //System.out.println(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() + " HP!");
       output.add(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     }
-    output.add(checkShieldedEffect(this));
-    return output;
+  checkShieldedEffect(this, output);
   }
 
-  public ActionResult respondToTeammateAttacked(BasicCharacter teammate, BasicCharacter source, PlayerTeam playerTeam, EnemyTeam enemyTeam){
-    return checkShieldedEffect(teammate);
+  public void respondToTeammateAttacked(BasicCharacter teammate, BasicCharacter source, PlayerTeam playerTeam, EnemyTeam enemyTeam, ActionResult output){
+    checkShieldedEffect(teammate, output);
   }
 
-  private ActionResult checkShieldedEffect(BasicCharacter target){
-    ActionResult output = new ActionResult();
+  private void checkShieldedEffect(BasicCharacter target, ActionResult output){
     if(StatusEffect.hasStatusEffect(target, "Shielded")){
       double counterattackAmount = GameState.truncate(output.getAmount(Signals.ORIGINAL_ATTACK_POWER),2);
       output.add(Signals.HEALTH_LOST, counterattackAmount);
       // Counterattack signal not yet implented
       output.add(getName() + " used Shield Counter to counterattack for " + counterattackAmount + " HP!", Signals.COUNTERATTACK_PERFORMED);
     }
-    return output;
   }
 
   // Called every time the Character conducts an offensive attack

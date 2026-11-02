@@ -214,6 +214,7 @@ public class EnemyCharacter extends BasicCharacter{
         if((Math.random() * 100) < (1.25-enemyTeam.getTotalHPPercentage())*100 && otherTargetFound){
           enemyTeam.getProtectedCharacters().add(defenseTarget);
           enemyTeam.getProtectedCharacterAmounts().add(this.getDefenseStrength());
+          enemyTeam.getProtectingCharacters().add(this);
           ActionResult output = new ActionResult();
           output.add(defenseTarget.getName() + " will receive " + this.getDefenseStrength() + " defense strength from " + this.getName() + "!");
           return output;

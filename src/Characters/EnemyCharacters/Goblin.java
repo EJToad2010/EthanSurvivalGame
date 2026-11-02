@@ -172,7 +172,8 @@ public class Goblin extends EnemyCharacter{
   }
   
   // Defense function which is called when an enemy targets the Knight
-  public ActionResult defend(BasicCharacter target, double defendedAmount, ActionResult output){
+  public void defend(BasicCharacter target, double defendedAmount, ActionResult output){
+    System.out.println("Correct function reached");
     if(getIsDefending()){
       //System.out.println(getName() + " partially hid from " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
       output.add(getName() + " partially hid from " + target.getName() + "'s attack for " + defendedAmount + " HP!", Signals.DEFENSE_PERFORMED, defendedAmount);
@@ -180,7 +181,7 @@ public class Goblin extends EnemyCharacter{
       //System.out.println(getName() + " tried to hide from " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
       output.add(getName() + " tried to hide from " + target.getName() + "'s attack for " + defendedAmount + " HP!", Signals.DEFENSE_PERFORMED, defendedAmount);
     }
-    return output;
+    System.out.println("Correct function exited");
   }
 
   // Called every time the Character conducts an offensive attack

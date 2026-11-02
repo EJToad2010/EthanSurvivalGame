@@ -19,7 +19,7 @@ public class Skeleton extends EnemyCharacter{
 
   public Skeleton(String name, String behaviorType){
     // Set the names, descriptions, and cooldowns of the Dart Goblin.
-    super(name, 75.0, 10.0, 20.0, 8.0, 50, 20, behaviorType);
+    super(name, 75.0, 8.0, 18.0, 8.0, 50, 20, behaviorType);
     setStartingLevel(2);
     setDescription("An undead creature that lost its muscular strength but is tough as bone.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Bone Chuck", "Bone Bash"});
@@ -111,7 +111,7 @@ public class Skeleton extends EnemyCharacter{
       Double wasDamageTaken = defenseResult.getAmount(Signals.WAS_DAMAGE_TAKEN);
       if(wasDamageTaken == 1.0){
         // Apply BASHED Effect
-        StatusEffect.addStatusEffect(target, "Bashed", 1);
+        output.add(StatusEffect.addStatusEffect(target, "Bashed", 1));
       }
     }
     return output;
@@ -134,7 +134,7 @@ public class Skeleton extends EnemyCharacter{
   }
   
   // Defense function which is called when an enemy targets the Knight
-  public ActionResult defend(BasicCharacter target, double defendedAmount, ActionResult output){
+  public void defend(BasicCharacter target, double defendedAmount, ActionResult output){
     if(getIsDefending()){
       //System.out.println(getName() + " partially hid from " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
       output.add(getName() + " partially deflected " + target.getName() + "'s attack for " + defendedAmount + " HP!", Signals.DEFENSE_PERFORMED, defendedAmount);
@@ -142,7 +142,6 @@ public class Skeleton extends EnemyCharacter{
       //System.out.println(getName() + " tried to hide from " + target.getName() + "'s attack for " + getDefenseStrength() + " HP!");
       output.add(getName() + " tried to deflect " + target.getName() + "'s attack for " + defendedAmount + " HP!", Signals.DEFENSE_PERFORMED, defendedAmount);
     }
-    return output;
   }
 
   // Called every time the Character conducts an offensive attack

@@ -505,8 +505,9 @@ public class BasicCharacter {
       return output;
     }
 
-    output.add(target.defend(this, GameState.truncate(((attack+attackAddifier)*attackMultiplier)-actualDamage,2), output));
+    target.defend(this, GameState.truncate(((attack+attackAddifier)*attackMultiplier)-actualDamage,2), output);
     output.add(Signals.TARGET_HEALTH_LOST, GameState.truncate(actualDamage,2));
+    System.out.println("Handle enemy defense concluded");
     return output;
   }
 
@@ -536,8 +537,12 @@ public class BasicCharacter {
       return output;
     }
 
-    output.add(target.defend(this, GameState.truncate(((attack+attackAddifier)*attackMultiplier)-actualDamage, 2), output));
-    output.add(Signals.TARGET_HEALTH_LOST, GameState.truncate(actualDamage,2));
+    System.out.println("Target defend entered");
+    System.out.println(GameState.truncate(((attack+attackAddifier)*attackMultiplier)-actualDamage, 2));
+    // Fix same object reference bug
+    target.defend(this, GameState.truncate(((attack+attackAddifier)*attackMultiplier)-actualDamage, 2), output);
+    System.out.println("Adding signals");
+    output.add(Signals.TARGET_HEALTH_LOST, Math.max(1,GameState.truncate(actualDamage,2)));
     output.add(Signals.WAS_DAMAGE_TAKEN, 1);
     System.out.println("Handle enemy defense concluded");
     return output;
@@ -589,7 +594,9 @@ public class BasicCharacter {
       for(int i = 0; i < playerTeam.getProtectedCharacters().size(); i++){
         if(playerTeam.getProtectedCharacters().get(i).equals(target)){
           totalProtectedAmount += playerTeam.getProtectedCharacterAmounts().get(i);
-          playerTeam.getProtectingCharacters().get(i).respondToTeammateAttacked(target, enemyTeam.findCharWithID((int)((double)output.getAmount(Signals.DAMAGE_SOURCE))), playerTeam, enemyTeam);
+          if(!playerTeam.getProtectingCharacters().isEmpty()){
+            playerTeam.getProtectingCharacters().get(i).respondToTeammateAttacked(target, enemyTeam.findCharWithID((int)((double)output.getAmount(Signals.DAMAGE_SOURCE))), playerTeam, enemyTeam, output);
+          }
         }
       }
       // System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
@@ -603,7 +610,9 @@ public class BasicCharacter {
       for(int i = 0; i < enemyTeam.getProtectedCharacters().size(); i++){
         if(enemyTeam.getProtectedCharacters().get(i).equals(target)){
           totalProtectedAmount += enemyTeam.getProtectedCharacterAmounts().get(i);
-          enemyTeam.getProtectingCharacters().get(i).respondToTeammateAttacked(target, playerTeam.findCharWithID((int)((double)output.getAmount(Signals.DAMAGE_SOURCE))), playerTeam, enemyTeam);
+          if(!enemyTeam.getProtectingCharacters().isEmpty()){
+            enemyTeam.getProtectingCharacters().get(i).respondToTeammateAttacked(target, playerTeam.findCharWithID((int)((double)output.getAmount(Signals.DAMAGE_SOURCE))), playerTeam, enemyTeam, output);
+          }
         }
       }
       output.add(target.getName() + " received " + totalProtectedAmount + " DEF!", Signals.DEFENSE_RECEIVED, enemyTeam.getProtectedCharacterAmounts().get(index));
@@ -619,7 +628,7 @@ public class BasicCharacter {
   // Handle the print statements shown when a character defends.
   // Damage calculations and accessing enemy functions are managed by helper functions
   // to make subclass overloading easier.
-  public ActionResult defend(BasicCharacter target, double defendedAmount, ActionResult output){
+  public void defend(BasicCharacter target, double defendedAmount, ActionResult output){
     if(isDefending){
       System.out.println(name + " defended against " + target.getName() + " for " + defendedAmount + " HP!");
       output.add(name + " defended against " + target.getName() + " for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
@@ -627,13 +636,11 @@ public class BasicCharacter {
       System.out.println(name + " lightly defended against " + target.getName() + " for " + defendedAmount + " HP!");
       output.add(name + " lightly defended against " + target.getName() + " for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     }
-    return output;
   }
 
   // Optional function implementation for subclasses
   // Automatically called when this character defended another teammate from an attack
-  public ActionResult respondToTeammateAttacked(BasicCharacter teammate, BasicCharacter source, PlayerTeam playerTeam, EnemyTeam enemyTeam){
-    return new ActionResult();
+  public void respondToTeammateAttacked(BasicCharacter teammate, BasicCharacter source, PlayerTeam playerTeam, EnemyTeam enemyTeam, ActionResult output){
   }
   
   // These methods are intended to be overriden by superclasses
