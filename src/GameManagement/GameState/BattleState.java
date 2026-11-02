@@ -43,6 +43,7 @@ public class BattleState extends GameState{
   private final int PLAYER_VICTORY = 12;
   private final int ENEMY_VICTORY = 13;
   private final int ENEMY_REWARDS = 14;
+  private final int HELP = 15;
 
   // Variables stored between steps
   private PlayerCharacter selectedCharacter;
@@ -152,6 +153,8 @@ public class BattleState extends GameState{
           } else{
             dialogManager.add("Your inventory is empty.");
           }
+        }else if(selectedActionType.equals("HELP")){
+          setStep(HELP);
         }else{
           System.out.println("THIS FEATURE ISN'T OUT YET");
         }
@@ -346,6 +349,8 @@ public class BattleState extends GameState{
       } else{
         nextTurnHalfActions();
       }
+    } else if(step == HELP){
+        setStep(SELECT_ACTION);
     }
   }
 
@@ -633,10 +638,10 @@ public class BattleState extends GameState{
       inputHandler = createCharacterOptions(playerTeam.getPlayerTeam(), deadCharacters);
     } else if(step == SELECT_ACTION){
       // Init the possible choice the player can make
-      inputHandler = createOptions(new String[]{"Basic ability", "Special ability", "Use item", "Defend"});
+      inputHandler = createOptions(new String[]{"Basic ability", "Special ability", "Use item", "Defend", "HELP"});
       if(StatusEffect.hasStatusEffect(selectedCharacter, "Taunt")){
         System.out.println("Char is taunted");
-        inputHandler = createOptions(new String[]{"Basic ability", "Special ability", "Use item", "Defend"}, new int[]{0, 1});
+        inputHandler = createOptions(new String[]{"Basic ability", "Special ability", "Use item", "Defend", "HELP"}, new int[]{0, 1});
       }
     } else if(step == SELECT_ABILITY){
       // Init the possible abilities the player can pick from
@@ -721,6 +726,26 @@ public class BattleState extends GameState{
         } else{
           System.out.println("ERROR: ITEM TARGETS EMPTY");
         }
+      }
+    } else if(step == HELP){
+      dialogManager.clear();
+      inputHandler.clear();
+      dialogManager.add(selectedCharacter.getName() + " (" + selectedCharacter.getType() 
+      + "): HP: " + selectedCharacter.getCurrentHP() + "/" + selectedCharacter.getMaxHP()
+      + " ATK: " + selectedCharacter.getAttackStrength()
+      + " DEF: " + selectedCharacter.getDefenseStrength()
+      + " SPD: " + selectedCharacter.getSpeed());
+      dialogManager.add(selectedCharacter.getDescription());
+      dialogManager.add("Unlocked basic abilities:");
+      for(int i = 0; i <= selectedCharacter.getHighestIndexBasic(); i++){
+        dialogManager.add(selectedCharacter.getBasicAbilityNames().get(i) + ": "
+        + selectedCharacter.getBasicAbilityDescriptions().get(i));
+      }
+      dialogManager.add("Unlocked special abilities:");
+      for(int i = 0; i <= selectedCharacter.getHighestIndexSpecial(); i++){
+        dialogManager.add(selectedCharacter.getSpecialAbilityNames().get(i) 
+        + " (CD " + selectedCharacter.getSpecialAbilityCooldowns().get(i) + "): "
+        + selectedCharacter.getSpecialAbilityDescriptions().get(i));
       }
     }
   }

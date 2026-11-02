@@ -121,11 +121,13 @@ public class DialogManager {
         UIManager.setTextColor(graphics, Color.WHITE);
         UIManager.setFontSize(32);
         UIManager.refreshText(graphics);
-        UIManager.drawCenteredStringInBox(graphics, dialogSequence.getMessage(dialogIndex), 0, 500, 1280, 220);
+        int lines = UIManager.drawCenteredStringInBox(graphics, dialogSequence.getMessage(dialogIndex), 0, 500, 1280, 220);
         // Display Press ENTER to continue
-        UIManager.setTextColor(graphics, Color.GRAY);
-        UIManager.setFontSize(25);
-        UIManager.refreshText(graphics);
-        UIManager.drawCenteredStringInBox(graphics, "(Press ENTER to continue)", 0, 680, 1280, 20);
+        if(lines <= 2){
+            UIManager.setTextColor(graphics, Color.GRAY);
+            UIManager.setFontSize(25);
+            UIManager.refreshText(graphics);
+            UIManager.drawCenteredStringInBox(graphics, "(Press ENTER to continue)", 0, 680, 1280, 20);
+        }
     }
 }

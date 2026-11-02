@@ -583,7 +583,7 @@ public class BasicCharacter {
         }
       }
       // System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
-      output.add(target.getName() + " received " + totalProtectedAmount + " defensive strength!", Signals.DEFENSE_RECEIVED, playerTeam.getProtectedCharacterAmounts().get(index));
+      output.add(target.getName() + " received " + totalProtectedAmount + " DEF!", Signals.DEFENSE_RECEIVED, playerTeam.getProtectedCharacterAmounts().get(index));
       defensiveStrength += totalProtectedAmount;
     }
 
@@ -595,7 +595,7 @@ public class BasicCharacter {
           totalProtectedAmount += enemyTeam.getProtectedCharacterAmounts().get(i);
         }
       }
-      output.add(target.getName() + " received " + totalProtectedAmount + " defensive strength!", Signals.DEFENSE_RECEIVED, enemyTeam.getProtectedCharacterAmounts().get(index));
+      output.add(target.getName() + " received " + totalProtectedAmount + " DEF!", Signals.DEFENSE_RECEIVED, enemyTeam.getProtectedCharacterAmounts().get(index));
       defensiveStrength += totalProtectedAmount;
     }
     actualDamage = attack * Math.pow((attack/(attack+defensiveStrength)),1.5);

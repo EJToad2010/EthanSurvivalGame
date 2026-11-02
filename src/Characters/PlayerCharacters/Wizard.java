@@ -6,6 +6,7 @@ import java.util.Scanner;
 import src.Characters.BasicCharacter;
 import src.Characters.PlayerCharacter;
 import src.GameManagement.GameManager;
+import src.GameManagement.GameState.GameState;
 import src.GameManagement.Mechanics.ActionResult;
 import src.GameManagement.Mechanics.Signals;
 import src.GameManagement.UI.ImageManager;
@@ -25,12 +26,12 @@ public class Wizard extends PlayerCharacter {
     setDescription("A fighter who uses magic for very high damage output, while sacrificing health and defense.");
     addToArrayList(getBasicAbilityNames(), new String[]{"Magic Zap", "Shielding Zap"});
     addToArrayList(getBasicAbilityDescriptions(), new String[]{"A single ranged attack that deals moderately high damage, but a small chance to miss.",
-                                                             "A single ranged attack that deals moderate damage and grants temporary defensive strength equal to 25% of the damage dealt."});
+                                                             "A single ranged attack that deals 15% less damage but grants temporary defensive strength equal to 33% of the damage dealt."});
     addToArrayList(getBasicAbilityTypes(), new String[]{"Offensive", "Offensive"});
     addToArrayList(getBasicAbilityUnlockLevels(), new Integer[]{0, 3});
     addToArrayList(getBasicAbilityEnemyCounts(), new Integer[]{1, 1});
     addToArrayList(getBasicAbilityAnimationLengths(), new Integer[]{10, 0});
-    addToArrayList(getBasicAbilityAccuracies(), new Double[]{0.85, 0.95});
+    addToArrayList(getBasicAbilityAccuracies(), new Double[]{0.85, 0.9});
     addToArrayList(getSpecialAbilityNames(), new String[]{"Fireball", "Spirit Calling"});
     addToArrayList(getSpecialAbilityDescriptions(), new String[]{"Deals heavy damage to a single target and has a 25% chance to burn the enemy.",
                                                                "The Wizard calls on the spirits to unleash a powerful attack. There is a 50% for attack power to be doubled, but a 50% for attack power to be reduced by 75%."});
@@ -66,10 +67,10 @@ public class Wizard extends PlayerCharacter {
       //System.out.println(target.getSimpleOutput());
     } else if(basicAbilityIndex == 1){
       // Shielding Zap
-      output.add(getName() + " fired a shielding zap at " + target.getName() + " for " + (getAttackStrength() - 10) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()-20);
-      output.add(handleEnemyDefense(target,0, basicAbilityIndex, getAttackStrength() - 10, playerTeam, enemyTeam));
+      output.add(getName() + " fired a shielding zap at " + target.getName() + " for " + GameState.truncate((getAttackStrength() * 0.85), 2) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength()-20);
+      output.add(handleEnemyDefense(target,0, basicAbilityIndex, GameState.truncate((getAttackStrength() * 0.85), 2), playerTeam, enemyTeam));
       playerTeam.getProtectedCharacters().add(this);
-      playerTeam.getProtectedCharacterAmounts().add((getAttackStrength() - 10) / 4);
+      playerTeam.getProtectedCharacterAmounts().add(GameState.truncate((getAttackStrength() - 10) / 3, 2));
       output.add(getName() + "'s force field gained " + (getAttackStrength() - 10) / 4 + " defensive strength!");
       //System.out.println(target.getSimpleOutput());
     }
