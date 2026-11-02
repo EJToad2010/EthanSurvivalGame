@@ -160,6 +160,7 @@ public class PlayerTeam {
   // Given an ID, look for a PlayerCharacter in this team with that ID
   // return null if none found
   public PlayerCharacter findCharWithID(int id){
+    System.out.println("Finding char with ID");
     for(PlayerCharacter p : playerTeam){
       if(p.getID() == id){
         return p;

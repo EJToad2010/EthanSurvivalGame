@@ -22,7 +22,7 @@ public class Main {
   
   // Class: PlayerTeam
   // Class: EnemyTeam
-  // Class: GameManager
+  //Class: GameManager
   public static void main(String[] args) throws IOException, InterruptedException{
     // Running the restructured game.
     new GameFrame();
