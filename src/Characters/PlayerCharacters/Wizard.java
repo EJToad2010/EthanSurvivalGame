@@ -119,8 +119,7 @@ public class Wizard extends PlayerCharacter {
   }
   
   // Defense function which is called when an enemy targets the Wizard
-  public ActionResult defend(BasicCharacter target, double defendedAmount){
-    ActionResult output = new ActionResult();
+  public ActionResult defend(BasicCharacter target, double defendedAmount, ActionResult output){
     if(getIsDefending()){
       //System.out.println(getName() + " partially cancelled " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
       output.add(getName() + "'s force field partially cancelled " + target.getName() + "'s attack for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);

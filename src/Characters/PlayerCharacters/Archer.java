@@ -110,8 +110,7 @@ public class Archer extends PlayerCharacter {
   }
   
   // Defense function which is called when an enemy targets the Archer
-  public ActionResult defend(BasicCharacter target, double defendedAmount){
-    ActionResult output = new ActionResult();
+  public ActionResult defend(BasicCharacter target, double defendedAmount, ActionResult output){
     if(getIsDefending()){
       //System.out.println(getName() + " partially dodged " + target.getName() + "'s attack for " + getDefenseStrength() * 2 + " HP!");
       output.add(getName() + " partially dodged " + target.getName() + "'s attack for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);

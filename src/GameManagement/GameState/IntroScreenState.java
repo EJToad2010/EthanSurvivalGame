@@ -13,6 +13,7 @@ public class IntroScreenState extends GameState{
         dialogManager.add("You have been hired to defeat the enemies attacking your kingdom.");
         dialogManager.add("Train skilled fighters and survive as long as possible!");
         dialogManager.add("Make skilled decisions. They will have a major impact on your success.");
+        dialogManager.add("Your journey begins in a land infested with goblins...");
         dialogManager.add("Good luck on your journey...");
         isAnimating = true;
         setFrame(10);

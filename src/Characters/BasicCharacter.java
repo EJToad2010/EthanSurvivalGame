@@ -491,10 +491,12 @@ public class BasicCharacter {
   // Use this version of handleEnemyDefense if accuracy should be guaranteed (100%)
   protected ActionResult handleEnemyDefense(BasicCharacter target, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
+    output.add(Signals.DAMAGE_SOURCE, getID());
     double actualDamage;
     double attackMultiplier = 1.0;
     double attackAddifier = 0;
     attackMultiplier = calculateAttackReductionEffects(target, attackMultiplier, output);
+    output.add(Signals.ORIGINAL_ATTACK_POWER, (attack+attackAddifier)*attackMultiplier);
     actualDamage = calculateActualDamage(target, (attack+attackAddifier)*attackMultiplier, playerTeam, enemyTeam, output);
 
     if(checkForEvasion(target)){
@@ -503,7 +505,7 @@ public class BasicCharacter {
       return output;
     }
 
-    output.add(target.defend(this, GameState.truncate(((attack+attackAddifier)*attackMultiplier)-actualDamage,2)));
+    output.add(target.defend(this, GameState.truncate(((attack+attackAddifier)*attackMultiplier)-actualDamage,2), output));
     output.add(Signals.TARGET_HEALTH_LOST, GameState.truncate(actualDamage,2));
     return output;
   }
@@ -511,10 +513,12 @@ public class BasicCharacter {
   // Use this version of handleEnemyDefense to handle accuracy
   protected ActionResult handleEnemyDefense(BasicCharacter target, int abilityType, int abilityIndex, double attack, PlayerTeam playerTeam, EnemyTeam enemyTeam){
     ActionResult output = new ActionResult();
+    output.add(Signals.DAMAGE_SOURCE, getID());
     double actualDamage;
     double attackMultiplier = 1.0;
     double attackAddifier = 0;
     attackMultiplier = calculateAttackReductionEffects(target, attackMultiplier, output);
+    output.add(Signals.ORIGINAL_ATTACK_POWER, (attack+attackAddifier)*attackMultiplier);
     actualDamage = calculateActualDamage(target, (attack+attackAddifier)*attackMultiplier, playerTeam, enemyTeam, output);
     if(abilityType == 0 && Math.random() > getBasicAbilityAccuracies().get(abilityIndex) + getAccuracyModifier()){
       // Missed attack
@@ -532,9 +536,10 @@ public class BasicCharacter {
       return output;
     }
 
-    output.add(target.defend(this, GameState.truncate(((attack+attackAddifier)*attackMultiplier)-actualDamage, 2)));
+    output.add(target.defend(this, GameState.truncate(((attack+attackAddifier)*attackMultiplier)-actualDamage, 2), output));
     output.add(Signals.TARGET_HEALTH_LOST, GameState.truncate(actualDamage,2));
     output.add(Signals.WAS_DAMAGE_TAKEN, 1);
+    System.out.println("Handle enemy defense concluded");
     return output;
   }
 
@@ -552,6 +557,10 @@ public class BasicCharacter {
     if(StatusEffect.hasStatusEffect(target, "Calcified")){
       output.add("Attack was reduced by 10% from " + target.getName() + " being CALCIFIED!");
       return attackMultiplier * 0.9;
+    }
+    if(StatusEffect.hasStatusEffect(target, "Shielded")){
+      output.add("Attack was reduced by 50% from " + target.getName() + " being SHIELDED!");
+      return attackMultiplier * 0.5;
     }
     return attackMultiplier;
   }
@@ -580,6 +589,7 @@ public class BasicCharacter {
       for(int i = 0; i < playerTeam.getProtectedCharacters().size(); i++){
         if(playerTeam.getProtectedCharacters().get(i).equals(target)){
           totalProtectedAmount += playerTeam.getProtectedCharacterAmounts().get(i);
+          playerTeam.getProtectingCharacters().get(i).respondToTeammateAttacked(target, enemyTeam.findCharWithID((int)((double)output.getAmount(Signals.DAMAGE_SOURCE))), playerTeam, enemyTeam);
         }
       }
       // System.out.println(target.getName() + " received " + playerTeam.getProtectedCharacterAmounts().get(index) + " defensive strength from a teammate!");
@@ -593,6 +603,7 @@ public class BasicCharacter {
       for(int i = 0; i < enemyTeam.getProtectedCharacters().size(); i++){
         if(enemyTeam.getProtectedCharacters().get(i).equals(target)){
           totalProtectedAmount += enemyTeam.getProtectedCharacterAmounts().get(i);
+          enemyTeam.getProtectingCharacters().get(i).respondToTeammateAttacked(target, playerTeam.findCharWithID((int)((double)output.getAmount(Signals.DAMAGE_SOURCE))), playerTeam, enemyTeam);
         }
       }
       output.add(target.getName() + " received " + totalProtectedAmount + " DEF!", Signals.DEFENSE_RECEIVED, enemyTeam.getProtectedCharacterAmounts().get(index));
@@ -608,8 +619,7 @@ public class BasicCharacter {
   // Handle the print statements shown when a character defends.
   // Damage calculations and accessing enemy functions are managed by helper functions
   // to make subclass overloading easier.
-  public ActionResult defend(BasicCharacter target, double defendedAmount){
-    ActionResult output = new ActionResult();
+  public ActionResult defend(BasicCharacter target, double defendedAmount, ActionResult output){
     if(isDefending){
       System.out.println(name + " defended against " + target.getName() + " for " + defendedAmount + " HP!");
       output.add(name + " defended against " + target.getName() + " for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
@@ -618,6 +628,12 @@ public class BasicCharacter {
       output.add(name + " lightly defended against " + target.getName() + " for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     }
     return output;
+  }
+
+  // Optional function implementation for subclasses
+  // Automatically called when this character defended another teammate from an attack
+  public ActionResult respondToTeammateAttacked(BasicCharacter teammate, BasicCharacter source, PlayerTeam playerTeam, EnemyTeam enemyTeam){
+    return new ActionResult();
   }
   
   // These methods are intended to be overriden by superclasses

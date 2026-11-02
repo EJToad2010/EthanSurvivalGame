@@ -5,10 +5,15 @@ package src.GameManagement.Mechanics;
 public class Signals {
     // Used to inform DialogManager that an action has been performed
     public static final String ATTACK_PERFORMED = "ATTACK_PERFORMED";
+    public static final String COUNTERATTACK_PERFORMED = "COUNTERATTACK_PERFORMED";
     public static final String DEFENSE_RECEIVED = "DEFENSE_RECEIVED";
     public static final String DEFENSE_PERFORMED = "DEFENSE_PERFORMED";
     // 0 = false, 1 = true whether a character took damage while defending
     public static final String WAS_DAMAGE_TAKEN = "WAS_DAMAGE_TAKEN";
+    // Null message stat containing the ID of the source of an attack
+    public static final String DAMAGE_SOURCE = "DAMAGE_SOURCE";
+    // The original attack power before defense applied
+    public static final String ORIGINAL_ATTACK_POWER = "ORIGINAL_ATTACK_POWER";
     // Stat changes
     // Used to control any HP changes besides pure attack / defense
     public static final String HEALTH_LOST = "HEALTH_LOST";

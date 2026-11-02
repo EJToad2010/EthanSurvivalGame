@@ -98,7 +98,7 @@ public class BattleState extends GameState{
       handleDialogEndedLogic(currentStep);
     }
     if(currentStep > 0){
-      checkWinConditions();
+      //checkWinConditions();
     }
     if(currentStep == INTRO_ANIM){
           nextTick();

@@ -26,6 +26,7 @@ public class EnemyTeam {
   // Handle characters who defend each other from enemy attacks
   private ArrayList<EnemyCharacter> protectedCharacters = new ArrayList<EnemyCharacter>();
   private ArrayList<Double> protectedCharacterAmounts = new ArrayList<Double>();
+  private ArrayList<EnemyCharacter> protectingCharacters = new ArrayList<EnemyCharacter>();
   
   // Constructor that takes in an exisiting ArrayList and modifies its components into an enemy
   public EnemyTeam(ArrayList<EnemyCharacter> enemyTeam, Inventory enemyInventory){
@@ -81,6 +82,11 @@ public class EnemyTeam {
   public ArrayList<Double> getProtectedCharacterAmounts(){
     return protectedCharacterAmounts;
   }
+
+  // Parallel to getProtectedCharacters that describes who is providing the defensive strength
+  public ArrayList<EnemyCharacter> getProtectingCharacters(){
+    return protectingCharacters;
+  }
   
   // The total of each player character's speed value
   // Used at the start of battle to decide which team goes first
@@ -121,6 +127,7 @@ public class EnemyTeam {
   public void resetProtectedCharacters(){
     protectedCharacters.clear();
     protectedCharacterAmounts.clear();
+    protectingCharacters.clear();
   }
 
    // Return the index of a Character in protectedCharacters
