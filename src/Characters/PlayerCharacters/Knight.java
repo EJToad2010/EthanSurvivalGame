@@ -60,7 +60,7 @@ public class Knight extends PlayerCharacter {
       //System.out.println(target.getSimpleOutput());
       
       if(!target.getIsDead()){
-        int counterAttackDamage = (int)(Math.random() * 3) + 3;
+        int counterAttackDamage = (int)(Math.random() * 3) + 1;
         //Thread.sleep(1000);
         //System.out.println(target.getName() + " counterattacked for " + (double) counterAttackDamage + " HP!");
         output.add(target.getName() + " counterattacked for " + (double) counterAttackDamage + " HP!", Signals.HEALTH_LOST, (double)counterAttackDamage);
@@ -71,8 +71,8 @@ public class Knight extends PlayerCharacter {
     } else if(basicAbilityIndex == 1){
       // Cautious Attack
       //System.out.println(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 8) + " HP!");
-      output.add(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 8) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength() - 8);
-      output.add(handleEnemyDefense(target, getAttackStrength() - 8, playerTeam, enemyTeam));
+      output.add(getName() + " cautiously swung their sword at " + target.getName() + " for " + (getAttackStrength() - 5) + " HP!", Signals.ATTACK_PERFORMED, getAttackStrength() - 8);
+      output.add(handleEnemyDefense(target, getAttackStrength() - 5, playerTeam, enemyTeam));
       //System.out.println(target.getSimpleOutput());
     }
     System.out.println("Basic ability Knight concluded");
@@ -118,16 +118,17 @@ public class Knight extends PlayerCharacter {
       //System.out.println(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + getDefenseStrength() + " HP!");
       output.add(getName() + " lightly blocked " + target.getName() + "'s attack with their shield for " + defendedAmount + " HP!",Signals.DEFENSE_PERFORMED, defendedAmount);
     }
-  checkShieldedEffect(this, output);
+  checkShieldedEffect(this, target, output);
   }
 
   public void respondToTeammateAttacked(BasicCharacter teammate, BasicCharacter source, PlayerTeam playerTeam, EnemyTeam enemyTeam, ActionResult output){
-    checkShieldedEffect(teammate, output);
+    checkShieldedEffect(teammate, source, output);
   }
 
-  private void checkShieldedEffect(BasicCharacter target, ActionResult output){
+  private void checkShieldedEffect(BasicCharacter target, BasicCharacter source, ActionResult output){
     if(StatusEffect.hasStatusEffect(target, "Shielded")){
       double counterattackAmount = GameState.truncate(output.getAmount(Signals.ORIGINAL_ATTACK_POWER),2);
+      output.add(Signals.TARGET_OBJECT, source.getID());
       output.add(Signals.HEALTH_LOST, counterattackAmount);
       // Counterattack signal not yet implented
       output.add(getName() + " used Shield Counter to counterattack for " + counterattackAmount + " HP!", Signals.COUNTERATTACK_PERFORMED);
